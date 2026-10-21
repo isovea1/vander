@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>VANDER - Gestiune Atelier</title>
     <style>
         :root {
@@ -16,71 +16,677 @@
             --text-main: #0f172a;
             --text-muted: #64748b;
             --border: #cbd5e1;
-            --radius: 10px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            --sidebar-bg: #1e293b;
+            --radius: 12px;
+            --shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+            --sidebar-bg: #111827;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg); color: var(--text-main); padding: 15px 10px; line-height: 1.5; }
-        .container { max-width: 900px; margin: 0 auto; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
 
-        /* Sidebar Styling - Mai îngust */
-        #sidebarOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 999; display: none; }
-        .sidebar { position: fixed; top: 0; left: -240px; width: 240px; height: 100%; background: var(--sidebar-bg); color: #fff; z-index: 1000; transition: left 0.3s ease; display: flex; flex-direction: column; box-shadow: 4px 0 10px rgba(0,0,0,0.3); }
-        .sidebar.open { left: 0; }
-        .sidebar-header { padding: 16px; border-bottom: 1px solid #334155; display: flex; align-items: center; justify-content: space-between; }
-        .sidebar-brand { font-size: 1.05rem; font-weight: 800; letter-spacing: 0.5px; }
-        .sidebar-user { padding: 15px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #334155; background: #0f172a; }
-        .sidebar-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background: #cbd5e1; }
-        .sidebar-user-name { font-size: 0.85rem; font-weight: 600; }
-        .sidebar-menu { list-style: none; padding: 8px 0; flex-grow: 1; overflow-y: auto; }
-        .sidebar-menu li a { display: flex; align-items: center; gap: 10px; padding: 11px 16px; color: #cbd5e1; text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.2s, color 0.2s; cursor: pointer; }
-        .sidebar-menu li a:hover, .sidebar-menu li.active a { background: #334155; color: #fff; }
-        .sidebar-footer { padding: 12px 16px; border-top: 1px solid #334155; }
-        .sidebar-logout-btn { background: transparent; border: none; color: #f87171; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; width: 100%; padding: 8px; border-radius: 6px; }
-        .sidebar-logout-btn:hover { background: rgba(248, 113, 113, 0.1); }
+        html, body {
+            min-height: 100%;
+        }
 
-        /* Header */
-        .app-header { background: var(--card-bg); padding: 20px; border-radius: var(--radius); box-shadow: var(--shadow); text-align: center; margin-bottom: 16px; border: 1px solid var(--border); position: relative; }
-        .logo-img { height: 40px; object-fit: contain; margin-bottom: 8px; }
-        .app-header h1 { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
-        .app-header p { color: var(--text-muted); font-size: 0.8rem; }
-        
-        .menu-toggle-btn { position: absolute; top: 15px; left: 15px; background: #f1f5f9; border: 1px solid var(--border); color: var(--primary); padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        .top-bar-btns { position: absolute; top: 15px; right: 15px; }
-        .btn-outline { background: #fef2f2; border: 1px solid #fecaca; color: var(--danger); padding: 5px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
+        body {
+            background: var(--bg);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding: 15px 10px;
+        }
 
-        /* Stats Grid */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-        .stat-card { background: var(--card-bg); padding: 15px; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); text-align: center; }
-        .stat-number { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
-        .stat-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; }
+        button, input, select, textarea {
+            font: inherit;
+        }
 
-        /* Cards */
-        .card { background: var(--card-bg); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); }
-        .card h2 { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 15px; }
+        a {
+            text-decoration: none;
+        }
 
-        /* Form elements */
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--primary); margin-bottom: 5px; text-transform: uppercase; }
-        input[type="text"], input[type="password"], input[type="number"], select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; background: #f8fafc; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); background: #fff; }
-        
-        .sizes-grid-container { display: flex; gap: 6px; flex-wrap: wrap; background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid var(--border); }
-        .size-box { text-align: center; background: white; padding: 6px; border-radius: 4px; border: 1px solid var(--border); flex: 1; min-width: 40px; }
-        .size-box span { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 2px; }
-        .size-box input { width: 100%; text-align: center; padding: 4px; font-weight: 700; font-size: 0.85rem; border: 1px solid var(--border); border-radius: 4px; }
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+        }
 
-        /* Buttons */
-        .btn-primary { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; border-radius: 6px; font-size: 0.95rem; font-weight: 700; cursor: pointer; }
-        .btn-primary:hover { background: #1d4ed8; }
-        .btn-secondary { background: #64748b; color: white; border: none; padding: 12px; border-radius: 6px; font-size: 0.90rem; font-weight: 700; cursor: pointer; }
+        #sidebarOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.38);
+            z-index: 999;
+            display: none;
+        }
 
-        /* Import Box */
-        .import-box { background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px dashed var(--border); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        #sidebarOverlay.show {
+            display: block;
+        }
 
-        /* Search & Filter inputs */
-        .filter-row { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .search-input, .filter-select { width: 100
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -260px;
+            width: 240px;
+            height: 100vh;
+            background: var(--sidebar-bg);
+            color: #fff;
+            z-index: 1000;
+            transition: left 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 12px 0 28px rgba(15, 23, 42, 0.2);
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 18px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-brand {
+            font-size: 1.05rem;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+        }
+
+        .sidebar-user {
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        .sidebar-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #cbd5e1;
+        }
+
+        .sidebar-user-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 10px 0;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .sidebar-menu li a:hover,
+        .sidebar-menu li.active a {
+            background: rgba(148, 163, 184, 0.15);
+            color: #fff;
+        }
+
+        .sidebar-footer {
+            padding: 12px 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .sidebar-logout-btn {
+            background: transparent;
+            border: none;
+            color: #f87171;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+        }
+
+        .sidebar-logout-btn:hover {
+            background: rgba(248, 113, 113, 0.08);
+        }
+
+        .app-header {
+            position: relative;
+            background: var(--card-bg);
+            padding: 22px 20px 18px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .logo-img {
+            display: block;
+            height: 42px;
+            object-fit: contain;
+            margin: 0 auto 8px;
+        }
+
+        .app-header h1 {
+            font-size: clamp(1.2rem, 2vw, 1.55rem);
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .app-header p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .menu-toggle-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            color: var(--primary);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .top-bar-btns {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+
+        .btn-outline {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: var(--danger);
+            padding: 7px 10px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 18px 16px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .card h2 {
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: #f8fafc;
+            color: var(--text-main);
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .sizes-grid-container {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .size-box {
+            flex: 1 1 40px;
+            min-width: 40px;
+            text-align: center;
+            background: #fff;
+            padding: 8px 6px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .size-box span {
+            display: block;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .size-box input {
+            width: 100%;
+            text-align: center;
+            padding: 4px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: white;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: #64748b;
+            color: #fff;
+            border: none;
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .import-box {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px dashed var(--border);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .search-input, .filter-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: white;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+        }
+
+        th, td {
+            border-bottom: 1px solid var(--border);
+            padding: 10px 8px;
+            text-align: left;
+            font-size: 0.82rem;
+        }
+
+        th {
+            background: #f8fafc;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .status.in-stock {
+            background: rgba(22, 163, 74, 0.12);
+            color: var(--success);
+        }
+
+        .status.low {
+            background: rgba(234, 179, 8, 0.15);
+            color: #a16207;
+        }
+
+        .status.out {
+            background: rgba(220, 38, 38, 0.12);
+            color: var(--danger);
+        }
+
+        @media (max-width: 700px) {
+            .stats-grid,
+            .form-row,
+            .filter-row {
+                grid-template-columns: 1fr;
+            }
+
+            .app-header {
+                padding-top: 54px;
+            }
+
+            .top-bar-btns {
+                right: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebarOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">VANDER</div>
+            <button class="btn-outline" type="button" id="closeSidebarBtn">X</button>
+        </div>
+
+        <div class="sidebar-user">
+            <img src="https://via.placeholder.com/36" alt="User" class="sidebar-avatar" />
+            <div class="sidebar-user-name">Admin Atelier</div>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li class="active"><a href="#">Dashboard</a></li>
+            <li><a href="#">Produse</a></li>
+            <li><a href="#">Comenzi</a></li>
+            <li><a href="#">Stocuri</a></li>
+            <li><a href="#">Clienti</a></li>
+            <li><a href="#">Facturi</a></li>
+            <li><a href="#">Setări</a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <button class="sidebar-logout-btn" type="button">🡢 Deconectare</button>
+        </div>
+    </aside>
+
+    <div class="container">
+        <header class="app-header">
+            <button class="menu-toggle-btn" id="menuToggleBtn" type="button">☰</button>
+            <div class="top-bar-btns">
+                <button class="btn-outline" type="button">LOGOUT</button>
+            </div>
+            <img class="logo-img" src="https://via.placeholder.com/150x40?text=VANDER" alt="VANDER logo" />
+            <h1>Gestiune Atelier</h1>
+            <p>Control complet al produselor, stocurilor și comenzilor</p>
+        </header>
+
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">128</div>
+                <div class="stat-label">Produse</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">42</div>
+                <div class="stat-label">Comenzi</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">96%</div>
+                <div class="stat-label">Stoc disponibil</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">€ 18.4k</div>
+                <div class="stat-label">Vânzări</div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Adăugare produs</h2>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="numeProdus">Nume produs</label>
+                    <input id="numeProdus" type="text" value="Pantalon Denim" />
+                </div>
+                <div class="form-group">
+                    <label for="codProdus">Cod produs</label>
+                    <input id="codProdus" type="text" value="VD-2048" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="categorie">Categorie</label>
+                    <select id="categorie">
+                        <option>Men</option>
+                        <option>Women</option>
+                        <option>Kids</option>
+                        <option>Accesorii</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pret">Preț de vânzare</label>
+                    <input id="pret" type="number" value="149" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Mărimi</label>
+                <div class="sizes-grid-container">
+                    <div class="size-box">
+                        <span>XS</span>
+                        <input type="number" value="6" />
+                    </div>
+                    <div class="size-box">
+                        <span>S</span>
+                        <input type="number" value="12" />
+                    </div>
+                    <div class="size-box">
+                        <span>M</span>
+                        <input type="number" value="18" />
+                    </div>
+                    <div class="size-box">
+                        <span>L</span>
+                        <input type="number" value="14" />
+                    </div>
+                    <div class="size-box">
+                        <span>XL</span>
+                        <input type="number" value="8" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="observatii">Observații</label>
+                <textarea id="observatii" rows="3">Material: denim premium, cusături rezistente, livrare în 48h.</textarea>
+            </div>
+
+            <button class="btn-primary" type="button">Salvează produs</button>
+        </section>
+
+        <section class="card">
+            <h2>Import date</h2>
+            <div class="import-box">
+                <button class="btn-secondary" type="button">Import CSV</button>
+                <button class="btn-secondary" type="button">Import Excel</button>
+                <span>Fișiere acceptate: .csv, .xlsx</span>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Stocuri disponibile</h2>
+
+            <div class="filter-row">
+                <input class="search-input" type="text" placeholder="Caută produs, cod sau categorie..." />
+                <select class="filter-select">
+                    <option>Toate</option>
+                    <option>Disponibil</option>
+                    <option>Stoc redus</option>
+                    <option>Epuizat</option>
+                </select>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Produs</th>
+                            <th>Cod</th>
+                            <th>Categorie</th>
+                            <th>Stoc</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Pantalon Denim</td>
+                            <td>VD-2048</td>
+                            <td>Men</td>
+                            <td>24</td>
+                            <td><span class="status in-stock">Disponibil</span></td>
+                        </tr>
+                        <tr>
+                            <td>Jachetă Urban</td>
+                            <td>VD-1182</td>
+                            <td>Women</td>
+                            <td>7</td>
+                            <td><span class="status low">Stoc redus</span></td>
+                        </tr>
+                        <tr>
+                            <td>Tricou Basic</td>
+                            <td>VD-7710</td>
+                            <td>Kids</td>
+                            <td>0</td>
+                            <td><span class="status out">Epuizat</span></td>
+                        </tr>
+                        <tr>
+                            <td>Geantă Travel</td>
+                            <td>VD-3860</td>
+                            <td>Accesorii</td>
+                            <td>15</td>
+                            <td><span class="status in-stock">Disponibil</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const menuToggleBtn = document.getElementById('menuToggleBtn');
+        const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+
+        function openSidebar() {
+            sidebar.classList.add('open');
+            sidebarOverlay.classList.add('show');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('show');
+        }
+
+        menuToggleBtn.addEventListener('click', openSidebar);
+        closeSidebarBtn.addEventListener('click', closeSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+    </script>
+</body>
+</html>
