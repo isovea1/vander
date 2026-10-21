@@ -4,10 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VANDER - Gestiune Atelier</title>
-    <!-- Includere Flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <!-- Includere Flatpickr Shortcut Buttons Plugin CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/shortcutButtons/style.css">
     <style>
         :root {
             --primary: #0f172a;
@@ -257,10 +254,8 @@
             <div id="productsList"></div>
         </section>
     </div>
-    <!-- Script Flatpickr JS și Plugin Shortcut Buttons -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ro.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/shortcutButtons/shortcutButtons.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
@@ -281,53 +276,13 @@
         let products = [];
         let historyLogs = [];
         const standardSizes = ["39", "40", "41", "42", "43", "44", "45"];
-        let todayObj = new Date();
-        let todayStr = todayObj.toISOString().split('T')[0];
-        let selectedStartDate = todayStr;
-        let selectedEndDate = todayStr;
-
-        // Inițializare Calendar cu intervale standard
+        let selectedStartDate = new Date().toISOString().split('T')[0];
+        let selectedEndDate = new Date().toISOString().split('T')[0];
         flatpickr("#historyDateRange", {
             mode: "range",
             dateFormat: "Y-m-d",
             locale: "ro",
             defaultDate: [selectedStartDate, selectedEndDate],
-            plugins: [
-                shortcutButtonsPlugin({
-                    button: [
-                        { label: "Astăzi" },
-                        { label: "Ieri" },
-                        { label: "Ultimele 7 zile" },
-                        { label: "Luna curentă" },
-                        { label: "Luna trecută" }
-                    ],
-                    onClick: (index, fp) => {
-                        let dStart = new Date();
-                        let dEnd = new Date();
-                        if (index === 0) {
-                            dStart = new Date();
-                            dEnd = new Date();
-                        } else if (index === 1) {
-                            dStart.setDate(todayObj.getDate() - 1);
-                            dEnd = new Date(dStart);
-                        } else if (index === 2) {
-                            dStart.setDate(todayObj.getDate() - 6);
-                            dEnd = new Date();
-                        } else if (index === 3) {
-                            dStart = new Date(todayObj.getFullYear(), todayObj.getMonth(), 1);
-                            dEnd = new Date();
-                        } else if (index === 4) {
-                            dStart = new Date(todayObj.getFullYear(), todayObj.getMonth() - 1, 1);
-                            dEnd = new Date(todayObj.getFullYear(), todayObj.getMonth(), 0);
-                        }
-                        selectedStartDate = dStart.toISOString().split('T')[0];
-                        selectedEndDate = dEnd.toISOString().split('T')[0];
-                        fp.setDate([selectedStartDate, selectedEndDate], true);
-                        fp.close();
-                        renderHistory();
-                    }
-                })
-            ],
             onChange: function(selectedDates, dateStr, instance) {
                 if (selectedDates.length === 2) {
                     selectedStartDate = instance.formatDate(selectedDates[0], "Y-m-d");
@@ -340,7 +295,6 @@
                 }
             }
         });
-
         const loginOverlay = document.getElementById('loginOverlay');
         const appMainContent = document.getElementById('appMainContent');
         const loginForm = document.getElementById('loginForm');
