@@ -108,7 +108,7 @@
         <div class="login-card">
             <img src="logo.png" alt="VANDER" style="height: 35px; margin-bottom: 12px;" onerror="this.style.display='none'">
             <h2 style="margin-bottom: 12px; font-size: 1.1rem; color: var(--primary);">Autentificare Atelier</h2>
-            <form id="loginForm">
+            <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="form-group" style="text-align: left;">
                     <label>Utilizator</label>
                     <input type="text" id="loginUser" required autocomplete="username" placeholder="ex: vander" />
@@ -142,7 +142,7 @@
             <li><a href="javascript:void(0)" onclick="filterByCategory('Ghete')">👢 Ghete / Botine / Cizme</a></li>
         </ul>
         <div class="sidebar-footer">
-            <button type="button" id="sidebarLogoutBtn" class="sidebar-logout-btn">
+            <button type="button" id="sidebarLogoutBtn" class="sidebar-logout-btn" onclick="handleLogout()">
                 <span>🚪 Logout</span>
             </button>
         </div>
@@ -151,7 +151,7 @@
         <header class="app-header">
             <button type="button" class="menu-toggle-btn" onclick="toggleSidebar()">☰ Meniu</button>
             <div class="top-bar-btns">
-                <button type="button" id="logoutBtn" class="btn-outline">Ieșire</button>
+                <button type="button" id="logoutBtn" class="btn-outline" onclick="handleLogout()">Ieșire</button>
             </div>
             <img src="logo.png" alt="VANDER Atelier" class="logo-img" onerror="this.style.display='none'" />
             <h1>VANDER - Gestiune Atelier</h1>
@@ -267,6 +267,53 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ro.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/shortcutButtons/shortcutButtons.js"></script>
+    <script>
+        // Funcții globale de autentificare plasate direct în fereastră pentru acces instant
+        const AUTH_KEY = 'vander_auth_active';
+        const CORRECT_USER = 'vander';
+        const CORRECT_PASS = 'atelier2026';
+
+        function checkAuth() {
+            const isLogged = localStorage.getItem(AUTH_KEY);
+            const loginOverlay = document.getElementById('loginOverlay');
+            const appMainContent = document.getElementById('appMainContent');
+            if (isLogged === 'true') {
+                if (loginOverlay) loginOverlay.style.display = 'none';
+                if (appMainContent) appMainContent.style.display = 'block';
+            } else {
+                if (loginOverlay) loginOverlay.style.display = 'flex';
+                if (appMainContent) appMainContent.style.display = 'none';
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('loginUser').value.trim();
+            const pass = document.getElementById('loginPass').value.trim();
+
+            if (user === CORRECT_USER && pass === CORRECT_PASS) {
+                localStorage.setItem(AUTH_KEY, 'true');
+                document.getElementById('loginPass').value = '';
+                checkAuth();
+                if (typeof window.initRealtimeSync === 'function') {
+                    window.initRealtimeSync();
+                }
+            } else {
+                alert('Utilizator sau parolă incorectă!');
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem(AUTH_KEY);
+            checkAuth();
+            location.reload();
+        }
+
+        // Verificare imediată la încărcarea paginii
+        window.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+        });
+    </script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
@@ -283,10 +330,6 @@
         const db = getDatabase(app);
         const productsRef = ref(db, 'vander_produse');
         const historyRef = ref(db, 'vander_istoric');
-        
-        const AUTH_KEY = 'vander_logged_in_state';
-        const CORRECT_USER = 'vander';
-        const CORRECT_PASS = 'atelier2026';
 
         let products = [];
         let historyLogs = [];
@@ -350,13 +393,6 @@
             }
         });
 
-        const loginOverlay = document.getElementById('loginOverlay');
-        const appMainContent = document.getElementById('appMainContent');
-        const loginForm = document.getElementById('loginForm');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const sidebarLogoutBtn = document.getElementById('sidebarLogoutBtn');
-        const syncStatus = document.getElementById('syncStatus');
-
         window.toggleSidebar = function() {
             const sidebar = document.getElementById('appSidebar');
             const overlay = document.getElementById('sidebarOverlay');
@@ -383,42 +419,9 @@
         }
         window.filterByCategory = filterByCategory;
 
-        function checkAuth() {
-            let logged = localStorage.getItem(AUTH_KEY);
-            if (logged === 'true') {
-                loginOverlay.style.display = 'none';
-                appMainContent.style.display = 'block';
-                initRealtimeSync();
-            } else {
-                loginOverlay.style.display = 'flex';
-                appMainContent.style.display = 'none';
-            }
-        }
-
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const user = document.getElementById('loginUser').value.trim();
-            const pass = document.getElementById('loginPass').value.trim();
-
-            if (user === CORRECT_USER && pass === CORRECT_PASS) {
-                localStorage.setItem(AUTH_KEY, 'true');
-                document.getElementById('loginPass').value = '';
-                checkAuth();
-            } else {
-                alert('Utilizator sau parolă incorectă!');
-            }
-        });
-
-        function handleLogout() {
-            localStorage.removeItem(AUTH_KEY);
-            checkAuth();
-        }
-        logoutBtn.addEventListener('click', handleLogout);
-        sidebarLogoutBtn.addEventListener('click', handleLogout);
-        checkAuth();
-
-        function initRealtimeSync() {
-            syncStatus.innerText = "⏳ Se sincronizează live...";
+        window.initRealtimeSync = function() {
+            const syncStatus = document.getElementById('syncStatus');
+            if(syncStatus) syncStatus.innerText = "⏳ Se sincronizează live...";
             onValue(productsRef, (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -429,10 +432,10 @@
                     ];
                     set(productsRef, products);
                 }
-                syncStatus.innerText = "● Sincronizat Online în Timp Real";
+                if(syncStatus) syncStatus.innerText = "● Sincronizat Online în Timp Real";
                 renderProducts();
             }, () => {
-                syncStatus.innerText = "● Eroare conexiune rețea";
+                if(syncStatus) syncStatus.innerText = "● Eroare conexiune rețea";
             });
             onValue(ref(db, 'vander_istoric'), (snapshot) => {
                 const data = snapshot.val();
@@ -444,6 +447,12 @@
                 renderHistory();
             });
         }
+
+        // Dacă e deja logat, pornește sincronizarea la pornire
+        if(localStorage.getItem('vander_auth_active') === 'true') {
+            window.initRealtimeSync();
+        }
+
         function saveToFirebase() {
             set(productsRef, products).catch(() => {
                 alert("Eroare la salvarea în baza de date online!");
@@ -471,6 +480,7 @@
         });
         function renderProducts() {
             const list = document.getElementById('productsList');
+            if(!list) return;
             list.innerHTML = '';
             const searchText = document.getElementById('searchInput').value.toLowerCase();
             const selectedCategory = document.getElementById('categoryFilter').value;
@@ -541,6 +551,7 @@
         }
         function renderHistory() {
             const container = document.getElementById('historyListContainer');
+            if(!container) return;
             let filteredLogs = historyLogs;
             if(selectedStartDate && selectedEndDate) {
                 filteredLogs = filteredLogs.filter(l => l.date >= selectedStartDate && l.date <= selectedEndDate);
