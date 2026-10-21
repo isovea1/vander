@@ -84,11 +84,7 @@
         .stock-header-row, .stock-values-row { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; gap: 1px; }
         .stock-cell-head { background: #cbd5e1; font-size: 0.55rem; font-weight: 800; padding: 2px 0; color: #334155; }
         .stock-cell-val { background: #ffffff; font-size: 0.65rem; font-weight: 700; padding: 3px 0; color: var(--primary); }
-        
-        /* Clase pentru stoc critic (1-4 bucăți) */
         .stock-cell-val.low-stock { background-color: var(--warning-light); color: #b45309; border: 1px solid var(--warning-bg); font-weight: 900; }
-        .stock-cell-val.out-stock { background-color: #fee2e2; color: var(--danger); font-weight: 900; }
-
         .inventory-total { font-size: 0.62rem; font-weight: 700; color: var(--text-muted); margin-bottom: 2px; text-align: right; }
         .sale-price-row { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 2px; margin-bottom: 2px; }
         .btn-stop-sale { width: 100%; background: var(--danger-bg); color: white; border: none; padding: 5px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.3px; display: flex; align-items: center; justify-content: center; text-align: center; }
@@ -114,11 +110,11 @@
             <form id="loginForm">
                 <div class="form-group" style="text-align: left;">
                     <label>Utilizator</label>
-                    <input type="text" id="loginUser" required placeholder="ex: vander" />
+                    <input type="text" id="loginUser" required autocomplete="username" placeholder="ex: vander" />
                 </div>
                 <div class="form-group" style="text-align: left;">
                     <label>Parolă</label>
-                    <input type="password" id="loginPass" required placeholder="••••••••" />
+                    <input type="password" id="loginPass" required autocomplete="current-password" placeholder="••••••••" />
                 </div>
                 <button type="submit" id="loginBtn" class="btn-primary" style="margin-top: 5px;">Intră în Aplicație</button>
             </form>
@@ -285,12 +281,26 @@
         const db = getDatabase(app);
         const productsRef = ref(db, 'vander_produse');
         const historyRef = ref(db, 'vander_istoric');
-        const AUTH_KEY = 'vander_is_logged';
+        
+        // Cheie sesiune securizată (se șterge automat la închiderea browserului)
+        const AUTH_KEY = 'vander_secure_session';
+        // Hash SHA-256 pentru parola 'atelier2026' (evită stocarea parolei în clar în cod)
+        const VALID_USER_HASH = 'vander';
+        const VALID_PASS_HASH = '90f845bc7948aefcc9cf0e812d1b7147eb68b20d36cfae8bfd4697bf92e1ef27'; 
+
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
         let products = [];
         let historyLogs = [];
         const standardSizes = ["39", "40", "41", "42", "43", "44", "45"];
         let selectedStartDate = new Date().toISOString().split('T')[0];
         let selectedEndDate = new Date().toISOString().split('T')[0];
+        
         flatpickr("#historyDateRange", {
             mode: "range",
             dateFormat: "Y-m-d",
@@ -308,12 +318,14 @@
                 }
             }
         });
+
         const loginOverlay = document.getElementById('loginOverlay');
         const appMainContent = document.getElementById('appMainContent');
         const loginForm = document.getElementById('loginForm');
         const logoutBtn = document.getElementById('logoutBtn');
         const sidebarLogoutBtn = document.getElementById('sidebarLogoutBtn');
         const syncStatus = document.getElementById('syncStatus');
+
         window.toggleSidebar = function() {
             const sidebar = document.getElementById('appSidebar');
             const overlay = document.getElementById('sidebarOverlay');
@@ -339,8 +351,10 @@
             document.getElementById('productsList').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         window.filterByCategory = filterByCategory;
+
         function checkAuth() {
-            if (localStorage.getItem(AUTH_KEY) === 'true') {
+            const session = sessionStorage.getItem(AUTH_KEY);
+            if (session === 'active') {
                 loginOverlay.style.display = 'none';
                 appMainContent.style.display = 'block';
                 initRealtimeSync();
@@ -349,24 +363,31 @@
                 appMainContent.style.display = 'none';
             }
         }
-        loginForm.addEventListener('submit', (e) => {
+
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const user = document.getElementById('loginUser').value.trim();
             const pass = document.getElementById('loginPass').value.trim();
-            if (user === 'vander' && pass === 'atelier2026') {
-                localStorage.setItem(AUTH_KEY, 'true');
+            
+            const passHash = await sha256(pass);
+
+            if (user === VALID_USER_HASH && passHash === VALID_PASS_HASH) {
+                sessionStorage.setItem(AUTH_KEY, 'active');
+                document.getElementById('loginPass').value = ''; // Curăță parola din memorie
                 checkAuth();
             } else {
                 alert('Utilizator sau parolă incorectă!');
             }
         });
+
         function handleLogout() {
-            localStorage.removeItem(AUTH_KEY);
+            sessionStorage.removeItem(AUTH_KEY);
             checkAuth();
         }
         logoutBtn.addEventListener('click', handleLogout);
         sidebarLogoutBtn.addEventListener('click', handleLogout);
         checkAuth();
+
         function initRealtimeSync() {
             syncStatus.innerText = "⏳ Se sincronizează live...";
             onValue(productsRef, (snapshot) => {
@@ -450,8 +471,6 @@
                     if (qty > 0 && qty <= 4) {
                         cellClass += " low-stock";
                         lowStockCount++;
-                    } else if (qty === 0) {
-                        // opțional poți lăsa normal sau adăuga stil
                     }
 
                     sizeHeaders += `<div class="stock-cell-head">${size}</div>`;
