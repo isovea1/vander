@@ -64,7 +64,7 @@
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .form-group { margin-bottom: 10px; }
         .form-group label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--primary); margin-bottom: 4px; text-transform: uppercase; }
-        input[type="text"], input[type="password"], input[type="number"], select, textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: #f8fafc; }
+        input[type="text"], input[type="password"], input[type="number"], input[type="date"], select, textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: #f8fafc; }
         input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); background: #fff; }
 
         .sizes-grid-container { display: flex; gap: 5px; flex-wrap: wrap; background: #f8fafc; padding: 8px; border-radius: 6px; border: 1px solid var(--border); }
@@ -80,6 +80,10 @@
 
         .filter-row { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-bottom: 12px; }
         .search-input, .filter-select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: #f8fafc; }
+
+        /* Stil pentru bara de filtru calendar istoric */
+        .history-filter-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid var(--border); }
+        .history-item { background: #ffffff; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; font-size: 0.78rem; display: flex; justify-content: space-between; align-items: center; }
 
         .product-card-style {
             background: #ffffff;
@@ -125,7 +129,6 @@
 
         .inventory-total { font-size: 0.62rem; font-weight: 700; color: var(--text-muted); margin-bottom: 2px; text-align: right; }
 
-        /* Container pentru a ține butonul Oprește Vânzarea și Prețul pe aceeași linie */
         .sale-price-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -232,6 +235,23 @@
         </section>
 
         <section class="card">
+            <h2>📅 Istoric Activitate și Vânzări</h2>
+            <div class="history-filter-bar">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>De la data</label>
+                    <input type="date" id="historyDateStart" />
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>Până la data</label>
+                    <input type="date" id="historyDateEnd" />
+                </div>
+            </div>
+            <div id="historyListContainer">
+                <div style="text-align: center; color: var(--text-muted); font-size: 0.75rem; padding: 10px;">Nicio înregistrare în intervalul selectat.</div>
+            </div>
+        </section>
+
+        <section class="card">
             <h2>📦 Importă Stoc din Tabel (CSV)</h2>
             <div class="import-box">
                 <input type="file" id="csvFileInput" accept=".csv" style="flex-grow: 1; font-size: 0.75rem;" />
@@ -332,9 +352,11 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const productsRef = ref(db, 'vander_produse');
+        const historyRef = ref(db, 'vander_istoric');
 
         const AUTH_KEY = 'vander_is_logged';
         let products = [];
+        let historyLogs = [];
         const standardSizes = ["39", "40", "41", "42", "43", "44", "45"];
 
         const loginOverlay = document.getElementById('loginOverlay');
@@ -408,6 +430,8 @@
 
         function initRealtimeSync() {
             syncStatus.innerText = "⏳ Se sincronizează live...";
+            
+            // Sincronizare produse
             onValue(productsRef, (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -420,8 +444,19 @@
                 }
                 syncStatus.innerText = "● Sincronizat Online în Timp Real";
                 renderProducts();
-            }, (error) => {
+            }, () => {
                 syncStatus.innerText = "● Eroare conexiune rețea";
+            });
+
+            // Sincronizare istoric
+            onValue(ref(db, 'vander_istoric'), (snapshot) => {
+                const data = snapshot.val();
+                if(data) {
+                    historyLogs = Array.isArray(data) ? data : Object.values(data);
+                } else {
+                    historyLogs = [];
+                }
+                renderHistory();
             });
         }
 
@@ -429,6 +464,18 @@
             set(productsRef, products).catch(() => {
                 alert("Eroare la salvarea în baza de date online!");
             });
+        }
+
+        function logAction(actionText) {
+            const now = new Date();
+            const logEntry = {
+                id: Date.now(),
+                date: now.toISOString().split('T')[0],
+                time: now.toLocaleTimeString('ro-RO'),
+                text: actionText
+            };
+            historyLogs.unshift(logEntry);
+            set(ref(db, 'vander_istoric'), historyLogs);
         }
 
         const sizesContainer = document.getElementById('sizesContainer');
@@ -488,7 +535,7 @@
                             <div class="inventory-total">Total în inventar: <b>${totalStock}</b></div>
 
                             <div class="sale-price-row">
-                                <button type="button" class="btn-stop-sale" onclick="alert('Funcție stoc gestionată pentru ${p.name}')">Oprește vânzarea</button>
+                                <button type="button" class="btn-stop-sale" onclick="window.stopSale(${p.id}, '${p.name}')">Oprește vânzarea</button>
                                 <div class="product-price-box">${p.price || 0} RON</div>
                             </div>
 
@@ -511,9 +558,52 @@
             document.getElementById('statTotalPieces').innerText = totalPiecesAll;
         }
 
+        window.stopSale = function(id, name) {
+            logAction(`Oprire vânzare pentru modelul: ${name}`);
+            alert(`S-a oprit vânzarea pentru ${name}`);
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('historyListContainer');
+            const startDate = document.getElementById('historyDateStart').value;
+            const endDate = document.getElementById('historyDateEnd').value;
+
+            let filteredLogs = historyLogs;
+            if(startDate) {
+                filteredLogs = filteredLogs.filter(l => l.date >= startDate);
+            }
+            if(endDate) {
+                filteredLogs = filteredLogs.filter(l => l.date <= endDate);
+            }
+
+            if(filteredLogs.length === 0) {
+                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.75rem; padding: 10px;">Nicio înregistrare găsită.</div>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            filteredLogs.forEach(log => {
+                container.innerHTML += `
+                    <div class="history-item">
+                        <span><b>${log.date} ${log.time}</b> - ${log.text}</span>
+                    </div>
+                `;
+            });
+        }
+
+        document.getElementById('historyDateStart').addEventListener('change', renderHistory);
+        document.getElementById('historyDateEnd').addEventListener('change', renderHistory);
+
+        // Setează implicit data de azi în filtrele de istoric la pornire
+        const todayStr = new Date().toISOString().split('T')[0];
+        document.getElementById('historyDateStart').value = todayStr;
+        document.getElementById('historyDateEnd').value = todayStr;
+
         window.deleteProd = function(id) {
             if(confirm("Sigur ștergi definitiv acest produs?")) {
-                products = products.filter(p => p && p.id !== id);
+                let p = products.find(item => item.id === id);
+                if(p) logAction(`Șters produsul: ${p.name}`);
+                products = products.filter(item => item && item.id !== id);
                 saveToFirebase();
             }
         }
@@ -591,6 +681,7 @@
                 });
 
                 saveToFirebase();
+                logAction(`Importat fișier CSV cu ${count} produse.`);
                 alert(`Importate ${count} produse cu succes în baza de date online!`);
             };
             reader.readAsText(fileInput.files[0]);
@@ -607,8 +698,9 @@
                 }
             });
 
+            const prodNameVal = document.getElementById('prodName').value;
             const prodData = {
-                name: document.getElementById('prodName').value,
+                name: prodNameVal,
                 color: document.getElementById('prodColor').value,
                 sku: document.getElementById('prodSku').value,
                 price: document.getElementById('prodPrice').value,
@@ -631,6 +723,7 @@
                         }
                         return p;
                     });
+                    logAction(`Modificat produsul: ${prodNameVal}`);
                 } else {
                     const newProd = {
                         id: Date.now(),
@@ -638,6 +731,7 @@
                         image: imageUrl || ""
                     };
                     products.push(newProd);
+                    logAction(`Adăugat produs nou: ${prodNameVal}`);
                 }
 
                 saveToFirebase();
