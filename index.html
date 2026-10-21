@@ -181,6 +181,7 @@
                 <button type="button" id="importCsvBtn" class="btn-secondary" style="padding: 6px 10px; font-size: 0.75rem;">Importă</button>
             </div>
         </section>
+
         <section class="card">
             <div class="accordion-header" onclick="toggleAddProductForm()">
                 <h2 id="formTitle" style="margin-bottom: 0;">✨ Adaugă Model Individual</h2>
@@ -239,6 +240,7 @@
                 </form>
             </div>
         </section>
+
         <section class="card">
             <h2>📅 Istoric Activitate și Vânzări</h2>
             <div class="single-calendar-box">
@@ -268,7 +270,6 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ro.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/shortcutButtons/shortcutButtons.js"></script>
     <script>
-        // Funcții globale de autentificare plasate direct în fereastră pentru acces instant
         const AUTH_KEY = 'vander_auth_active';
         const CORRECT_USER = 'vander';
         const CORRECT_PASS = 'atelier2026';
@@ -309,7 +310,20 @@
             location.reload();
         }
 
-        // Verificare imediată la încărcarea paginii
+        // Funcție globală sigură pentru deschiderea/închiderea formularului de adăugare produs
+        window.toggleAddProductForm = function() {
+            const container = document.getElementById('formContainer');
+            const icon = document.getElementById('accordionIcon');
+            if (!container) return;
+            if (container.style.display === 'block') {
+                container.style.display = 'none';
+                if (icon) icon.style.transform = 'rotate(0deg)';
+            } else {
+                container.style.display = 'block';
+                if (icon) icon.style.transform = 'rotate(180deg)';
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             checkAuth();
         });
@@ -399,17 +413,7 @@
             sidebar.classList.toggle('open');
             overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
         }
-        window.toggleAddProductForm = function() {
-            const container = document.getElementById('formContainer');
-            const icon = document.getElementById('accordionIcon');
-            if (container.style.display === 'block') {
-                container.style.display = 'none';
-                icon.style.transform = 'rotate(0deg)';
-            } else {
-                container.style.display = 'block';
-                icon.style.transform = 'rotate(180deg)';
-            }
-        }
+
         function filterByCategory(category) {
             const categoryFilter = document.getElementById('categoryFilter');
             if (categoryFilter) { categoryFilter.value = category || ''; }
@@ -427,9 +431,7 @@
                 if (data) {
                     products = Array.isArray(data) ? data : Object.values(data);
                 } else {
-                    products = [
-                        { id: 1, name: "Pantofi Ceremonie din Piele Naturala", color: "Negru", sku: "053", price: 135, category: "Pantofi eleganți", image: "1.webp", notes: "", stock: { "39": 0, "40": 3, "41": 0, "42": 0, "43": 0, "44": 0 } }
-                    ];
+                    products = [];
                     set(productsRef, products);
                 }
                 if(syncStatus) syncStatus.innerText = "● Sincronizat Online în Timp Real";
@@ -448,7 +450,6 @@
             });
         }
 
-        // Dacă e deja logat, pornește sincronizarea la pornire
         if(localStorage.getItem('vander_auth_active') === 'true') {
             window.initRealtimeSync();
         }
@@ -707,7 +708,4 @@
             }
         });
         document.getElementById('searchInput').addEventListener('input', renderProducts);
-        document.getElementById('categoryFilter').addEventListener('change', renderProducts);
-    </script>
-</body>
-</html>
+        document.getElementById('categoryFilter').addEventListener('change', render
