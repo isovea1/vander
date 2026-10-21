@@ -467,12 +467,12 @@
 
         .product-item {
             display: grid;
-            grid-template-columns: 220px 1fr;
+            grid-template-columns: 240px 1fr;
             gap: 16px;
-            background: rgba(255,255,255,0.28);
+            background: rgba(255,255,255,0.3);
             border: 1px solid rgba(15, 23, 42, 0.08);
             border-radius: 12px;
-            padding: 14px 12px 12px;
+            padding: 12px;
         }
 
         .product-photo {
@@ -482,7 +482,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 170px;
+            min-height: 190px;
             overflow: hidden;
         }
 
@@ -506,7 +506,7 @@
             flex-wrap: wrap;
             gap: 8px;
             font-weight: 800;
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             color: var(--primary);
             margin-bottom: 10px;
         }
@@ -520,7 +520,7 @@
             background: #3b82f6;
             border-radius: 8px;
             color: white;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 800;
             padding: 0 10px;
             text-transform: lowercase;
@@ -530,8 +530,8 @@
             display: grid;
             grid-template-columns: repeat(6, minmax(0, 1fr));
             gap: 6px;
-            max-width: 320px;
-            margin-top: 10px;
+            max-width: 340px;
+            margin-top: 8px;
         }
 
         .size-box-grid {
@@ -586,6 +586,31 @@
 
         .meta-row .code {
             font-size: 1.1rem;
+        }
+
+        .form-shell {
+            display: grid;
+            gap: 10px;
+        }
+
+        .status-inline {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 4px;
+        }
+
+        .status-inline label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: none;
+        }
+
+        .hidden {
+            display: none !important;
         }
 
         @media (max-width: 700px) {
@@ -652,280 +677,327 @@
 
         <section class="stats-grid">
             <div class="stat-card">
-                <div class="stat-number">128</div>
+                <div class="stat-number" id="totalProductsStat">0</div>
                 <div class="stat-label">Produse</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">42</div>
+                <div class="stat-number" id="totalOrdersStat">0</div>
                 <div class="stat-label">Comenzi</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">96%</div>
+                <div class="stat-number" id="stockStat">0%</div>
                 <div class="stat-label">Stoc disponibil</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">€ 18.4k</div>
+                <div class="stat-number" id="salesStat">€ 0</div>
                 <div class="stat-label">Vânzări</div>
             </div>
         </section>
 
         <section class="card">
             <h2>Produse</h2>
-
-            <div class="product-list">
-                <article class="product-item">
-                    <div class="product-photo">
-                        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80" alt="Ghete barbati" />
-                    </div>
-                    <div class="product-body">
-                        <div class="product-title">
-                            <span>Ghete barbati din piele naturala neagra 20253</span>
-                            <span class="tag">top</span>
-                        </div>
-
-                        <div class="size-grid">
-                            <div class="size-box-grid">39</div>
-                            <div class="size-box-grid">40</div>
-                            <div class="size-box-grid">41</div>
-                            <div class="size-box-grid">42</div>
-                            <div class="size-box-grid">43</div>
-                            <div class="size-box-grid">44</div>
-                            <div class="size-box-grid empty">0</div>
-                            <div class="size-box-grid empty">1</div>
-                            <div class="size-box-grid empty">2</div>
-                            <div class="size-box-grid empty">2</div>
-                            <div class="size-box-grid empty">2</div>
-                            <div class="size-box-grid empty">0</div>
-                        </div>
-
-                        <div class="inventory">Total in inventar: 7</div>
-                        <button class="red-btn" type="button">Opreste vanzarea</button>
-
-                        <div class="meta-row">
-                            <span>F104 N</span>
-                            <span class="code">160</span>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="product-item">
-                    <div class="product-photo">
-                        <img src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=900&q=80" alt="Pantofi barbati" />
-                    </div>
-                    <div class="product-body">
-                        <div class="product-title">
-                            <span>Pantofi barbati din piele naturala neagra 20254</span>
-                            <span class="tag">top</span>
-                        </div>
-
-                        <div class="size-grid">
-                            <div class="size-box-grid">39</div>
-                            <div class="size-box-grid">40</div>
-                            <div class="size-box-grid">41</div>
-                            <div class="size-box-grid">42</div>
-                            <div class="size-box-grid">43</div>
-                            <div class="size-box-grid">44</div>
-                            <div class="size-box-grid empty">0</div>
-                            <div class="size-box-grid empty">2</div>
-                            <div class="size-box-grid empty">1</div>
-                            <div class="size-box-grid empty">2</div>
-                            <div class="size-box-grid empty">0</div>
-                            <div class="size-box-grid empty">0</div>
-                        </div>
-
-                        <div class="inventory">Total in inventar: 5</div>
-                        <button class="red-btn" type="button">Opreste vanzarea</button>
-
-                        <div class="meta-row">
-                            <span>4052 N</span>
-                            <span class="code">135</span>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="product-item">
-                    <div class="product-photo">
-                        <img src="https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=900&q=80" alt="Pantofi barbati neagra" />
-                    </div>
-                    <div class="product-body">
-                        <div class="product-title">
-                            <span>Pantofi barbati din piele naturala neagra 20255</span>
-                            <span class="tag">top</span>
-                        </div>
-
-                        <div class="size-grid">
-                            <div class="size-box-grid">39</div>
-                            <div class="size-box-grid">40</div>
-                            <div class="size-box-grid">41</div>
-                            <div class="size-box-grid">42</div>
-                            <div class="size-box-grid">43</div>
-                            <div class="size-box-grid">44</div>
-                            <div class="size-box-grid empty">1</div>
-                            <div class="size-box-grid empty">2</div>
-                            <div class="size-box-grid empty">4</div>
-                            <div class="size-box-grid empty">3</div>
-                            <div class="size-box-grid empty">2</div>
-                            <div class="size-box-grid empty">1</div>
-                        </div>
-
-                        <div class="inventory">Total in inventar: 13</div>
-                        <button class="red-btn" type="button">Opreste vanzarea</button>
-                    </div>
-                </article>
-            </div>
+            <div class="product-list" id="productList"></div>
         </section>
 
         <section class="card">
-            <h2>Adăugare produs</h2>
+            <h2 id="formTitle">Adăugare produs</h2>
 
-            <div class="form-row">
+            <div class="form-shell">
                 <div class="form-group">
                     <label for="numeProdus">Nume produs</label>
-                    <input id="numeProdus" type="text" value="Pantalon Denim" />
+                    <input id="numeProdus" type="text" placeholder="ex: Ghete barbati din piele naturala" />
                 </div>
-                <div class="form-group">
-                    <label for="codProdus">Cod produs</label>
-                    <input id="codProdus" type="text" value="VD-2048" />
-                </div>
-            </div>
 
-            <div class="form-row">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="codProdus">Cod produs</label>
+                        <input id="codProdus" type="text" placeholder="ex: 20253" />
+                    </div>
+                    <div class="form-group">
+                        <label for="pretProdus">Preț</label>
+                        <input id="pretProdus" type="number" value="0" />
+                    </div>
+                </div>
+
                 <div class="form-group">
-                    <label for="categorie">Categorie</label>
-                    <select id="categorie">
-                        <option>Men</option>
-                        <option>Women</option>
-                        <option>Kids</option>
-                        <option>Accesorii</option>
+                    <label for="imageUrl">URL imagine</label>
+                    <input id="imageUrl" type="text" placeholder="https://...jpg" />
+                </div>
+
+                <div class="form-group">
+                    <label>Categorie</label>
+                    <select id="categorieProdus">
+                        <option value="Ghete/Botine/Cizme">Ghete/Botine/Cizme</option>
+                        <option value="Pantofi">Pantofi</option>
+                        <option value="Top Produse">Top Produse</option>
+                        <option value="Toate Produsele">Toate Produsele</option>
                     </select>
                 </div>
+
                 <div class="form-group">
-                    <label for="pret">Preț de vânzare</label>
-                    <input id="pret" type="number" value="149" />
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Mărimi</label>
-                <div class="sizes-grid-container">
-                    <div class="size-box">
-                        <span>XS</span>
-                        <input type="number" value="6" />
-                    </div>
-                    <div class="size-box">
-                        <span>S</span>
-                        <input type="number" value="12" />
-                    </div>
-                    <div class="size-box">
-                        <span>M</span>
-                        <input type="number" value="18" />
-                    </div>
-                    <div class="size-box">
-                        <span>L</span>
-                        <input type="number" value="14" />
-                    </div>
-                    <div class="size-box">
-                        <span>XL</span>
-                        <input type="number" value="8" />
+                    <label>Mărimi</label>
+                    <div class="sizes-grid-container">
+                        <div class="size-box"><span>39</span><input id="size39" type="number" value="0" /></div>
+                        <div class="size-box"><span>40</span><input id="size40" type="number" value="0" /></div>
+                        <div class="size-box"><span>41</span><input id="size41" type="number" value="0" /></div>
+                        <div class="size-box"><span>42</span><input id="size42" type="number" value="0" /></div>
+                        <div class="size-box"><span>43</span><input id="size43" type="number" value="0" /></div>
+                        <div class="size-box"><span>44</span><input id="size44" type="number" value="0" /></div>
                     </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label for="observatii">Observații</label>
-                <textarea id="observatii" rows="3">Material: denim premium, cusături rezistente, livrare în 48h.</textarea>
-            </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <div class="status-inline">
+                        <label><input type="checkbox" id="topProduct" checked /> Top</label>
+                        <label><input type="checkbox" id="activeProduct" checked /> Activ</label>
+                    </div>
+                </div>
 
-            <button class="btn-primary" type="button">Salvează produs</button>
-        </section>
-
-        <section class="card">
-            <h2>Import date</h2>
-            <div class="import-box">
-                <button class="btn-secondary" type="button">Import CSV</button>
-                <button class="btn-secondary" type="button">Import Excel</button>
-                <span>Fișiere acceptate: .csv, .xlsx</span>
-            </div>
-        </section>
-
-        <section class="card">
-            <h2>Stocuri disponibile</h2>
-
-            <div class="filter-row">
-                <input class="search-input" type="text" placeholder="Caută produs, cod sau categorie..." />
-                <select class="filter-select">
-                    <option>Toate</option>
-                    <option>Disponibil</option>
-                    <option>Stoc redus</option>
-                    <option>Epuizat</option>
-                </select>
-            </div>
-
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Produs</th>
-                            <th>Cod</th>
-                            <th>Categorie</th>
-                            <th>Stoc</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Pantalon Denim</td>
-                            <td>VD-2048</td>
-                            <td>Men</td>
-                            <td>24</td>
-                            <td><span class="status in-stock">Disponibil</span></td>
-                        </tr>
-                        <tr>
-                            <td>Jachetă Urban</td>
-                            <td>VD-1182</td>
-                            <td>Women</td>
-                            <td>7</td>
-                            <td><span class="status low">Stoc redus</span></td>
-                        </tr>
-                        <tr>
-                            <td>Tricou Basic</td>
-                            <td>VD-7710</td>
-                            <td>Kids</td>
-                            <td>0</td>
-                            <td><span class="status out">Epuizat</span></td>
-                        </tr>
-                        <tr>
-                            <td>Geantă Travel</td>
-                            <td>VD-3860</td>
-                            <td>Accesorii</td>
-                            <td>15</td>
-                            <td><span class="status in-stock">Disponibil</span></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="form-row">
+                    <button id="saveProductBtn" class="btn-primary" type="button">Salvează produs</button>
+                    <button id="newProductBtn" class="btn-secondary" type="button">Produs nou</button>
+                </div>
             </div>
         </section>
     </div>
 
-    <script>
-        const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        const menuToggleBtn = document.getElementById('menuToggleBtn');
-        const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import {
+            getFirestore,
+            collection,
+            onSnapshot,
+            setDoc,
+            doc,
+            deleteDoc,
+            updateDoc
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const productListEl = document.getElementById("productList");
+        const totalProductsStat = document.getElementById("totalProductsStat");
+        const totalOrdersStat = document.getElementById("totalOrdersStat");
+        const stockStat = document.getElementById("stockStat");
+        const salesStat = document.getElementById("salesStat");
+
+        const formTitle = document.getElementById("formTitle");
+        const numeInput = document.getElementById("numeProdus");
+        const codInput = document.getElementById("codProdus");
+        const pretInput = document.getElementById("pretProdus");
+        const imageUrlInput = document.getElementById("imageUrl");
+        const categorieInput = document.getElementById("categorieProdus");
+        const topProduct = document.getElementById("topProduct");
+        const activeProduct = document.getElementById("activeProduct");
+        const saveProductBtn = document.getElementById("saveProductBtn");
+        const newProductBtn = document.getElementById("newProductBtn");
+
+        let currentProductId = null;
+
+        const sizeFields = [39, 40, 41, 42, 43, 44].reduce((acc, size) => {
+            acc[size] = document.getElementById(`size${size}`);
+            return acc;
+        }, {});
+
+        function getSizesFromForm() {
+            const sizes = {};
+            [39, 40, 41, 42, 43, 44].forEach(size => {
+                sizes[String(size)] = Number(sizeFields[size].value || 0);
+            });
+            return sizes;
+        }
+
+        function computeTotal(sizes) {
+            return Object.values(sizes).reduce((sum, value) => sum + Number(value || 0), 0);
+        }
+
+        function clearForm() {
+            currentProductId = null;
+            formTitle.textContent = "Adăugare produs";
+            numeInput.value = "";
+            codInput.value = "";
+            pretInput.value = "0";
+            imageUrlInput.value = "";
+            categorieInput.value = "Ghete/Botine/Cizme";
+            topProduct.checked = true;
+            activeProduct.checked = true;
+            [39, 40, 41, 42, 43, 44].forEach(size => sizeFields[size].value = 0);
+        }
+
+        function fillForm(product) {
+            currentProductId = product.id;
+            formTitle.textContent = "Editare produs";
+            numeInput.value = product.nume || "";
+            codInput.value = product.cod || "";
+            pretInput.value = Number(product.pret || 0);
+            imageUrlInput.value = product.imageUrl || "";
+            categorieInput.value = product.categorie || "Ghete/Botine/Cizme";
+            topProduct.checked = Boolean(product.top);
+            activeProduct.checked = product.status !== "inactiv";
+            [39, 40, 41, 42, 43, 44].forEach(size => {
+                const value = product.sizes?.[String(size)] ?? 0;
+                sizeFields[size].value = value;
+            });
+        }
+
+        function buildProductPayload() {
+            const sizes = getSizesFromForm();
+            const payload = {
+                nume: numeInput.value.trim(),
+                cod: codInput.value.trim(),
+                categorie: categorieInput.value,
+                pret: Number(pretInput.value || 0),
+                imageUrl: imageUrlInput.value.trim(),
+                sizes,
+                total: computeTotal(sizes),
+                top: Boolean(topProduct.checked),
+                status: activeProduct.checked ? "activ" : "inactiv",
+                updatedAt: Date.now()
+            };
+
+            if (!payload.nume || !payload.cod) {
+                alert("Completează numele și codul produsului.");
+                return null;
+            }
+
+            return payload;
+        }
+
+        async function saveProduct() {
+            const payload = buildProductPayload();
+            if (!payload) return;
+
+            const id = currentProductId || codInput.value.trim();
+            const ref = doc(db, "produse", id);
+            await setDoc(ref, { ...payload, id }, { merge: true });
+            clearForm();
+            alert("Produsul a fost salvat în Firebase.");
+        }
+
+        async function deleteProduct(productId) {
+            if (!productId) return;
+            const confirmed = confirm("Ștergi produsul din Firebase?");
+            if (!confirmed) return;
+            await deleteDoc(doc(db, "produse", productId));
+        }
+
+        async function toggleProductStatus(product) {
+            const ref = doc(db, "produse", product.id);
+            await updateDoc(ref, {
+                status: product.status === "activ" ? "inactiv" : "activ",
+                updatedAt: Date.now()
+            });
+        }
+
+        function renderProduct(product) {
+            const item = document.createElement("article");
+            item.className = "product-item";
+
+            const image = product.imageUrl || "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80";
+            const sizes = product.sizes || {};
+            const sizeCells = [39, 40, 41, 42, 43, 44].map(size => {
+                const value = sizes[String(size)] ?? 0;
+                return `<div class="size-box-grid ${value === 0 ? "empty" : ""}">${value}</div>`;
+            }).join("");
+
+            const statusText = product.status === "inactiv" ? "Inactiv" : "Activ";
+
+            item.innerHTML = `
+                <div class="product-photo">
+                    <img src="${image}" alt="${product.nume || "Produs"}" />
+                </div>
+                <div class="product-body">
+                    <div class="product-title">
+                        <span>${product.nume || "Produs nou"}</span>
+                        ${product.top ? '<span class="tag">top</span>' : ""}
+                    </div>
+
+                    <div class="size-grid">${sizeCells}</div>
+
+                    <div class="inventory">Total in inventar: ${product.total ?? 0} • ${statusText}</div>
+
+                    <div style="display:flex; gap:10px; margin-top:12px; max-width:300px;">
+                        <button class="red-btn" type="button" data-action="toggle" data-id="${product.id}">Opreste vanzarea</button>
+                        <button class="btn-secondary" type="button" data-action="edit" data-id="${product.id}" style="flex:1; border-radius:8px;">Editează</button>
+                    </div>
+
+                    <div class="meta-row">
+                        <span>${product.cod || "N/A"}</span>
+                        <span class="code">${Number(product.pret || 0)} lei</span>
+                    </div>
+                </div>
+            `;
+
+            item.querySelector("[data-action='toggle']").addEventListener("click", async () => {
+                await toggleProductStatus(product);
+            });
+
+            item.querySelector("[data-action='edit']").addEventListener("click", () => {
+                fillForm(product);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+
+            return item;
+        }
+
+        function updateStats(products) {
+            const activeProducts = products.filter(p => p.status !== "inactiv");
+            totalProductsStat.textContent = String(activeProducts.length);
+            totalOrdersStat.textContent = String(activeProducts.reduce((sum, p) => sum + (Number(p.total || 0) > 0 ? 1 : 0), 0));
+
+            const totalStock = activeProducts.reduce((sum, p) => sum + Number(p.total || 0), 0);
+            const stockPercent = activeProducts.length ? Math.min(100, Math.round((totalStock / Math.max(1, activeProducts.length * 20)) * 100)) : 0;
+            stockStat.textContent = `${stockPercent}%`;
+
+            const salesTotal = activeProducts.reduce((sum, p) => sum + Number(p.pret || 0), 0);
+            salesStat.textContent = `€ ${salesTotal}`;
+        }
+
+        onSnapshot(collection(db, "produse"), (snapshot) => {
+            const products = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+            productListEl.innerHTML = "";
+            products.sort((a, b) => String(a.nume || "").localeCompare(String(b.nume || "")));
+            products.forEach(product => productListEl.appendChild(renderProduct(product)));
+            updateStats(products);
+        }, (error) => {
+            console.error("Firebase error:", error);
+            productListEl.innerHTML = `<div class="card"><strong>Eroare Firebase:</strong> verifică config-ul din script.</div>`;
+        });
+
+        saveProductBtn.addEventListener("click", saveProduct);
+        newProductBtn.addEventListener("click", clearForm);
+
+        const sidebar = document.getElementById("sidebar");
+        const sidebarOverlay = document.getElementById("sidebarOverlay");
+        const menuToggleBtn = document.getElementById("menuToggleBtn");
+        const closeSidebarBtn = document.getElementById("closeSidebarBtn");
 
         function openSidebar() {
-            sidebar.classList.add('open');
-            sidebarOverlay.classList.add('show');
+            sidebar.classList.add("open");
+            sidebarOverlay.classList.add("show");
         }
 
         function closeSidebar() {
-            sidebar.classList.remove('open');
-            sidebarOverlay.classList.remove('show');
+            sidebar.classList.remove("open");
+            sidebarOverlay.classList.remove("show");
         }
 
-        menuToggleBtn.addEventListener('click', openSidebar);
-        closeSidebarBtn.addEventListener('click', closeSidebar);
-        sidebarOverlay.addEventListener('click', closeSidebar);
+        menuToggleBtn.addEventListener("click", openSidebar);
+        closeSidebarBtn.addEventListener("click", closeSidebar);
+        sidebarOverlay.addEventListener("click", closeSidebar);
+
+        clearForm();
     </script>
 </body>
 </html>
