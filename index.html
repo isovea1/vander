@@ -64,7 +64,7 @@
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .form-group { margin-bottom: 10px; }
         .form-group label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--primary); margin-bottom: 4px; text-transform: uppercase; }
-        input[type="text"], input[type="password"], input[type="number"], select, textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: #f8fafc; }
+        input[type="text"], input[type="password"], input[type="number"], input[type="date"], select, textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: #f8fafc; }
         input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); background: #fff; }
 
         .sizes-grid-container { display: flex; gap: 5px; flex-wrap: wrap; background: #f8fafc; padding: 8px; border-radius: 6px; border: 1px solid var(--border); }
@@ -81,10 +81,8 @@
         .filter-row { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-bottom: 12px; }
         .search-input, .filter-select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: #f8fafc; }
 
-        /* Stil pentru căsuța unică de calendar istoric exact ca în cerință[cite: 6] */
-        .single-calendar-box { display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; gap: 8px; margin-bottom: 10px; }
-        .calendar-icon-styled { font-size: 1.1rem; }
-        .single-calendar-input { border: none; background: transparent; font-size: 0.85rem; font-weight: 600; color: var(--primary); width: 100%; outline: none; cursor: pointer; }
+        /* Stil pentru interval de date (De la - Până la) */
+        .history-date-range { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; background: #f8fafc; padding: 8px; border-radius: 6px; border: 1px solid var(--border); }
         .history-item { background: #ffffff; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; margin-bottom: 6px; font-size: 0.78rem; display: flex; justify-content: space-between; align-items: center; }
 
         .product-card-style {
@@ -304,15 +302,21 @@
             </div>
         </section>
 
-        <!-- Istoric Activitate plasat direct deasupra la Stoc Atelier cu o singură căsuță de dată -->
+        <!-- Istoric Activitate cu interval De la / Până la, plasat deasupra la Stoc Atelier -->
         <section class="card">
             <h2>📅 Istoric Activitate și Vânzări</h2>
-            <div class="single-calendar-box">
-                <span class="calendar-icon-styled">📅</span>
-                <input type="date" id="historyDateSingle" class="single-calendar-input" />
+            <div class="history-date-range">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>De la data</label>
+                    <input type="date" id="historyDateStart" />
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>Până la data</label>
+                    <input type="date" id="historyDateEnd" />
+                </div>
             </div>
             <div id="historyListContainer">
-                <div style="text-align: center; color: var(--text-muted); font-size: 0.75rem; padding: 10px;">Nicio înregistrare pentru data selectată.</div>
+                <div style="text-align: center; color: var(--text-muted); font-size: 0.75rem; padding: 10px;">Nicio înregistrare în intervalul selectat.</div>
             </div>
         </section>
 
@@ -560,15 +564,19 @@
 
         function renderHistory() {
             const container = document.getElementById('historyListContainer');
-            const selectedDate = document.getElementById('historyDateSingle').value;
+            const startDate = document.getElementById('historyDateStart').value;
+            const endDate = document.getElementById('historyDateEnd').value;
 
             let filteredLogs = historyLogs;
-            if(selectedDate) {
-                filteredLogs = filteredLogs.filter(l => l.date === selectedDate);
+            if(startDate) {
+                filteredLogs = filteredLogs.filter(l => l.date >= startDate);
+            }
+            if(endDate) {
+                filteredLogs = filteredLogs.filter(l => l.date <= endDate);
             }
 
             if(filteredLogs.length === 0) {
-                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.75rem; padding: 10px;">Nicio înregistrare pentru data selectată.</div>`;
+                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.75rem; padding: 10px;">Nicio înregistrare în intervalul selectat.</div>`;
                 return;
             }
 
@@ -576,17 +584,19 @@
             filteredLogs.forEach(log => {
                 container.innerHTML += `
                     <div class="history-item">
-                        <span><b>${log.time}</b> - ${log.text}</span>
+                        <span><b>${log.date} ${log.time}</b> - ${log.text}</span>
                     </div>
                 `;
             });
         }
 
-        document.getElementById('historyDateSingle').addEventListener('change', renderHistory);
+        document.getElementById('historyDateStart').addEventListener('change', renderHistory);
+        document.getElementById('historyDateEnd').addEventListener('change', renderHistory);
 
-        // Setează implicit data de azi în căsuța unică la pornire
+        // Setează implicit data de azi în ambele câmpuri la pornire
         const todayStr = new Date().toISOString().split('T')[0];
-        document.getElementById('historyDateSingle').value = todayStr;
+        document.getElementById('historyDateStart').value = todayStr;
+        document.getElementById('historyDateEnd').value = todayStr;
 
         window.deleteProd = function(id) {
             if(confirm("Sigur ștergi definitiv acest produs?")) {
