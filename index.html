@@ -85,7 +85,6 @@
         .filter-row { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-bottom: 12px; }
         .search-input, .filter-select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: #f8fafc; }
 
-        /* Stil pentru o singură căsuță de calendar cu interval */
         .single-calendar-box { display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; gap: 8px; margin-bottom: 10px; }
         .calendar-icon-styled { font-size: 1.1rem; }
         .single-calendar-input { border: none; background: transparent; font-size: 0.85rem; font-weight: 600; color: var(--primary); width: 100%; outline: none; cursor: pointer; }
@@ -248,7 +247,6 @@
             </div>
         </section>
 
-        <!-- Secțiune Accordion pentru Adăugare Produs -->
         <section class="card">
             <div class="accordion-header" onclick="toggleAddProductForm()">
                 <h2 id="formTitle" style="margin-bottom: 0;">✨ Adaugă Model Individual</h2>
@@ -390,23 +388,18 @@
                         let dEnd = new Date();
 
                         if (index === 0) {
-                            // Astăzi
                             dStart = new Date();
                             dEnd = new Date();
                         } else if (index === 1) {
-                            // Ieri
                             dStart.setDate(todayObj.getDate() - 1);
                             dEnd = new Date(dStart);
                         } else if (index === 2) {
-                            // Ultimele 7 zile
                             dStart.setDate(todayObj.getDate() - 6);
                             dEnd = new Date();
                         } else if (index === 3) {
-                            // Luna curentă
                             dStart = new Date(todayObj.getFullYear(), todayObj.getMonth(), 1);
                             dEnd = new Date();
                         } else if (index === 4) {
-                            // Luna trecută
                             dStart = new Date(todayObj.getFullYear(), todayObj.getMonth() - 1, 1);
                             dEnd = new Date(todayObj.getFullYear(), todayObj.getMonth(), 0);
                         }
@@ -489,7 +482,7 @@
                 appMainContent.style.display = 'block';
                 initRealtimeSync();
             } else {
-                alert('Utilizator sau parolă incorectă!');
+                alert('Utilizator sau parolă incorectă! Folosește: vander / atelier2026');
             }
         });
 
