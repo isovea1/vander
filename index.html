@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VANDER - Gestiune Atelier</title>
+    <!-- Includere Flatpickr CSS pentru un calendar profesional tip interval -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
         :root {
             --primary: #0f172a;
@@ -64,7 +66,7 @@
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .form-group { margin-bottom: 10px; }
         .form-group label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--primary); margin-bottom: 4px; text-transform: uppercase; }
-        input[type="text"], input[type="password"], input[type="number"], input[type="date"], select, textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: #f8fafc; }
+        input[type="text"], input[type="password"], input[type="number"], select, textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: #f8fafc; }
         input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); background: #fff; }
 
         .sizes-grid-container { display: flex; gap: 5px; flex-wrap: wrap; background: #f8fafc; padding: 8px; border-radius: 6px; border: 1px solid var(--border); }
@@ -81,8 +83,10 @@
         .filter-row { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-bottom: 12px; }
         .search-input, .filter-select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: #f8fafc; }
 
-        /* Stil pentru interval de date (De la - Până la) */
-        .history-date-range { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; background: #f8fafc; padding: 8px; border-radius: 6px; border: 1px solid var(--border); }
+        /* Stil pentru o singură căsuță de calendar cu interval */
+        .single-calendar-box { display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; gap: 8px; margin-bottom: 10px; }
+        .calendar-icon-styled { font-size: 1.1rem; }
+        .single-calendar-input { border: none; background: transparent; font-size: 0.85rem; font-weight: 600; color: var(--primary); width: 100%; outline: none; cursor: pointer; }
         .history-item { background: #ffffff; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; margin-bottom: 6px; font-size: 0.78rem; display: flex; justify-content: space-between; align-items: center; }
 
         .product-card-style {
@@ -302,18 +306,12 @@
             </div>
         </section>
 
-        <!-- Istoric Activitate cu interval De la / Până la, plasat deasupra la Stoc Atelier -->
+        <!-- Istoric Activitate cu O SINGURĂ căsuță de calendar (interval de date) plasat deasupra la Stoc Atelier -->
         <section class="card">
             <h2>📅 Istoric Activitate și Vânzări</h2>
-            <div class="history-date-range">
-                <div class="form-group" style="margin-bottom:0;">
-                    <label>De la data</label>
-                    <input type="date" id="historyDateStart" />
-                </div>
-                <div class="form-group" style="margin-bottom:0;">
-                    <label>Până la data</label>
-                    <input type="date" id="historyDateEnd" />
-                </div>
+            <div class="single-calendar-box">
+                <span class="calendar-icon-styled">📅</span>
+                <input type="text" id="historyDateRange" class="single-calendar-input" placeholder="Selectează intervalul de date..." readonly />
             </div>
             <div id="historyListContainer">
                 <div style="text-align: center; color: var(--text-muted); font-size: 0.75rem; padding: 10px;">Nicio înregistrare în intervalul selectat.</div>
@@ -335,6 +333,10 @@
             <div id="productsList"></div>
         </section>
     </div>
+
+    <!-- Script Flatpickr JS pentru calendarul interactiv -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ro.js"></script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
@@ -359,6 +361,28 @@
         let products = [];
         let historyLogs = [];
         const standardSizes = ["39", "40", "41", "42", "43", "44", "45"];
+
+        let selectedStartDate = new Date().toISOString().split('T')[0];
+        let selectedEndDate = new Date().toISOString().split('T')[0];
+
+        // Inițializare Calendar Flatpickr (Mod Range / Interval într-o singură căsuță)
+        flatpickr("#historyDateRange", {
+            mode: "range",
+            dateFormat: "Y-m-d",
+            locale: "ro",
+            defaultDate: [selectedStartDate, selectedEndDate],
+            onChange: function(selectedDates, dateStr, instance) {
+                if (selectedDates.length === 2) {
+                    selectedStartDate = instance.formatDate(selectedDates[0], "Y-m-d");
+                    selectedEndDate = instance.formatDate(selectedDates[1], "Y-m-d");
+                    renderHistory();
+                } else if (selectedDates.length === 1) {
+                    selectedStartDate = instance.formatDate(selectedDates[0], "Y-m-d");
+                    selectedEndDate = selectedStartDate;
+                    renderHistory();
+                }
+            }
+        });
 
         const loginOverlay = document.getElementById('loginOverlay');
         const appMainContent = document.getElementById('appMainContent');
@@ -564,15 +588,10 @@
 
         function renderHistory() {
             const container = document.getElementById('historyListContainer');
-            const startDate = document.getElementById('historyDateStart').value;
-            const endDate = document.getElementById('historyDateEnd').value;
-
             let filteredLogs = historyLogs;
-            if(startDate) {
-                filteredLogs = filteredLogs.filter(l => l.date >= startDate);
-            }
-            if(endDate) {
-                filteredLogs = filteredLogs.filter(l => l.date <= endDate);
+
+            if(selectedStartDate && selectedEndDate) {
+                filteredLogs = filteredLogs.filter(l => l.date >= selectedStartDate && l.date <= selectedEndDate);
             }
 
             if(filteredLogs.length === 0) {
@@ -589,14 +608,6 @@
                 `;
             });
         }
-
-        document.getElementById('historyDateStart').addEventListener('change', renderHistory);
-        document.getElementById('historyDateEnd').addEventListener('change', renderHistory);
-
-        // Setează implicit data de azi în ambele câmpuri la pornire
-        const todayStr = new Date().toISOString().split('T')[0];
-        document.getElementById('historyDateStart').value = todayStr;
-        document.getElementById('historyDateEnd').value = todayStr;
 
         window.deleteProd = function(id) {
             if(confirm("Sigur ștergi definitiv acest produs?")) {
