@@ -81,7 +81,6 @@
         .filter-row { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-bottom: 12px; }
         .search-input, .filter-select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: #f8fafc; }
 
-        /* Stil card produs aranjat pe 2 coloane (poza stânga, detalii dreapta) exact ca în referință[cite: 2] */
         .product-card-style {
             background: #ffffff;
             border: 1px solid var(--border);
@@ -89,7 +88,7 @@
             padding: 10px;
             margin-bottom: 10px;
             display: grid;
-            grid-template-columns: 140px 1fr; /* Lățime fixă pentru poză în stânga, detalii în dreapta */
+            grid-template-columns: 140px 1fr;
             gap: 12px;
             align-items: center;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
@@ -129,14 +128,13 @@
         .btn-stop-sale { width: 100%; background: var(--danger-bg); color: white; border: none; padding: 5px; border-radius: 4px; font-size: 0.68rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.3px; }
         .btn-stop-sale:hover { background: var(--danger); }
 
-        .product-bottom-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 2px; }
-        .product-bottom-inputs input { padding: 3px 6px; font-size: 0.68rem; background: #fff; }
+        /* Prețul afișat curat pe un rând dedicat */
+        .product-price-box { width: 100%; background: #f8fafc; border: 1px solid var(--border); border-radius: 4px; padding: 4px 8px; font-size: 0.75rem; font-weight: 700; color: var(--primary); text-align: center; margin-top: 2px; }
 
         .item-actions-row { display: flex; gap: 4px; margin-top: 2px; }
         .btn-mini-edit { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 4px 6px; border-radius: 4px; font-size: 0.58rem; font-weight: 700; cursor: pointer; flex: 1; }
         .btn-mini-del { background: #ffe4e6; color: #be123c; border: 1px solid #fecaca; padding: 4px 6px; border-radius: 4px; font-size: 0.58rem; font-weight: 700; cursor: pointer; flex: 1; }
 
-        /* Adaptare suplimentară pentru telefoane foarte înguste dacă este nevoie */
         @media (max-width: 400px) {
             .product-card-style {
                 grid-template-columns: 110px 1fr;
@@ -483,9 +481,8 @@
 
                             <button type="button" class="btn-stop-sale" onclick="alert('Funcție stoc gestionată pentru ${p.name}')">Oprește vânzarea</button>
 
-                            <div class="product-bottom-inputs">
-                                <input type="text" value="${p.name} ${p.color}" readonly style="background:#f1f5f9; color:#334155;" />
-                                <input type="text" value="${p.price || 0} RON" readonly style="background:#f1f5f9; color:#334155; text-align:center;" />
+                            <div class="product-price-box">
+                                ${p.price || 0} RON
                             </div>
 
                             <div class="item-actions-row">
