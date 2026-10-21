@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VANDER - Gestiune Atelier</title>
-    <!-- Includere Flatpickr CSS pentru un calendar profesional tip interval -->
+    <!-- Includere Flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- Includere Flatpickr Shortcut Buttons Plugin CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/shortcutButtons/style.css">
     <style>
         :root {
             --primary: #0f172a;
@@ -83,7 +85,7 @@
         .filter-row { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-bottom: 12px; }
         .search-input, .filter-select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: #f8fafc; }
 
-        /* Stil pentru o singură căsuță de calendar cu interval */
+        /* Stil pentru căsuța unică de calendar cu interval */
         .single-calendar-box { display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; gap: 8px; margin-bottom: 10px; }
         .calendar-icon-styled { font-size: 1.1rem; }
         .single-calendar-input { border: none; background: transparent; font-size: 0.85rem; font-weight: 600; color: var(--primary); width: 100%; outline: none; cursor: pointer; }
@@ -306,7 +308,7 @@
             </div>
         </section>
 
-        <!-- Istoric Activitate cu O SINGURĂ căsuță de calendar (interval de date) plasat deasupra la Stoc Atelier -->
+        <!-- Istoric Activitate cu O SINGURĂ căsuță de calendar (interval de date + butoane predefinite) -->
         <section class="card">
             <h2>📅 Istoric Activitate și Vânzări</h2>
             <div class="single-calendar-box">
@@ -334,9 +336,10 @@
         </section>
     </div>
 
-    <!-- Script Flatpickr JS pentru calendarul interactiv -->
+    <!-- Script Flatpickr JS și Plugin-uri -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ro.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/shortcutButtons/shortcutButtons.js"></script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
@@ -362,15 +365,60 @@
         let historyLogs = [];
         const standardSizes = ["39", "40", "41", "42", "43", "44", "45"];
 
-        let selectedStartDate = new Date().toISOString().split('T')[0];
-        let selectedEndDate = new Date().toISOString().split('T')[0];
+        let todayObj = new Date();
+        let todayStr = todayObj.toISOString().split('T')[0];
+        let selectedStartDate = todayStr;
+        let selectedEndDate = todayStr;
 
-        // Inițializare Calendar Flatpickr (Mod Range / Interval într-o singură căsuță)
+        // Inițializare Calendar Flatpickr cu interval și butoane predefinite
         flatpickr("#historyDateRange", {
             mode: "range",
             dateFormat: "Y-m-d",
             locale: "ro",
             defaultDate: [selectedStartDate, selectedEndDate],
+            plugins: [
+                shortcutButtonsPlugin({
+                    button: [
+                        { label: "Astăzi" },
+                        { label: "Ieri" },
+                        { label: "Ultimele 7 zile" },
+                        { label: "Luna curentă" },
+                        { label: "Luna trecută" }
+                    ],
+                    onClick: (index, fp) => {
+                        let dStart = new Date();
+                        let dEnd = new Date();
+
+                        if (index === 0) {
+                            // Astăzi
+                            dStart = new Date();
+                            dEnd = new Date();
+                        } else if (index === 1) {
+                            // Ieri
+                            dStart.setDate(todayObj.getDate() - 1);
+                            dEnd = new Date(dStart);
+                        } else if (index === 2) {
+                            // Ultimele 7 zile
+                            dStart.setDate(todayObj.getDate() - 6);
+                            dEnd = new Date();
+                        } else if (index === 3) {
+                            // Luna curentă
+                            dStart = new Date(todayObj.getFullYear(), todayObj.getMonth(), 1);
+                            dEnd = new Date();
+                        } else if (index === 4) {
+                            // Luna trecută
+                            dStart = new Date(todayObj.getFullYear(), todayObj.getMonth() - 1, 1);
+                            dEnd = new Date(todayObj.getFullYear(), todayObj.getMonth(), 0);
+                        }
+
+                        selectedStartDate = dStart.toISOString().split('T')[0];
+                        selectedEndDate = dEnd.toISOString().split('T')[0];
+                        fp.setDate([selectedStartDate, selectedEndDate], true);
+                        fp.close();
+                        renderHistory();
+                    }
+                })
+            ],
             onChange: function(selectedDates, dateStr, instance) {
                 if (selectedDates.length === 2) {
                     selectedStartDate = instance.formatDate(selectedDates[0], "Y-m-d");
