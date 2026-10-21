@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VANDER - Gestiune Atelier</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/shortcutButtons/style.css">
     <style>
         :root {
             --primary: #0f172a;
@@ -265,6 +266,7 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ro.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/shortcutButtons/shortcutButtons.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
@@ -282,30 +284,60 @@
         const productsRef = ref(db, 'vander_produse');
         const historyRef = ref(db, 'vander_istoric');
         
-        // Cheie sesiune securizată (se șterge automat la închiderea browserului)
+        // Sesiune securizată folosind sessionStorage (se șterge când se închide browserul)
         const AUTH_KEY = 'vander_secure_session';
-        // Hash SHA-256 pentru parola 'atelier2026' (evită stocarea parolei în clar în cod)
-        const VALID_USER_HASH = 'vander';
-        const VALID_PASS_HASH = '90f845bc7948aefcc9cf0e812d1b7147eb68b20d36cfae8bfd4697bf92e1ef27'; 
-
-        async function sha256(message) {
-            const msgBuffer = new TextEncoder().encode(message);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
+        const CORRECT_USER = 'vander';
+        const CORRECT_PASS = 'atelier2026';
 
         let products = [];
         let historyLogs = [];
         const standardSizes = ["39", "40", "41", "42", "43", "44", "45"];
-        let selectedStartDate = new Date().toISOString().split('T')[0];
-        let selectedEndDate = new Date().toISOString().split('T')[0];
+        let todayObj = new Date();
+        let todayStr = todayObj.toISOString().split('T')[0];
+        let selectedStartDate = todayStr;
+        let selectedEndDate = todayStr;
         
         flatpickr("#historyDateRange", {
             mode: "range",
             dateFormat: "Y-m-d",
             locale: "ro",
             defaultDate: [selectedStartDate, selectedEndDate],
+            plugins: [
+                shortcutButtonsPlugin({
+                    button: [
+                        { label: "Astăzi" },
+                        { label: "Ieri" },
+                        { label: "Ultimele 7 zile" },
+                        { label: "Luna curentă" },
+                        { label: "Luna trecută" }
+                    ],
+                    onClick: (index, fp) => {
+                        let dStart = new Date();
+                        let dEnd = new Date();
+                        if (index === 0) {
+                            dStart = new Date();
+                            dEnd = new Date();
+                        } else if (index === 1) {
+                            dStart.setDate(todayObj.getDate() - 1);
+                            dEnd = new Date(dStart);
+                        } else if (index === 2) {
+                            dStart.setDate(todayObj.getDate() - 6);
+                            dEnd = new Date();
+                        } else if (index === 3) {
+                            dStart = new Date(todayObj.getFullYear(), todayObj.getMonth(), 1);
+                            dEnd = new Date();
+                        } else if (index === 4) {
+                            dStart = new Date(todayObj.getFullYear(), todayObj.getMonth() - 1, 1);
+                            dEnd = new Date(todayObj.getFullYear(), todayObj.getMonth(), 0);
+                        }
+                        selectedStartDate = dStart.toISOString().split('T')[0];
+                        selectedEndDate = dEnd.toISOString().split('T')[0];
+                        fp.setDate([selectedStartDate, selectedEndDate], true);
+                        fp.close();
+                        renderHistory();
+                    }
+                })
+            ],
             onChange: function(selectedDates, dateStr, instance) {
                 if (selectedDates.length === 2) {
                     selectedStartDate = instance.formatDate(selectedDates[0], "Y-m-d");
@@ -353,8 +385,7 @@
         window.filterByCategory = filterByCategory;
 
         function checkAuth() {
-            const session = sessionStorage.getItem(AUTH_KEY);
-            if (session === 'active') {
+            if (sessionStorage.getItem(AUTH_KEY) === 'active') {
                 loginOverlay.style.display = 'none';
                 appMainContent.style.display = 'block';
                 initRealtimeSync();
@@ -364,16 +395,14 @@
             }
         }
 
-        loginForm.addEventListener('submit', async (e) => {
+        loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const user = document.getElementById('loginUser').value.trim();
             const pass = document.getElementById('loginPass').value.trim();
-            
-            const passHash = await sha256(pass);
 
-            if (user === VALID_USER_HASH && passHash === VALID_PASS_HASH) {
+            if (user === CORRECT_USER && pass === CORRECT_PASS) {
                 sessionStorage.setItem(AUTH_KEY, 'active');
-                document.getElementById('loginPass').value = ''; // Curăță parola din memorie
+                document.getElementById('loginPass').value = '';
                 checkAuth();
             } else {
                 alert('Utilizator sau parolă incorectă!');
@@ -403,271 +432,3 @@
                 syncStatus.innerText = "● Sincronizat Online în Timp Real";
                 renderProducts();
             }, () => {
-                syncStatus.innerText = "● Eroare conexiune rețea";
-            });
-            onValue(ref(db, 'vander_istoric'), (snapshot) => {
-                const data = snapshot.val();
-                if(data) {
-                    historyLogs = Array.isArray(data) ? data : Object.values(data);
-                } else {
-                    historyLogs = [];
-                }
-                renderHistory();
-            });
-        }
-        function saveToFirebase() {
-            set(productsRef, products).catch(() => {
-                alert("Eroare la salvarea în baza de date online!");
-            });
-        }
-        function logAction(actionText) {
-            const now = new Date();
-            const logEntry = {
-                id: Date.now(),
-                date: now.toISOString().split('T')[0],
-                time: now.toLocaleTimeString('ro-RO'),
-                text: actionText
-            };
-            historyLogs.unshift(logEntry);
-            set(ref(db, 'vander_istoric'), historyLogs);
-        }
-        const sizesContainer = document.getElementById('sizesContainer');
-        standardSizes.forEach(size => {
-            sizesContainer.innerHTML += `
-                <div class="size-box">
-                    <span>${size}</span>
-                    <input type="number" class="size-input" data-size="${size}" min="0" value="0">
-                </div>
-            `;
-        });
-        function renderProducts() {
-            const list = document.getElementById('productsList');
-            list.innerHTML = '';
-            const searchText = document.getElementById('searchInput').value.toLowerCase();
-            const selectedCategory = document.getElementById('categoryFilter').value;
-            let filtered = products.filter(p => {
-                if (!p) return false;
-                let matchesSearch = (p.name + (p.sku || '') + (p.color || '')).toLowerCase().includes(searchText);
-                let matchesCategory = !selectedCategory || p.category === selectedCategory;
-                return matchesSearch && matchesCategory;
-            });
-            if(filtered.length === 0) {
-                list.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">Niciun produs găsit.</div>`;
-                return;
-            }
-            
-            let totalPiecesAll = 0;
-            let lowStockCount = 0;
-
-            filtered.forEach(p => {
-                let totalStock = 0;
-                let sizeHeaders = '';
-                let sizeValues = '';
-                standardSizes.forEach(size => {
-                    let qty = (p.stock && p.stock[size]) ? parseInt(p.stock[size]) || 0 : 0;
-                    totalStock += qty;
-                    
-                    let cellClass = "stock-cell-val";
-                    if (qty > 0 && qty <= 4) {
-                        cellClass += " low-stock";
-                        lowStockCount++;
-                    }
-
-                    sizeHeaders += `<div class="stock-cell-head">${size}</div>`;
-                    sizeValues += `<div class="${cellClass}">${qty}</div>`;
-                });
-                totalPiecesAll += totalStock;
-
-                list.innerHTML += `
-                    <div class="product-card-style">
-                        <img src="${p.image || 'logo.png'}" class="product-thumb" onerror="this.src='logo.png'">
-                        <div class="product-details">
-                            <div class="product-name-sku">
-                                ${p.name} ${p.color} ⦿ <b>VND${p.sku || '0000'}</b>
-                            </div>
-                            <div class="stock-table-grid">
-                                <div class="stock-header-row">${sizeHeaders}</div>
-                                <div class="stock-values-row">${sizeValues}</div>
-                            </div>
-                            <div class="inventory-total">Total în inventar: <b>${totalStock}</b></div>
-                            <div class="sale-price-row">
-                                <button type="button" class="btn-stop-sale" onclick="window.stopSale(${p.id}, '${p.name}')">Oprește vânzarea</button>
-                                <div class="product-price-box">${p.price || 0} RON</div>
-                            </div>
-                            <div class="item-actions-row">
-                                <button onclick="window.editProd(${p.id})" class="btn-mini-edit">Editează / Schimbă Poză</button>
-                                <button onclick="window.deleteProd(${p.id})" class="btn-mini-del">Șterge</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            document.getElementById('statTotalModels').innerText = products.length;
-            document.getElementById('statTotalPieces').innerText = totalPiecesAll;
-            document.getElementById('statLowStock').innerText = lowStockCount;
-        }
-        window.stopSale = function(id, name) {
-            logAction(`Oprire vânzare pentru modelul: ${name}`);
-            alert(`S-a oprit vânzarea pentru ${name}`);
-        }
-        function renderHistory() {
-            const container = document.getElementById('historyListContainer');
-            let filteredLogs = historyLogs;
-            if(selectedStartDate && selectedEndDate) {
-                filteredLogs = filteredLogs.filter(l => l.date >= selectedStartDate && l.date <= selectedEndDate);
-            }
-            if(filteredLogs.length === 0) {
-                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.75rem; padding: 10px;">Nicio înregistrare în intervalul selectat.</div>`;
-                return;
-            }
-            container.innerHTML = '';
-            filteredLogs.forEach(log => {
-                container.innerHTML += `
-                    <div class="history-item">
-                        <span><b>${log.date} ${log.time}</b> - ${log.text}</span>
-                    </div>
-                `;
-            });
-        }
-        window.deleteProd = function(id) {
-            if(confirm("Sigur ștergi definitiv acest produs?")) {
-                let p = products.find(item => item.id === id);
-                if(p) logAction(`Șters produsul: ${p.name}`);
-                products = products.filter(item => item && item.id !== id);
-                saveToFirebase();
-            }
-        }
-        window.editProd = function(id) {
-            const p = products.find(prod => prod && prod.id === id);
-            if(!p) return;
-            const container = document.getElementById('formContainer');
-            if (container.style.display !== 'block') {
-                toggleAddProductForm();
-            }
-            document.getElementById('editProductId').value = p.id;
-            document.getElementById('prodName').value = p.name || '';
-            document.getElementById('prodColor').value = p.color || '';
-            document.getElementById('prodSku').value = p.sku || '';
-            document.getElementById('prodPrice').value = p.price || '';
-            document.getElementById('prodCategory').value = p.category || 'Pantofi sport';
-            document.getElementById('prodNotes').value = p.notes || '';
-            document.querySelectorAll('.size-input').forEach(inp => {
-                let size = inp.dataset.size;
-                inp.value = (p.stock && p.stock[size]) ? p.stock[size] : 0;
-            });
-            document.getElementById('formTitle').innerText = "✏️ Editează Produsul: " + p.name;
-            document.getElementById('saveProductBtn').innerText = "Actualizează Produsul";
-            document.getElementById('cancelEditBtn').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        window.cancelEdit = function() {
-            document.getElementById('addProductForm').reset();
-            document.getElementById('editProductId').value = '';
-            document.getElementById('formTitle').innerText = "✨ Adaugă Model Individual";
-            document.getElementById('saveProductBtn').innerText = "Salvează Produsul";
-            document.getElementById('cancelEditBtn').style.display = 'none';
-            document.querySelectorAll('.size-input').forEach(inp => inp.value = 0);
-            toggleAddProductForm();
-        }
-        document.getElementById('importCsvBtn').addEventListener('click', () => {
-            const fileInput = document.getElementById('csvFileInput');
-            if(!fileInput.files[0]) {
-                alert('Selectează un fișier CSV mai întâi!');
-                return;
-            }
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const lines = e.target.result.split('\n');
-                let count = 0;
-                lines.forEach((line, index) => {
-                    if(index === 0 || !line.trim()) return;
-                    const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-                    if(cols.length >= 5) {
-                        products.push({
-                            id: Date.now() + Math.random(),
-                            name: cols[0], color: cols[1], sku: cols[2],
-                            price: parseFloat(cols[3]) || 0, category: cols[4],
-                            notes: cols[12] || 'Importat CSV', image: '',
-                            stock: {
-                                "39": parseInt(cols[5]) || 0, "40": parseInt(cols[6]) || 0,
-                                "41": parseInt(cols[7]) || 0, "42": parseInt(cols[8]) || 0,
-                                "43": parseInt(cols[9]) || 0, "44": parseInt(cols[10]) || 0,
-                                "45": parseInt(cols[11]) || 0
-                            }
-                        });
-                        count++;
-                    }
-                });
-                saveToFirebase();
-                logAction(`Importat fișier CSV cu ${count} produse.`);
-                alert(`Importate ${count} produse cu succes în baza de date online!`);
-            };
-            reader.readAsText(fileInput.files[0]);
-        });
-        document.getElementById('addProductForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            let editId = document.getElementById('editProductId').value;
-            let stock = {};
-            document.querySelectorAll('.size-input').forEach(inp => {
-                let val = parseInt(inp.value) || 0;
-                if(val > 0) {
-                    stock[inp.dataset.size] = val;
-                }
-            });
-            const prodNameVal = document.getElementById('prodName').value;
-            const prodData = {
-                name: prodNameVal,
-                color: document.getElementById('prodColor').value,
-                sku: document.getElementById('prodSku').value,
-                price: document.getElementById('prodPrice').value,
-                category: document.getElementById('prodCategory').value,
-                notes: document.getElementById('prodNotes').value,
-                stock: stock
-            };
-            const fileInput = document.getElementById('prodImgFile');
-            function finishSave(imageUrl) {
-                if(editId) {
-                    products = products.map(p => {
-                        if(p && p.id == editId) {
-                            return {
-                                ...p,
-                                ...prodData,
-                                image: imageUrl !== undefined ? imageUrl : (p.image || "")
-                            };
-                        }
-                        return p;
-                    });
-                    logAction(`Modificat produsul: ${prodNameVal}`);
-                } else {
-                    const newProd = {
-                        id: Date.now(),
-                        ...prodData,
-                        image: imageUrl || ""
-                    };
-                    products.push(newProd);
-                    logAction(`Adăugat produs nou: ${prodNameVal}`);
-                }
-                saveToFirebase();
-                cancelEdit();
-                alert(editId ? 'Produs actualizat cu succes!' : 'Produs salvat cu succes!');
-            }
-            if(fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    finishSave(evt.target.result);
-                };
-                reader.readAsDataURL(fileInput.files[0]);
-            } else {
-                let existingImg = undefined;
-                if(editId) {
-                    let oldP = products.find(p => p && p.id == editId);
-                    if(oldP) existingImg = oldP.image;
-                }
-                finishSave(existingImg);
-            }
-        });
-        document.getElementById('searchInput').addEventListener('input', renderProducts);
-        document.getElementById('categoryFilter').addEventListener('change', renderProducts);
-    </script>
-</body>
-</html>
