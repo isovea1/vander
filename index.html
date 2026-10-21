@@ -3,610 +3,750 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VANDER Products</title>
+  <title>VANDER - Editare Produse</title>
   <style>
     :root {
       --bg-dark: #4a4d52;
-      --bar-dark: rgba(28, 31, 34, 0.96);
+      --bar-dark: rgba(18, 22, 26, 0.96);
       --screen-bg: #dfe0dc;
-      --panel-bg: #f1f1f1;
-      --panel-2: #e9e9e7;
-      --line: #d1d1d1;
-      --text: #1d1d1f;
-      --muted: #6b7076;
+      --surface: rgba(255,255,255,0.32);
+      --surface-2: rgba(255,255,255,0.2);
+      --line: rgba(0,0,0,0.12);
+      --text: #1c1d20;
+      --muted: #6b7280;
       --blue: #2d8bfd;
-      --red: #ee4b4b;
-      --red-deep: #d93a3a;
-      --green: #1dbb9c;
-      --green-deep: #159076;
-      --shadow: rgba(0,0,0,0.14);
+      --green: #18b98a;
+      --green-deep: #0f8e6d;
+      --red: #ef4f4f;
+      --red-deep: #cf3a3a;
+      --yellow: #f6d365;
+      --shadow: 0 16px 28px rgba(0,0,0,0.14);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-
-    html, body {
-      height: 100%;
-      background: var(--bg-dark);
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    html, body { height: 100%; background: var(--bg-dark); }
     body {
       display: grid;
       place-items: center;
-      padding: 0;
       color: var(--text);
+      overflow: hidden;
+      padding: 0;
     }
 
     .phone {
       position: relative;
       width: 420px;
       height: 100vh;
-      max-height: 860px;
+      max-height: 920px;
       background: var(--screen-bg);
       overflow: hidden;
-      border-radius: 0;
-      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.22);
     }
 
     .statusbar {
       height: 52px;
       background: var(--bar-dark);
-      color: #f4f4f4;
+      color: #f6f8fa;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 18px;
-      font-weight: 700;
       font-size: 17px;
+      font-weight: 700;
       letter-spacing: 0.02em;
     }
 
-    .status-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .status-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .status-right .signal {
-      display: flex;
-      align-items: end;
-      gap: 3px;
-      height: 14px;
-    }
-
-    .status-right .signal span {
+    .status-left, .status-right { display: flex; align-items: center; gap: 10px; }
+    .signal { display: flex; align-items: end; gap: 3px; height: 14px; }
+    .signal span {
       display: block;
       width: 3px;
       border-radius: 2px 2px 0 0;
-      background: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.92);
     }
-
-    .status-right .signal span:nth-child(1) { height: 4px; }
-    .status-right .signal span:nth-child(2) { height: 7px; }
-    .status-right .signal span:nth-child(3) { height: 9px; }
-    .status-right .signal span:nth-child(4) { height: 12px; }
+    .signal span:nth-child(1){ height: 4px; }
+    .signal span:nth-child(2){ height: 7px; }
+    .signal span:nth-child(3){ height: 9px; }
+    .signal span:nth-child(4){ height: 12px; }
 
     .battery {
-      width: 26px;
-      height: 14px;
-      border-radius: 4px;
+      width: 28px;
+      height: 12px;
+      border: 2px solid rgba(255,255,255,0.9);
+      border-radius: 3px;
       position: relative;
-      border: 2px solid #f3f3f3;
       background: transparent;
     }
-
     .battery::before {
       content: "";
       position: absolute;
-      inset: 2px;
-      background: linear-gradient(90deg, #f4d958 0 100%);
+      left: 2px;
+      top: 2px;
+      width: 16px;
+      height: 4px;
       border-radius: 2px;
+      background: #ebd765;
     }
-
     .battery::after {
       content: "";
       position: absolute;
       right: -4px;
-      top: 3px;
-      width: 3px;
-      height: 6px;
+      top: 2px;
+      width: 2px;
+      height: 5px;
+      border-radius: 1px;
       background: rgba(255,255,255,0.9);
-      border-radius: 2px;
     }
 
-    .status-pill {
-      min-width: 29px;
+    .network-badge {
+      min-width: 32px;
       height: 20px;
+      background: #f0d95a;
+      color: #1d1d1f;
+      border-radius: 999px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background: #f0d642;
-      color: #212121;
-      border-radius: 10px;
       font-size: 12px;
-      font-weight: 900;
+      font-weight: 800;
       padding: 0 8px;
     }
 
     .topbar {
-      height: 46px;
-      background: rgba(16, 16, 16, 0.12);
+      height: 48px;
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
       border-bottom: 1px solid rgba(0,0,0,0.06);
-    }
-
-    .topbar .domain {
-      font-size: 22px;
+      background: rgba(0,0,0,0.05);
+      font-size: 15px;
       font-weight: 700;
       letter-spacing: 0.02em;
-      color: #1f2327;
     }
-
-    .menu-line {
-      position: absolute;
-      left: 18px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 20px;
-      height: 18px;
-      cursor: pointer;
-    }
-
-    .menu-line span {
-      position: absolute;
-      left: 0;
-      width: 100%;
-      height: 3px;
-      background: #1f2327;
-      border-radius: 2px;
-    }
-
-    .menu-line span:nth-child(1) { top: 0; }
-    .menu-line span:nth-child(2) { top: 7px; }
-    .menu-line span:nth-child(3) { top: 14px; }
 
     .title-row {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 16px 18px 12px 14px;
-      font-size: 17px;
+      gap: 14px;
+      padding: 16px 18px 12px;
       font-weight: 800;
-      letter-spacing: 0.02em;
-      color: #1a1a1a;
+      font-size: 17px;
       text-transform: uppercase;
+      letter-spacing: 0.02em;
     }
 
-    .title-row .burger {
-      width: 22px;
-      height: 22px;
-      display: inline-flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 4px;
-      position: relative;
-      top: -1px;
-    }
-
-    .title-row .burger span {
-      display: block;
+    .hamburger { width: 22px; height: 18px; position: relative; display: inline-block; }
+    .hamburger span {
+      position: absolute;
+      left: 0;
       width: 100%;
       height: 3px;
-      background: #202224;
+      background: #1e2125;
       border-radius: 2px;
     }
+    .hamburger span:nth-child(1){ top: 0; }
+    .hamburger span:nth-child(2){ top: 7px; }
+    .hamburger span:nth-child(3){ top: 14px; }
 
     .content {
-      height: calc(100% - 52px - 46px - 52px);
+      height: calc(100vh - 52px - 48px - 120px);
       overflow-y: auto;
-      padding: 0 14px 20px;
+      padding: 0 12px 12px;
+      scrollbar-width: none;
     }
+    .content::-webkit-scrollbar { display: none; }
 
     .product-card {
-      background: rgba(255,255,255,0.28);
-      border: 1px solid rgba(0,0,0,0.08);
-      border-radius: 10px;
-      padding: 8px 10px 8px 10px;
-      margin-bottom: 18px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      margin-bottom: 12px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.45);
     }
 
-    .product-row {
+    .product-layout {
       display: grid;
-      grid-template-columns: 190px 1fr;
-      gap: 12px;
-      align-items: center;
+      grid-template-columns: 150px 1fr;
+      gap: 10px;
+      align-items: start;
     }
 
-    .product-photo {
-      height: 128px;
-      border-radius: 8px;
+    .shoe-box {
+      height: 150px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      background: linear-gradient(180deg, rgba(255,255,255,0.3), rgba(255,255,255,0.06));
+      background: linear-gradient(180deg, rgba(255,255,255,0.24), rgba(255,255,255,0.08));
+      border: 1px solid rgba(0,0,0,0.05);
     }
-
-    .product-photo img {
-      display: block;
-      width: 100%;
+    .shoe-box img {
+      width: 125%;
       height: 100%;
       object-fit: cover;
-      filter: drop-shadow(0 8px 10px rgba(0,0,0,0.12));
-      background: #f5f5f6;
+      filter: drop-shadow(0 8px 12px rgba(0,0,0,0.12));
+      transform: scale(1.18);
+      background: transparent;
     }
 
-    .product-summary {
-      padding: 4px 0;
-    }
-
-    .product-name {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
+    .field-group {
+      display: grid;
       gap: 8px;
-      font-size: 16px;
-      font-weight: 700;
-      line-height: 1.15;
-      color: #1d2022;
       margin-bottom: 8px;
     }
 
-    .tag {
-      display: inline-flex;
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
       align-items: center;
-      justify-content: center;
-      min-width: 52px;
-      height: 28px;
-      background: var(--blue);
-      border-radius: 8px;
-      color: #fff;
-      font-size: 16px;
-      font-weight: 800;
-      padding: 0 10px;
-      text-transform: lowercase;
     }
 
-    .stock-grid {
+    .field-row label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .product-input,
+    .product-price,
+    .product-code,
+    .size-input {
+      width: 100%;
+      border: 1px solid rgba(0,0,0,0.15);
+      background: rgba(255,255,255,0.42);
+      border-radius: 8px;
+      padding: 8px 9px;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .product-input {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .product-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .size-grid {
       display: grid;
       grid-template-columns: repeat(6, minmax(0, 1fr));
-      gap: 4px;
-      max-width: 290px;
+      gap: 6px;
       margin-top: 2px;
     }
 
-    .stock-cell {
-      width: 100%;
-      height: 32px;
-      display: grid;
-      place-items: center;
-      border: 1px solid rgba(0,0,0,0.18);
-      background: rgba(255,255,255,0.28);
-      font-size: 16px;
-      font-weight: 700;
-      color: #2b2e33;
-    }
-
-    .stock-cell.empty {
-      opacity: 0.7;
-      background: rgba(255,255,255,0.18);
-    }
-
-    .inventory {
-      margin-top: 10px;
-      text-align: center;
-      font-size: 18px;
-      font-weight: 700;
-      color: #1d1f22;
-    }
-
-    .cta-btn {
-      display: block;
-      width: 100%;
-      height: 42px;
-      border: none;
+    .size-box {
+      border: 1px solid rgba(0,0,0,0.14);
+      background: rgba(255,255,255,0.34);
       border-radius: 8px;
-      background: linear-gradient(180deg, #ff5c5c, #eb3c3c);
-      color: white;
-      font-size: 18px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 68px;
+      padding: 4px 2px;
+    }
+
+    .size-box span {
+      font-size: 11px;
       font-weight: 800;
-      letter-spacing: 0.01em;
-      margin-top: 10px;
-      box-shadow: 0 4px 0 rgba(163, 36, 36, 0.3);
-      cursor: pointer;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .size-box input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      text-align: center;
+      font-weight: 800;
+      font-size: 13px;
+      color: var(--text);
+      outline: none;
     }
 
     .meta-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-top: 12px;
-      padding-top: 12px;
+      margin-top: 10px;
+      padding-top: 10px;
       border-top: 1px solid rgba(0,0,0,0.08);
-      font-size: 17px;
+      font-size: 14px;
       font-weight: 700;
-      color: #1d2023;
+      color: #1f2125;
     }
 
-    .meta-row .code {
-      width: 100%;
+    .meta-row .price {
+      min-width: 60px;
       text-align: right;
-      padding-left: 12px;
+      font-size: 15px;
     }
 
-    .bottom-bar {
+    .toggle-wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      min-width: 52px;
+      height: 28px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.12);
+      padding: 4px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .switch::before {
+      content: "";
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transform: translateX(0);
+      transition: transform 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .switch.active {
+      background: var(--green);
+    }
+    .switch.active::before { transform: translateX(24px); }
+
+    .action-bar {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      border-top: 1px solid rgba(0,0,0,0.08);
+      background: rgba(255,255,255,0.18);
+    }
+
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.2s ease;
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn.primary {
+      background: linear-gradient(180deg, var(--green) 0%, var(--green-deep) 100%);
+      color: white;
+      box-shadow: 0 4px 0 rgba(12, 127, 103, 0.24);
+      flex: 1;
+    }
+    .btn.secondary {
+      background: linear-gradient(180deg, var(--blue) 0%, #1e6ee8 100%);
+      color: white;
+      box-shadow: 0 4px 0 rgba(18, 63, 154, 0.24);
+      flex: 1;
+    }
+    .btn.danger {
+      background: linear-gradient(180deg, var(--red) 0%, var(--red-deep) 100%);
+      color: white;
+      box-shadow: 0 4px 0 rgba(153, 43, 43, 0.24);
+    }
+
+    .login-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(17, 18, 20, 0.72);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 14px;
-      padding: 12px 14px 16px;
-      background: rgba(255,255,255,0.06);
-      border-top: 1px solid rgba(0,0,0,0.06);
+      z-index: 40;
+      backdrop-filter: blur(2px);
     }
 
-    .save-box {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      margin-top: 4px;
+    .login-box {
+      width: min(86%, 300px);
+      background: rgba(255,255,255,0.95);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 20px 18px 16px;
     }
 
-    .save-btn {
-      width: 100%;
-      max-width: 290px;
-      height: 42px;
-      border: none;
-      border-radius: 8px;
-      background: linear-gradient(180deg, #1ebf9a, #0f9e82);
-      color: white;
+    .login-box h2 {
+      text-align: center;
       font-size: 18px;
+      margin-bottom: 14px;
+      color: #1f2937;
+    }
+
+    .login-form {
+      display: grid;
+      gap: 12px;
+    }
+
+    .login-form input {
+      width: 100%;
+      border: 1px solid rgba(0,0,0,0.15);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      background: #f9fafb;
+      color: #111827;
+    }
+
+    .login-form button {
+      border: none;
+      border-radius: 10px;
+      padding: 11px 12px;
+      background: linear-gradient(180deg, var(--green) 0%, var(--green-deep) 100%);
+      color: white;
       font-weight: 800;
-      box-shadow: 0 4px 0 rgba(9, 123, 98, 0.25);
       cursor: pointer;
     }
 
-    .vertical-scroll {
-      position: absolute;
-      left: 10px;
-      bottom: 96px;
-      width: 20px;
-      height: 120px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .vertical-scroll::before,
-    .vertical-scroll::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 2px;
-      background: rgba(0,0,0,0.32);
-      border-radius: 999px;
-    }
-
-    .vertical-scroll::before {
-      height: 68px;
-      top: 10px;
-    }
-
-    .vertical-scroll::after {
-      height: 68px;
-      bottom: 10px;
-    }
-
-    .scroll-arrow {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 7px solid transparent;
-      border-right: 7px solid transparent;
-      border-top: 10px solid rgba(0,0,0,0.5);
-      top: 0;
-    }
-
-    .scroll-arrow.down {
-      bottom: 0;
-      top: auto;
-      border-top: none;
-      border-left: 7px solid transparent;
-      border-right: 7px solid transparent;
-      border-bottom: 10px solid rgba(0,0,0,0.5);
-    }
+    .hidden { display: none !important; }
 
     @media (max-width: 420px) {
-      .phone {
-        width: 100vw;
-      }
+      .phone { width: 100vw; }
     }
   </style>
 </head>
 <body>
   <div class="phone">
-    <div class="statusbar">
-      <div class="status-left">
-        <span>08:52</span>
-        <span style="font-size: 18px;">◔</span>
-      </div>
-      <div class="status-right">
-        <div class="signal" aria-label="signal">
-          <span></span><span></span><span></span><span></span>
-        </div>
-        <div class="battery" aria-label="battery"></div>
-        <span class="status-pill">17</span>
+    <div class="login-overlay" id="loginOverlay">
+      <div class="login-box">
+        <h2>Autentificare</h2>
+        <form class="login-form" id="loginForm">
+          <input type="password" id="loginPassword" placeholder="Introdu codul de acces" autocomplete="off" required />
+          <button type="submit">Intră în aplicație</button>
+        </form>
       </div>
     </div>
 
-    <div class="topbar">
-      <div class="domain">supp.ssell.ro</div>
-    </div>
-
-    <div class="title-row">
-      <div class="burger" aria-label="menu">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-      <div>Toate produsele</div>
-    </div>
-
-    <div class="content">
-      <div class="product-card">
-        <div class="product-row">
-          <div class="product-photo">
-            <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80" alt="Ghete" />
-          </div>
-
-          <div class="product-summary">
-            <div class="product-name">
-              <span>Ghete barbati din piele naturala</span>
-              <span>neagra 20253</span>
-              <span class="tag">top</span>
-            </div>
-
-            <div class="stock-grid">
-              <div class="stock-cell">39</div>
-              <div class="stock-cell">40</div>
-              <div class="stock-cell">41</div>
-              <div class="stock-cell">42</div>
-              <div class="stock-cell">43</div>
-              <div class="stock-cell">44</div>
-
-              <div class="stock-cell empty">0</div>
-              <div class="stock-cell empty">1</div>
-              <div class="stock-cell empty">2</div>
-              <div class="stock-cell empty">2</div>
-              <div class="stock-cell empty">2</div>
-              <div class="stock-cell empty">0</div>
-            </div>
-
-            <div class="inventory">Total in inventar: 7</div>
-            <button class="cta-btn" type="button">Opreste vanzarea</button>
-          </div>
+    <div id="appMainContent">
+      <div class="statusbar">
+        <div class="status-left">
+          <span>08:52</span>
+          <span style="font-size: 18px;">◔</span>
         </div>
-
-        <div class="meta-row">
-          <span>F104 N</span>
-          <span class="code">160</span>
+        <div class="status-right">
+          <div class="signal" aria-label="signal">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div class="battery" aria-label="battery"></div>
+          <span class="network-badge">17</span>
         </div>
       </div>
 
-      <div class="product-card">
-        <div class="product-row">
-          <div class="product-photo">
-            <img src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=900&q=80" alt="Pantofi" />
-          </div>
+      <div class="topbar">supp.ssell.ro</div>
 
-          <div class="product-summary">
-            <div class="product-name">
-              <span>Pantofi barbati din piele naturala</span>
-              <span>neagra 20254</span>
-              <span class="tag">top</span>
-            </div>
-
-            <div class="stock-grid">
-              <div class="stock-cell">39</div>
-              <div class="stock-cell">40</div>
-              <div class="stock-cell">41</div>
-              <div class="stock-cell">42</div>
-              <div class="stock-cell">43</div>
-              <div class="stock-cell">44</div>
-
-              <div class="stock-cell empty">0</div>
-              <div class="stock-cell empty">2</div>
-              <div class="stock-cell empty">1</div>
-              <div class="stock-cell empty">2</div>
-              <div class="stock-cell empty">0</div>
-              <div class="stock-cell empty">0</div>
-            </div>
-
-            <div class="inventory">Total in inventar: 5</div>
-            <button class="cta-btn" type="button">Opreste vanzarea</button>
-          </div>
+      <div class="title-row">
+        <div class="hamburger" aria-label="menu">
+          <span></span><span></span><span></span>
         </div>
-
-        <div class="meta-row">
-          <span>4052 N</span>
-          <span class="code">135</span>
-        </div>
+        <div>Toate produsele</div>
       </div>
 
-      <div class="product-card">
-        <div class="product-row">
-          <div class="product-photo">
-            <img src="https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=900&q=80" alt="Pantofi negru" />
-          </div>
+      <div class="content" id="productList"></div>
 
-          <div class="product-summary">
-            <div class="product-name">
-              <span>Pantofi barbati din piele naturala</span>
-              <span>neagra 20255</span>
-              <span class="tag">top</span>
-            </div>
-
-            <div class="stock-grid">
-              <div class="stock-cell">39</div>
-              <div class="stock-cell">40</div>
-              <div class="stock-cell">41</div>
-              <div class="stock-cell">42</div>
-              <div class="stock-cell">43</div>
-              <div class="stock-cell">44</div>
-
-              <div class="stock-cell empty">1</div>
-              <div class="stock-cell empty">2</div>
-              <div class="stock-cell empty">4</div>
-              <div class="stock-cell empty">3</div>
-              <div class="stock-cell empty">2</div>
-              <div class="stock-cell empty">1</div>
-            </div>
-
-            <div class="inventory">Total in inventar: 13</div>
-            <button class="cta-btn" type="button">Opreste vanzarea</button>
-          </div>
-        </div>
+      <div class="action-bar">
+        <button class="btn secondary" id="addProductBtn" type="button">+ Adaugă produs</button>
+        <button class="btn primary" id="saveProductsBtn" type="button">Salvează</button>
       </div>
-
-      <div class="save-box">
-        <button class="save-btn" type="button">Salveaza modificarile</button>
-      </div>
-    </div>
-
-    <div class="vertical-scroll" aria-hidden="true">
-      <div class="scroll-arrow"></div>
-      <div class="scroll-arrow down"></div>
     </div>
   </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDdI_ae-3iwkgxk9I-OMhgw_2OA3WtLwn8",
+      authDomain: "vander-9e026.firebaseapp.com",
+      databaseURL: "https://vander-9e026-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "vander-9e026",
+      storageBucket: "vander-9e026.firebasestorage.app",
+      messagingSenderId: "317349329202",
+      appId: "1:317349329202:web:68ed0cdf0f75637801bf2b"
+    };
+
+    const AUTH_KEY = 'vander_is_logged';
+    const standardSizes = [39, 40, 41, 42, 43, 44, 45];
+    const DEFAULT_PRODUCTS = [
+      {
+        id: 'F104N',
+        name: 'Ghete bărbați din piele naturală',
+        code: 'F104N',
+        color: 'Negru',
+        price: 160,
+        image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80',
+        active: true,
+        sizes: {39: 2, 40: 3, 41: 4, 42: 3, 43: 2, 44: 1, 45: 0}
+      },
+      {
+        id: '4052N',
+        name: 'Pantofi bărbați din piele naturală',
+        code: '4052N',
+        color: 'Negru',
+        price: 135,
+        image: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=900&q=80',
+        active: true,
+        sizes: {39: 1, 40: 2, 41: 2, 42: 3, 43: 2, 44: 1, 45: 0}
+      },
+      {
+        id: '20255',
+        name: 'Pantofi casual premium',
+        code: '20255',
+        color: 'Negru',
+        price: 149,
+        image: 'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=900&q=80',
+        active: true,
+        sizes: {39: 0, 40: 2, 41: 4, 42: 2, 43: 3, 44: 2, 45: 1}
+      }
+    ];
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const productsRef = ref(db, 'vander_produse');
+
+    let products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+
+    const loginOverlay = document.getElementById('loginOverlay');
+    const appMainContent = document.getElementById('appMainContent');
+    const loginForm = document.getElementById('loginForm');
+    const productList = document.getElementById('productList');
+    const addProductBtn = document.getElementById('addProductBtn');
+    const saveProductsBtn = document.getElementById('saveProductsBtn');
+
+    function normalizeSizes(rawSizes = {}) {
+      const normalized = {};
+      standardSizes.forEach((size) => {
+        const value = Array.isArray(rawSizes)
+          ? Number(rawSizes[standardSizes.indexOf(size)] || 0)
+          : Number(rawSizes[size] || 0);
+        normalized[size] = Number.isFinite(value) ? value : 0;
+      });
+      return normalized;
+    }
+
+    function normalizeProduct(product, index = 0) {
+      const normalized = {
+        id: product.id || `prod-${Date.now()}-${index}`,
+        name: product.name || `Produs ${index + 1}`,
+        code: product.code || `COD-${index + 1}`,
+        color: product.color || 'Negru',
+        price: Number(product.price || 0),
+        image: product.image || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80',
+        active: product.active !== false,
+        sizes: normalizeSizes(product.sizes || {})
+      };
+      return normalized;
+    }
+
+    function getTotalStock(product) {
+      return Object.values(product.sizes || {}).reduce((sum, count) => sum + Number(count || 0), 0);
+    }
+
+    function renderProducts() {
+      productList.innerHTML = products.map((product, index) => {
+        const amount = getTotalStock(product);
+        return `
+          <article class="product-card" data-index="${index}">
+            <div class="product-layout">
+              <div class="shoe-box">
+                <img src="${product.image}" alt="${product.name}" />
+              </div>
+
+              <div>
+                <div class="field-group">
+                  <div class="field-row">
+                    <label>Nume</label>
+                  </div>
+                  <input class="product-input" data-field="name" data-index="${index}" value="${escapeHtml(product.name)}" />
+                </div>
+
+                <div class="field-group">
+                  <div class="field-row">
+                    <label>Cod</label>
+                    <span style="font-size:11px; color: var(--muted); font-weight:800;">${amount} buc.</span>
+                  </div>
+                  <input class="product-code" data-field="code" data-index="${index}" value="${escapeHtml(product.code)}" />
+                </div>
+
+                <div class="field-group">
+                  <div class="field-row">
+                    <label>Preț</label>
+                    <span style="font-size:11px; color: var(--muted); font-weight:800;">Lei</span>
+                  </div>
+                  <input class="product-price" type="number" min="0" data-field="price" data-index="${index}" value="${Number(product.price || 0)}" />
+                </div>
+              </div>
+            </div>
+
+            <div class="product-row">
+              <span>${product.color || 'Negru'}</span>
+              <span style="color:#111827;">ID: ${product.id}</span>
+            </div>
+
+            <div class="size-grid">
+              ${standardSizes.map((size) => `
+                <div class="size-box">
+                  <span>${size}</span>
+                  <input type="number" min="0" data-size="${size}" data-index="${index}" value="${Number(product.sizes[size] || 0)}" />
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="toggle-wrap">
+              <span style="font-size:12px; font-weight:800; text-transform: uppercase; color: var(--muted);">Disponibil</span>
+              <button class="switch ${product.active ? 'active' : ''}" data-toggle="active" data-index="${index}" type="button" aria-label="Toggle disponibil"></button>
+            </div>
+
+            <div class="meta-row">
+              <span>Stoc total</span>
+              <span class="price">${amount}</span>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      document.querySelectorAll('[data-field]').forEach((input) => {
+        input.addEventListener('input', (event) => {
+          const index = Number(event.target.dataset.index);
+          const field = event.target.dataset.field;
+          if (!products[index]) return;
+
+          if (field === 'price') {
+            products[index][field] = Number(event.target.value || 0);
+          } else {
+            products[index][field] = event.target.value;
+          }
+        });
+      });
+
+      document.querySelectorAll('[data-size]').forEach((input) => {
+        input.addEventListener('input', (event) => {
+          const index = Number(event.target.dataset.index);
+          const size = Number(event.target.dataset.size);
+          if (!products[index]) return;
+          products[index].sizes[size] = Number(event.target.value || 0);
+          renderProducts();
+        });
+      });
+
+      document.querySelectorAll('[data-toggle]').forEach((button) => {
+        button.addEventListener('click', (event) => {
+          const index = Number(event.target.dataset.index);
+          if (!products[index]) return;
+          products[index].active = !products[index].active;
+          renderProducts();
+        });
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function saveProductsToFirebase() {
+      const safeProducts = products.map((product, index) => normalizeProduct(product, index));
+      set(productsRef, safeProducts)
+        .then(() => {
+          products = safeProducts;
+          renderProducts();
+        })
+        .catch((error) => {
+          console.error('Eroare la salvarea în Firebase:', error);
+          alert('A apărut o eroare la salvarea datelor. Verifică configurația Firebase.');
+        });
+    }
+
+    function addProduct() {
+      const newProduct = {
+        id: `prod-${Date.now()}`,
+        name: 'Produs nou',
+        code: `NEW-${products.length + 1}`,
+        color: 'Negru',
+        price: 0,
+        image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80',
+        active: true,
+        sizes: {39: 0, 40: 0, 41: 0, 42: 0, 43: 0, 44: 0, 45: 0}
+      };
+      products.push(newProduct);
+      renderProducts();
+      saveProductsToFirebase();
+    }
+
+    function isLoggedIn() {
+      return localStorage.getItem(AUTH_KEY) === 'true';
+    }
+
+    function setLoggedIn(flag) {
+      localStorage.setItem(AUTH_KEY, flag ? 'true' : 'false');
+      loginOverlay.classList.toggle('hidden', flag);
+      appMainContent.classList.toggle('hidden', !flag);
+    }
+
+    function initAuth() {
+      const password = '1234';
+      loginForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const entered = document.getElementById('loginPassword').value;
+        if (entered === password) {
+          setLoggedIn(true);
+          document.getElementById('loginPassword').value = '';
+          syncFromFirebase();
+        } else {
+          alert('Cod incorect. Folosește 1234 pentru demo.');
+        }
+      });
+    }
+
+    function syncFromFirebase() {
+      onValue(productsRef, (snapshot) => {
+        const data = snapshot.val();
+        if (Array.isArray(data) && data.length) {
+          products = data.map(normalizeProduct);
+        } else if (data && typeof data === 'object') {
+          products = Object.values(data).map(normalizeProduct);
+        } else {
+          products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+        }
+        renderProducts();
+      }, {
+        onlyOnce: false
+      });
+    }
+
+    loginForm.addEventListener('submit', (event) => event.preventDefault());
+    addProductBtn.addEventListener('click', addProduct);
+    saveProductsBtn.addEventListener('click', saveProductsToFirebase);
+
+    initAuth();
+    setLoggedIn(isLoggedIn());
+    syncFromFirebase();
+  </script>
 </body>
 </html>
-```
-
-Acesta este foarte aproape de captura ta: bară de status, topbar gri, listă de produse cu imagine mare, cutii de mărimi, buton roșu, și buton verde de salvare în partea de jos. Dacă vrei, în continuare pot să-l fac și mai aproape de imagine prin:
-- dimensiuni exact identice la fonturi și spacing
-- iconițe mai apropiate de screenshot
-- sidebar menu deschis/închis
-- comportament de scroll identic
-- și un produs editabil live din Firebase. 
-
-Dacă vrei, dau imediat și varianta „încă și mai apropiată de mockup-ul din imagine”. 
-
-Also, the repo file has been kept in sync with this styling if you want the live saved version. 
-
-If you want me to make it even closer to the image, say: “fă-l exact ca în imagine”. 
