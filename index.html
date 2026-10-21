@@ -1,1 +1,602 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VANDER - Gestiune Atelier</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --danger: #dc2626;
+            --danger-bg: #ef4444;
+            --success: #16a34a;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+            --radius: 10px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --sidebar-bg: #1e293b;
+        }
 
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); padding: 15px 10px; line-height: 1.5; }
+        .container { max-width: 900px; margin: 0 auto; transition: margin-left 0.3s ease; }
+
+        /* Sidebar Styling */
+        #sidebarOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; }
+        .sidebar { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: var(--sidebar-bg); color: #fff; z-index: 1000; transition: left 0.3s ease; display: flex; flex-direction: column; box-shadow: 4px 0 10px rgba(0,0,0,0.3); }
+        .sidebar.open { left: 0; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid #334155; display: flex; align-items: center; justify-content: space-between; }
+        .sidebar-brand { font-size: 1.1rem; font-weight: 800; letter-spacing: 0.5px; }
+        .sidebar-user { padding: 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #334155; background: #0f172a; }
+        .sidebar-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #cbd5e1; }
+        .sidebar-user-name { font-size: 0.9rem; font-weight: 600; }
+        .sidebar-menu { list-style: none; padding: 10px 0; flex-grow: 1; overflow-y: auto; }
+        .sidebar-menu li a { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: #cbd5e1; text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: background 0.2s, color 0.2s; }
+        .sidebar-menu li a:hover, .sidebar-menu li.active a { background: #334155; color: #fff; }
+        .sidebar-footer { padding: 15px 20px; border-top: 1px solid #334155; }
+        .sidebar-logout-btn { background: transparent; border: none; color: #f87171; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; font-weight: 600; cursor: pointer; width: 100%; padding: 10px; border-radius: 6px; }
+        .sidebar-logout-btn:hover { background: rgba(248, 113, 113, 0.1); }
+
+        /* Header */
+        .app-header { background: var(--card-bg); padding: 20px; border-radius: var(--radius); box-shadow: var(--shadow); text-align: center; margin-bottom: 16px; border: 1px solid var(--border); position: relative; }
+        .logo-img { height: 40px; object-fit: contain; margin-bottom: 8px; }
+        .app-header h1 { font-size: 1.4rem; font-weight: 800; color: var(--primary); }
+        .app-header p { color: var(--text-muted); font-size: 0.85rem; }
+        
+        .menu-toggle-btn { position: absolute; top: 15px; left: 15px; background: #f1f5f9; border: 1px solid var(--border); color: var(--primary); padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .top-bar-btns { position: absolute; top: 15px; right: 15px; }
+        .btn-outline { background: #fef2f2; border: 1px solid #fecaca; color: var(--danger); padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; }
+
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+        .stat-card { background: var(--card-bg); padding: 15px; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); text-align: center; }
+        .stat-number { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+        .stat-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; }
+
+        /* Cards */
+        .card { background: var(--card-bg); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+        .card h2 { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 15px; }
+
+        /* Form elements */
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--primary); margin-bottom: 5px; text-transform: uppercase; }
+        input[type="text"], input[type="password"], input[type="number"], select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; background: #f8fafc; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); background: #fff; }
+        
+        .sizes-grid-container { display: flex; gap: 6px; flex-wrap: wrap; background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid var(--border); }
+        .size-box { text-align: center; background: white; padding: 6px; border-radius: 4px; border: 1px solid var(--border); flex: 1; min-width: 40px; }
+        .size-box span { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 2px; }
+        .size-box input { width: 100%; text-align: center; padding: 4px; font-weight: 700; font-size: 0.85rem; border: 1px solid var(--border); border-radius: 4px; }
+
+        /* Buttons */
+        .btn-primary { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; border-radius: 6px; font-size: 0.95rem; font-weight: 700; cursor: pointer; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-secondary { background: #64748b; color: white; border: none; padding: 12px; border-radius: 6px; font-size: 0.90rem; font-weight: 700; cursor: pointer; }
+
+        /* Import Box */
+        .import-box { background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px dashed var(--border); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+        /* Search & Filter inputs */
+        .filter-row { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .search-input, .filter-select { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; background: #f8fafc; }
+
+        /* Card produs stilizat */
+        .product-card-style { background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; margin-bottom: 12px; display: flex; gap: 12px; align-items: flex-start; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .product-thumb { width: 90px; height: 90px; object-fit: contain; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 4px; flex-shrink: 0; }
+        .product-details { flex-grow: 1; }
+        .product-name-sku { font-size: 0.9rem; font-weight: 700; color: var(--primary); margin-bottom: 6px; line-height: 1.3; }
+        
+        .stock-table-grid { background: #e2e8f0; border-radius: 6px; padding: 2px; margin-bottom: 8px; overflow-x: auto; }
+        .stock-header-row, .stock-values-row { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; gap: 1px; }
+        .stock-cell-head { background: #cbd5e1; font-size: 0.7rem; font-weight: 800; padding: 4px 2px; color: #334155; }
+        .stock-cell-val { background: #ffffff; font-size: 0.8rem; font-weight: 700; padding: 6px 2px; color: var(--primary); }
+
+        .inventory-total { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-align: right; }
+        
+        .btn-stop-sale { width: 100%; background: var(--danger-bg); color: white; border: none; padding: 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.3px; }
+        .btn-stop-sale:hover { background: var(--danger); }
+
+        .product-bottom-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+        .product-bottom-inputs input { padding: 6px 10px; font-size: 0.85rem; background: #fff; }
+
+        .item-actions-row { display: flex; gap: 6px; margin-top: 8px; }
+        .btn-mini-edit { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; cursor: pointer; flex: 1; }
+        .btn-mini-del { background: #ffe4e6; color: #be123c; border: 1px solid #fecaca; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; cursor: pointer; flex: 1; }
+
+        /* Login Overlay */
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .login-card { background: white; padding: 30px 20px; border-radius: var(--radius); width: 100%; max-width: 380px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); text-align: center; }
+
+        #syncStatus { font-size: 0.7rem; color: var(--success); margin-top: 4px; font-weight: 700; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+    <!-- Ecranul de Autentificare -->
+    <div id="loginOverlay">
+        <div class="login-card">
+            <img src="logo.png" alt="VANDER" style="height: 40px; margin-bottom: 15px;" onerror="this.style.display='none'">
+            <h2 style="margin-bottom: 15px; font-size: 1.2rem; color: var(--primary);">Autentificare Atelier</h2>
+            <form id="loginForm">
+                <div class="form-group" style="text-align: left;">
+                    <label>Utilizator</label>
+                    <input type="text" id="loginUser" required placeholder="ex: vander" />
+                </div>
+                <div class="form-group" style="text-align: left;">
+                    <label>Parolă</label>
+                    <input type="password" id="loginPass" required placeholder="••••••••" />
+                </div>
+                <button type="submit" id="loginBtn" class="btn-primary" style="margin-top: 5px;">Intră în Aplicație</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Meniu Lateral (Sidebar) -->
+    <div id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <nav class="sidebar" id="appSidebar">
+        <div class="sidebar-header">
+            <span class="sidebar-brand">VANDER <span style="font-size:0.75rem; color:#94a3b8;">admin</span></span>
+            <button onclick="toggleSidebar()" style="background:none; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">✕</button>
+        </div>
+        <div class="sidebar-user">
+            <img src="logo.png" alt="Avatar" class="sidebar-avatar" onerror="this.src='logo.png'">
+            <div>
+                <div class="sidebar-user-name">Madalin Mandocescu</div>
+                <div style="font-size: 0.75rem; color: #94a3b8;">Administrator</div>
+            </div>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#" onclick="toggleSidebar()">📦 Comenzi noi</a></li>
+            <li class="active"><a href="#" onclick="toggleSidebar()">⭐ TOP Produse</a></li>
+            <li><a href="#" onclick="toggleSidebar()">📋 Toate Produsele</a></li>
+            <li><a href="#" onclick="toggleSidebar()">👞 Pantofi</a></li>
+            <li><a href="#" onclick="toggleSidebar()">👢 Ghete/Botine/Cizme</a></li>
+            <li><a href="#" onclick="toggleSidebar()">📊 Vanzari produse</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button type="button" id="sidebarLogoutBtn" class="sidebar-logout-btn">
+                <span>🚪 Logout</span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container" id="appMainContent" style="display: none;">
+        <!-- Header -->
+        <header class="app-header">
+            <button type="button" class="menu-toggle-btn" onclick="toggleSidebar()">
+                ☰ Meniu
+            </button>
+            <div class="top-bar-btns">
+                <button type="button" id="logoutBtn" class="btn-outline">Ieșire</button>
+            </div>
+            <img src="logo.png" alt="VANDER Atelier" class="logo-img" onerror="this.style.display='none'" />
+            <h1>VANDER - Gestiune Atelier</h1>
+            <p>Registru digital de stoc și mărimi</p>
+            <div id="syncStatus">● Conectat la Firebase Realtime DB</div>
+        </header>
+
+        <!-- Statistici -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="statTotalModels">0</div>
+                <div class="stat-label">Modele</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="statTotalPieces">0</div>
+                <div class="stat-label">Total Perechi</div>
+            </div>
+        </section>
+
+        <!-- Import CSV -->
+        <section class="card">
+            <h2>📦 Importă Stoc din Tabel (CSV)</h2>
+            <div class="import-box">
+                <input type="file" id="csvFileInput" accept=".csv" style="flex-grow: 1; font-size: 0.8rem;" />
+                <button type="button" id="importCsvBtn" class="btn-secondary" style="padding: 8px 12px; font-size: 0.8rem;">Importă</button>
+            </div>
+        </section>
+
+        <!-- Adăugare / Editare Model -->
+        <section class="card">
+            <h2 id="formTitle">✨ Adaugă Model Individual</h2>
+            <form id="addProductForm">
+                <input type="hidden" id="editProductId" value="" />
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Denumire Produs *</label>
+                        <input type="text" id="prodName" required placeholder="ex: Pantofi Ceremonie" />
+                    </div>
+                    <div class="form-group">
+                        <label>Culoare *</label>
+                        <input type="text" id="prodColor" required placeholder="ex: Negru lac" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Cod SKU</label>
+                        <input type="text" id="prodSku" placeholder="ex: 053" />
+                    </div>
+                    <div class="form-group">
+                        <label>Preț (RON)</label>
+                        <input type="number" id="prodPrice" min="0" placeholder="349" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Categorie</label>
+                    <select id="prodCategory">
+                        <option value="Pantofi sport">Pantofi sport</option>
+                        <option value="Pantofi eleganți">Pantofi eleganți</option>
+                        <option value="Pantofi casual">Pantofi casual</option>
+                        <option value="Ghete">Ghete</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Mărimi și Stoc (39 - 45)</label>
+                    <div id="sizesContainer" class="sizes-grid-container"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Imagine</label>
+                        <input type="file" id="prodImgFile" accept="image/*" style="background:#fff; padding:6px;" />
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Note Atelier</label>
+                        <textarea id="prodNotes" rows="1" placeholder="Piele naturală..." style="height: 38px;"></textarea>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 15px;">
+                    <button type="submit" id="saveProductBtn" class="btn-primary">Salvează Produsul</button>
+                    <button type="button" id="cancelEditBtn" class="btn-secondary" style="display: none; padding: 12px;" onclick="cancelEdit()">Anulează</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Lista Stoc cu Filtru -->
+        <section class="card">
+            <h2>📋 Stoc Atelier</h2>
+            <div class="filter-row">
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Caută model, SKU..." />
+                <select id="categoryFilter" class="filter-select">
+                    <option value="">Toate Categoriile</option>
+                    <option value="Pantofi sport">Pantofi sport</option>
+                    <option value="Pantofi eleganți">Pantofi eleganți</option>
+                    <option value="Pantofi casual">Pantofi casual</option>
+                    <option value="Ghete">Ghete</option>
+                </select>
+            </div>
+            <div id="productsList"></div>
+        </section>
+    </div>
+
+    <!-- Script Firebase & Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDdI_ae-3iwkgxk9I-OMhgw_2OA3WtLwn8",
+            authDomain: "vander-9e026.firebaseapp.com",
+            databaseURL: "https://vander-9e026-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "vander-9e026",
+            storageBucket: "vander-9e026.firebasestorage.app",
+            messagingSenderId: "317349329202",
+            appId: "1:317349329202:web:68ed0cdf0f75637801bf2b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const productsRef = ref(db, 'vander_produse');
+
+        const AUTH_KEY = 'vander_is_logged';
+        let products = [];
+        const standardSizes = ["39", "40", "41", "42", "43", "44", "45"];
+
+        const loginOverlay = document.getElementById('loginOverlay');
+        const appMainContent = document.getElementById('appMainContent');
+        const loginForm = document.getElementById('loginForm');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const sidebarLogoutBtn = document.getElementById('sidebarLogoutBtn');
+        const syncStatus = document.getElementById('syncStatus');
+
+        // Funcție control meniu lateral
+        window.toggleSidebar = function() {
+            const sidebar = document.getElementById('appSidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+        }
+
+        function checkAuth() {
+            if (localStorage.getItem(AUTH_KEY) === 'true') {
+                loginOverlay.style.display = 'none';
+                appMainContent.style.display = 'block';
+                initRealtimeSync();
+            } else {
+                loginOverlay.style.display = 'flex';
+                appMainContent.style.display = 'none';
+            }
+        }
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = document.getElementById('loginUser').value.trim();
+            const pass = document.getElementById('loginPass').value.trim();
+
+            if (user === 'vander' && pass === 'atelier2026') {
+                localStorage.setItem(AUTH_KEY, 'true');
+                checkAuth();
+            } else {
+                alert('Utilizator sau parolă incorectă!');
+            }
+        });
+
+        function handleLogout() {
+            localStorage.removeItem(AUTH_KEY);
+            checkAuth();
+        }
+
+        logoutBtn.addEventListener('click', handleLogout);
+        sidebarLogoutBtn.addEventListener('click', handleLogout);
+
+        checkAuth();
+
+        function initRealtimeSync() {
+            syncStatus.innerText = "⏳ Se sincronizează live...";
+            onValue(productsRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    products = Array.isArray(data) ? data : Object.values(data);
+                } else {
+                    products = [
+                        { id: 1, name: "Pantofi Ceremonie din Piele Naturala", color: "Negru", sku: "053", price: 135, category: "Pantofi eleganți", image: "1.webp", notes: "", stock: { "39": 0, "40": 3, "41": 0, "42": 0, "43": 0, "44": 0 } }
+                    ];
+                    set(productsRef, products);
+                }
+                syncStatus.innerText = "● Sincronizat Online în Timp Real";
+                renderProducts();
+            }, (error) => {
+                syncStatus.innerText = "● Eroare conexiune rețea";
+            });
+        }
+
+        function saveToFirebase() {
+            set(productsRef, products).catch((error) => {
+                alert("Eroare la salvarea în baza de date online!");
+            });
+        }
+
+        const sizesContainer = document.getElementById('sizesContainer');
+        standardSizes.forEach(size => {
+            sizesContainer.innerHTML += `
+                <div class="size-box">
+                    <span>${size}</span>
+                    <input type="number" class="size-input" data-size="${size}" min="0" value="0">
+                </div>
+            `;
+        });
+
+        function renderProducts() {
+            const list = document.getElementById('productsList');
+            list.innerHTML = '';
+            
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const selectedCategory = document.getElementById('categoryFilter').value;
+
+            let filtered = products.filter(p => {
+                if (!p) return false;
+                let matchesSearch = (p.name + (p.sku || '') + (p.color || '')).toLowerCase().includes(searchText);
+                let matchesCategory = !selectedCategory || p.category === selectedCategory;
+                return matchesSearch && matchesCategory;
+            });
+            
+            if(filtered.length === 0) {
+                list.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">Niciun produs găsit.</div>`;
+                return;
+            }
+
+            filtered.forEach(p => {
+                let totalStock = 0;
+                let sizeHeaders = '';
+                let sizeValues = '';
+
+                standardSizes.forEach(size => {
+                    let qty = (p.stock && p.stock[size]) ? parseInt(p.stock[size]) || 0 : 0;
+                    totalStock += qty;
+                    sizeHeaders += `<div class="stock-cell-head">${size}</div>`;
+                    sizeValues += `<div class="stock-cell-val">${qty}</div>`;
+                });
+
+                list.innerHTML += `
+                    <div class="product-card-style">
+                        <img src="${p.image || 'logo.png'}" class="product-thumb" onerror="this.src='logo.png'">
+                        <div class="product-details">
+                            <div class="product-name-sku">
+                                ${p.name} ${p.color} ⦿ - <b>39*VND${p.sku || '0000'}</b>
+                            </div>
+                            
+                            <div class="stock-table-grid">
+                                <div class="stock-header-row">${sizeHeaders}</div>
+                                <div class="stock-values-row">${sizeValues}</div>
+                            </div>
+                            
+                            <div class="inventory-total">Total în inventar: <b>${totalStock}</b></div>
+                            
+                            <button type="button" class="btn-stop-sale" onclick="alert('Funcție stoc gestionată pentru ${p.name}')">Oprește vanzarea</button>
+
+                            <div class="product-bottom-inputs">
+                                <input type="text" value="${p.name} ${p.color}" readonly style="background:#f1f5f9; color:#334155;" />
+                                <input type="text" value="${p.price || 0} RON" readonly style="background:#f1f5f9; color:#334155; text-align:center;" />
+                            </div>
+
+                            <div class="item-actions-row">
+                                <button onclick="window.editProd(${p.id})" class="btn-mini-edit">Editează / Schimbă Poză</button>
+                                <button onclick="window.deleteProd(${p.id})" class="btn-mini-del">Șterge</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('statTotalModels').innerText = products.length;
+            let totalPiecesAll = 0;
+            products.forEach(p => {
+                if(p && p.stock) {
+                    for(let s in p.stock) totalPiecesAll += parseInt(p.stock[s]) || 0;
+                }
+            });
+            document.getElementById('statTotalPieces').innerText = totalPiecesAll;
+        }
+
+        window.deleteProd = function(id) {
+            if(confirm("Sigur ștergi definitiv acest produs?")) {
+                products = products.filter(p => p && p.id !== id);
+                saveToFirebase();
+            }
+        }
+
+        window.editProd = function(id) {
+            const p = products.find(prod => prod && prod.id === id);
+            if(!p) return;
+
+            document.getElementById('editProductId').value = p.id;
+            document.getElementById('prodName').value = p.name || '';
+            document.getElementById('prodColor').value = p.color || '';
+            document.getElementById('prodSku').value = p.sku || '';
+            document.getElementById('prodPrice').value = p.price || '';
+            document.getElementById('prodCategory').value = p.category || 'Pantofi sport';
+            document.getElementById('prodNotes').value = p.notes || '';
+
+            document.querySelectorAll('.size-input').forEach(inp => {
+                let size = inp.dataset.size;
+                inp.value = (p.stock && p.stock[size]) ? p.stock[size] : 0;
+            });
+
+            document.getElementById('formTitle').innerText = "✏️ Editează Produsul: " + p.name;
+            document.getElementById('saveProductBtn').innerText = "Actualizează Produsul";
+            document.getElementById('cancelEditBtn').style.display = 'block';
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.cancelEdit = function() {
+            document.getElementById('addProductForm').reset();
+            document.getElementById('editProductId').value = '';
+            document.getElementById('formTitle').innerText = "✨ Adaugă Model Individual";
+            document.getElementById('saveProductBtn').innerText = "Salvează Produsul";
+            document.getElementById('cancelEditBtn').style.display = 'none';
+            document.querySelectorAll('.size-input').forEach(inp => inp.value = 0);
+        }
+
+        document.getElementById('importCsvBtn').addEventListener('click', () => {
+            const fileInput = document.getElementById('csvFileInput');
+            if(!fileInput.files[0]) {
+                alert('Selectează un fișier CSV mai întâi!');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const lines = e.target.result.split('\n');
+                let count = 0;
+
+                lines.forEach((line, index) => {
+                    if(index === 0 || !line.trim()) return;
+                    const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+                    if(cols.length >= 5) {
+                        products.push({
+                            id: Date.now() + Math.random(),
+                            name: cols[0], color: cols[1], sku: cols[2],
+                            price: parseFloat(cols[3]) || 0, category: cols[4],
+                            notes: cols[12] || 'Importat CSV', image: '',
+                            stock: {
+                                "39": parseInt(cols[5]) || 0, "40": parseInt(cols[6]) || 0,
+                                "41": parseInt(cols[7]) || 0, "42": parseInt(cols[8]) || 0,
+                                "43": parseInt(cols[9]) || 0, "44": parseInt(cols[10]) || 0,
+                                "45": parseInt(cols[11]) || 0
+                            }
+                        });
+                        count++;
+                    }
+                });
+
+                saveToFirebase();
+                alert(`Importate ${count} produse cu succes în baza de date online!`);
+            };
+            reader.readAsText(fileInput.files[0]);
+        });
+
+        document.getElementById('addProductForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            let editId = document.getElementById('editProductId').value;
+            let stock = {};
+            document.querySelectorAll('.size-input').forEach(inp => {
+                let val = parseInt(inp.value) || 0;
+                if(val > 0) {
+                    stock[inp.dataset.size] = val;
+                }
+            });
+
+            const prodData = {
+                name: document.getElementById('prodName').value,
+                color: document.getElementById('prodColor').value,
+                sku: document.getElementById('prodSku').value,
+                price: document.getElementById('prodPrice').value,
+                category: document.getElementById('prodCategory').value,
+                notes: document.getElementById('prodNotes').value,
+                stock: stock
+            };
+
+            const fileInput = document.getElementById('prodImgFile');
+
+            function finishSave(imageUrl) {
+                if(editId) {
+                    products = products.map(p => {
+                        if(p && p.id == editId) {
+                            return {
+                                ...p,
+                                ...prodData,
+                                image: imageUrl !== undefined ? imageUrl : (p.image || "")
+                            };
+                        }
+                        return p;
+                    });
+                } else {
+                    const newProd = {
+                        id: Date.now(),
+                        ...prodData,
+                        image: imageUrl || ""
+                    };
+                    products.push(newProd);
+                }
+
+                saveToFirebase();
+                cancelEdit();
+                alert(editId ? 'Produs actualizat cu succes!' : 'Produs salvat cu succes!');
+            }
+
+            if(fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    finishSave(evt.target.result);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                let existingImg = undefined;
+                if(editId) {
+                    let oldP = products.find(p => p && p.id == editId);
+                    if(oldP) existingImg = oldP.image;
+                }
+                finishSave(existingImg);
+            }
+        });
+
+        document.getElementById('searchInput').addEventListener('input', renderProducts);
+        document.getElementById('categoryFilter').addEventListener('change', renderProducts);
+    </script>
+</body>
+</html>
