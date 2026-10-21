@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VANDER - Gestiune Atelier</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/shortcutButtons/style.css">
     <style>
         :root {
             --primary: #0f172a;
@@ -85,7 +84,11 @@
         .stock-header-row, .stock-values-row { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; gap: 1px; }
         .stock-cell-head { background: #cbd5e1; font-size: 0.55rem; font-weight: 800; padding: 2px 0; color: #334155; }
         .stock-cell-val { background: #ffffff; font-size: 0.65rem; font-weight: 700; padding: 3px 0; color: var(--primary); }
+        
+        /* Clase pentru stoc critic (1-4 bucăți) */
         .stock-cell-val.low-stock { background-color: var(--warning-light); color: #b45309; border: 1px solid var(--warning-bg); font-weight: 900; }
+        .stock-cell-val.out-stock { background-color: #fee2e2; color: var(--danger); font-weight: 900; }
+
         .inventory-total { font-size: 0.62rem; font-weight: 700; color: var(--text-muted); margin-bottom: 2px; text-align: right; }
         .sale-price-row { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 2px; margin-bottom: 2px; }
         .btn-stop-sale { width: 100%; background: var(--danger-bg); color: white; border: none; padding: 5px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.3px; display: flex; align-items: center; justify-content: center; text-align: center; }
@@ -108,14 +111,14 @@
         <div class="login-card">
             <img src="logo.png" alt="VANDER" style="height: 35px; margin-bottom: 12px;" onerror="this.style.display='none'">
             <h2 style="margin-bottom: 12px; font-size: 1.1rem; color: var(--primary);">Autentificare Atelier</h2>
-            <form id="loginForm" onsubmit="handleLogin(event)">
+            <form id="loginForm">
                 <div class="form-group" style="text-align: left;">
                     <label>Utilizator</label>
-                    <input type="text" id="loginUser" required autocomplete="username" placeholder="ex: vander" />
+                    <input type="text" id="loginUser" required placeholder="ex: vander" />
                 </div>
                 <div class="form-group" style="text-align: left;">
                     <label>Parolă</label>
-                    <input type="password" id="loginPass" required autocomplete="current-password" placeholder="••••••••" />
+                    <input type="password" id="loginPass" required placeholder="••••••••" />
                 </div>
                 <button type="submit" id="loginBtn" class="btn-primary" style="margin-top: 5px;">Intră în Aplicație</button>
             </form>
@@ -142,7 +145,7 @@
             <li><a href="javascript:void(0)" onclick="filterByCategory('Ghete')">👢 Ghete / Botine / Cizme</a></li>
         </ul>
         <div class="sidebar-footer">
-            <button type="button" id="sidebarLogoutBtn" class="sidebar-logout-btn" onclick="handleLogout()">
+            <button type="button" id="sidebarLogoutBtn" class="sidebar-logout-btn">
                 <span>🚪 Logout</span>
             </button>
         </div>
@@ -151,7 +154,7 @@
         <header class="app-header">
             <button type="button" class="menu-toggle-btn" onclick="toggleSidebar()">☰ Meniu</button>
             <div class="top-bar-btns">
-                <button type="button" id="logoutBtn" class="btn-outline" onclick="handleLogout()">Ieșire</button>
+                <button type="button" id="logoutBtn" class="btn-outline">Ieșire</button>
             </div>
             <img src="logo.png" alt="VANDER Atelier" class="logo-img" onerror="this.style.display='none'" />
             <h1>VANDER - Gestiune Atelier</h1>
@@ -181,7 +184,6 @@
                 <button type="button" id="importCsvBtn" class="btn-secondary" style="padding: 6px 10px; font-size: 0.75rem;">Importă</button>
             </div>
         </section>
-
         <section class="card">
             <div class="accordion-header" onclick="toggleAddProductForm()">
                 <h2 id="formTitle" style="margin-bottom: 0;">✨ Adaugă Model Individual</h2>
@@ -240,7 +242,6 @@
                 </form>
             </div>
         </section>
-
         <section class="card">
             <h2>📅 Istoric Activitate și Vânzări</h2>
             <div class="single-calendar-box">
@@ -268,66 +269,6 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ro.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/shortcutButtons/shortcutButtons.js"></script>
-    <script>
-        const AUTH_KEY = 'vander_auth_active';
-        const CORRECT_USER = 'vander';
-        const CORRECT_PASS = 'atelier2026';
-
-        function checkAuth() {
-            const isLogged = localStorage.getItem(AUTH_KEY);
-            const loginOverlay = document.getElementById('loginOverlay');
-            const appMainContent = document.getElementById('appMainContent');
-            if (isLogged === 'true') {
-                if (loginOverlay) loginOverlay.style.display = 'none';
-                if (appMainContent) appMainContent.style.display = 'block';
-            } else {
-                if (loginOverlay) loginOverlay.style.display = 'flex';
-                if (appMainContent) appMainContent.style.display = 'none';
-            }
-        }
-
-        function handleLogin(e) {
-            e.preventDefault();
-            const user = document.getElementById('loginUser').value.trim();
-            const pass = document.getElementById('loginPass').value.trim();
-
-            if (user === CORRECT_USER && pass === CORRECT_PASS) {
-                localStorage.setItem(AUTH_KEY, 'true');
-                document.getElementById('loginPass').value = '';
-                checkAuth();
-                if (typeof window.initRealtimeSync === 'function') {
-                    window.initRealtimeSync();
-                }
-            } else {
-                alert('Utilizator sau parolă incorectă!');
-            }
-        }
-
-        function handleLogout() {
-            localStorage.removeItem(AUTH_KEY);
-            checkAuth();
-            location.reload();
-        }
-
-        // Funcție globală sigură pentru deschiderea/închiderea formularului de adăugare produs
-        window.toggleAddProductForm = function() {
-            const container = document.getElementById('formContainer');
-            const icon = document.getElementById('accordionIcon');
-            if (!container) return;
-            if (container.style.display === 'block') {
-                container.style.display = 'none';
-                if (icon) icon.style.transform = 'rotate(0deg)';
-            } else {
-                container.style.display = 'block';
-                if (icon) icon.style.transform = 'rotate(180deg)';
-            }
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            checkAuth();
-        });
-    </script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
@@ -344,56 +285,17 @@
         const db = getDatabase(app);
         const productsRef = ref(db, 'vander_produse');
         const historyRef = ref(db, 'vander_istoric');
-
+        const AUTH_KEY = 'vander_is_logged';
         let products = [];
         let historyLogs = [];
         const standardSizes = ["39", "40", "41", "42", "43", "44", "45"];
-        let todayObj = new Date();
-        let todayStr = todayObj.toISOString().split('T')[0];
-        let selectedStartDate = todayStr;
-        let selectedEndDate = todayStr;
-        
+        let selectedStartDate = new Date().toISOString().split('T')[0];
+        let selectedEndDate = new Date().toISOString().split('T')[0];
         flatpickr("#historyDateRange", {
             mode: "range",
             dateFormat: "Y-m-d",
             locale: "ro",
             defaultDate: [selectedStartDate, selectedEndDate],
-            plugins: [
-                shortcutButtonsPlugin({
-                    button: [
-                        { label: "Astăzi" },
-                        { label: "Ieri" },
-                        { label: "Ultimele 7 zile" },
-                        { label: "Luna curentă" },
-                        { label: "Luna trecută" }
-                    ],
-                    onClick: (index, fp) => {
-                        let dStart = new Date();
-                        let dEnd = new Date();
-                        if (index === 0) {
-                            dStart = new Date();
-                            dEnd = new Date();
-                        } else if (index === 1) {
-                            dStart.setDate(todayObj.getDate() - 1);
-                            dEnd = new Date(dStart);
-                        } else if (index === 2) {
-                            dStart.setDate(todayObj.getDate() - 6);
-                            dEnd = new Date();
-                        } else if (index === 3) {
-                            dStart = new Date(todayObj.getFullYear(), todayObj.getMonth(), 1);
-                            dEnd = new Date();
-                        } else if (index === 4) {
-                            dStart = new Date(todayObj.getFullYear(), todayObj.getMonth() - 1, 1);
-                            dEnd = new Date(todayObj.getFullYear(), todayObj.getMonth(), 0);
-                        }
-                        selectedStartDate = dStart.toISOString().split('T')[0];
-                        selectedEndDate = dEnd.toISOString().split('T')[0];
-                        fp.setDate([selectedStartDate, selectedEndDate], true);
-                        fp.close();
-                        renderHistory();
-                    }
-                })
-            ],
             onChange: function(selectedDates, dateStr, instance) {
                 if (selectedDates.length === 2) {
                     selectedStartDate = instance.formatDate(selectedDates[0], "Y-m-d");
@@ -406,14 +308,29 @@
                 }
             }
         });
-
+        const loginOverlay = document.getElementById('loginOverlay');
+        const appMainContent = document.getElementById('appMainContent');
+        const loginForm = document.getElementById('loginForm');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const sidebarLogoutBtn = document.getElementById('sidebarLogoutBtn');
+        const syncStatus = document.getElementById('syncStatus');
         window.toggleSidebar = function() {
             const sidebar = document.getElementById('appSidebar');
             const overlay = document.getElementById('sidebarOverlay');
             sidebar.classList.toggle('open');
             overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
         }
-
+        window.toggleAddProductForm = function() {
+            const container = document.getElementById('formContainer');
+            const icon = document.getElementById('accordionIcon');
+            if (container.style.display === 'block') {
+                container.style.display = 'none';
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                container.style.display = 'block';
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
         function filterByCategory(category) {
             const categoryFilter = document.getElementById('categoryFilter');
             if (categoryFilter) { categoryFilter.value = category || ''; }
@@ -422,22 +339,50 @@
             document.getElementById('productsList').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         window.filterByCategory = filterByCategory;
-
-        window.initRealtimeSync = function() {
-            const syncStatus = document.getElementById('syncStatus');
-            if(syncStatus) syncStatus.innerText = "⏳ Se sincronizează live...";
+        function checkAuth() {
+            if (localStorage.getItem(AUTH_KEY) === 'true') {
+                loginOverlay.style.display = 'none';
+                appMainContent.style.display = 'block';
+                initRealtimeSync();
+            } else {
+                loginOverlay.style.display = 'flex';
+                appMainContent.style.display = 'none';
+            }
+        }
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = document.getElementById('loginUser').value.trim();
+            const pass = document.getElementById('loginPass').value.trim();
+            if (user === 'vander' && pass === 'atelier2026') {
+                localStorage.setItem(AUTH_KEY, 'true');
+                checkAuth();
+            } else {
+                alert('Utilizator sau parolă incorectă!');
+            }
+        });
+        function handleLogout() {
+            localStorage.removeItem(AUTH_KEY);
+            checkAuth();
+        }
+        logoutBtn.addEventListener('click', handleLogout);
+        sidebarLogoutBtn.addEventListener('click', handleLogout);
+        checkAuth();
+        function initRealtimeSync() {
+            syncStatus.innerText = "⏳ Se sincronizează live...";
             onValue(productsRef, (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     products = Array.isArray(data) ? data : Object.values(data);
                 } else {
-                    products = [];
+                    products = [
+                        { id: 1, name: "Pantofi Ceremonie din Piele Naturala", color: "Negru", sku: "053", price: 135, category: "Pantofi eleganți", image: "1.webp", notes: "", stock: { "39": 0, "40": 3, "41": 0, "42": 0, "43": 0, "44": 0 } }
+                    ];
                     set(productsRef, products);
                 }
-                if(syncStatus) syncStatus.innerText = "● Sincronizat Online în Timp Real";
+                syncStatus.innerText = "● Sincronizat Online în Timp Real";
                 renderProducts();
             }, () => {
-                if(syncStatus) syncStatus.innerText = "● Eroare conexiune rețea";
+                syncStatus.innerText = "● Eroare conexiune rețea";
             });
             onValue(ref(db, 'vander_istoric'), (snapshot) => {
                 const data = snapshot.val();
@@ -449,11 +394,6 @@
                 renderHistory();
             });
         }
-
-        if(localStorage.getItem('vander_auth_active') === 'true') {
-            window.initRealtimeSync();
-        }
-
         function saveToFirebase() {
             set(productsRef, products).catch(() => {
                 alert("Eroare la salvarea în baza de date online!");
@@ -481,7 +421,6 @@
         });
         function renderProducts() {
             const list = document.getElementById('productsList');
-            if(!list) return;
             list.innerHTML = '';
             const searchText = document.getElementById('searchInput').value.toLowerCase();
             const selectedCategory = document.getElementById('categoryFilter').value;
@@ -511,6 +450,8 @@
                     if (qty > 0 && qty <= 4) {
                         cellClass += " low-stock";
                         lowStockCount++;
+                    } else if (qty === 0) {
+                        // opțional poți lăsa normal sau adăuga stil
                     }
 
                     sizeHeaders += `<div class="stock-cell-head">${size}</div>`;
@@ -552,7 +493,6 @@
         }
         function renderHistory() {
             const container = document.getElementById('historyListContainer');
-            if(!container) return;
             let filteredLogs = historyLogs;
             if(selectedStartDate && selectedEndDate) {
                 filteredLogs = filteredLogs.filter(l => l.date >= selectedStartDate && l.date <= selectedEndDate);
@@ -708,4 +648,7 @@
             }
         });
         document.getElementById('searchInput').addEventListener('input', renderProducts);
-        document.getElementById('categoryFilter').addEventListener('change', render
+        document.getElementById('categoryFilter').addEventListener('change', renderProducts);
+    </script>
+</body>
+</html>
