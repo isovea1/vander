@@ -1,692 +1,909 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VANDER - Gestiune Atelier</title>
-    <style>
-        :root {
-            --primary: #0f172a;
-            --accent: #2563eb;
-            --danger: #dc2626;
-            --danger-bg: #ef4444;
-            --success: #16a34a;
-            --bg: #f1f5f9;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border: #cbd5e1;
-            --radius: 12px;
-            --shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
-            --sidebar-bg: #111827;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VANDER - app mock</title>
+  <style>
+    :root {
+      --bg-dark: #4f4f4f;
+      --bg-app: #d9d9d6;
+      --panel: #f7f7f7;
+      --panel-2: #efefef;
+      --dark-panel: #4c4d52;
+      --dark-panel-2: #575b61;
+      --text: #202224;
+      --muted: #6d7278;
+      --line: #d1d1d1;
+      --red: #f35050;
+      --green: #2dd5a4;
+      --green-2: #1ca67a;
+      --blue: #2d8bfd;
+      --shadow: rgba(0,0,0,0.18);
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
+    * { box-sizing: border-box; }
 
-        html, body {
-            min-height: 100%;
-        }
+    html, body {
+      margin: 0;
+      height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+    }
 
-        body {
-            background: var(--bg);
-            color: var(--text-main);
-            line-height: 1.5;
-            padding: 15px 10px;
-        }
+    body {
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
 
-        button, input, select, textarea {
-            font: inherit;
-        }
+    .phone {
+      position: relative;
+      width: 420px;
+      height: 820px;
+      background: var(--bg-app);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 26px 60px rgba(0,0,0,0.35);
+      border: 2px solid rgba(255,255,255,0.25);
+    }
 
-        a {
-            text-decoration: none;
-        }
+    .statusbar {
+      height: 52px;
+      background: rgba(27, 30, 34, 0.92);
+      color: #f2f2f2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px 0 18px;
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: 0.03em;
+    }
 
-        .container {
-            max-width: 980px;
-            margin: 0 auto;
-        }
+    .status-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-        #sidebarOverlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.38);
-            z-index: 999;
-            display: none;
-        }
+    .wifi {
+      width: 18px;
+      height: 12px;
+      position: relative;
+      border: 2px solid transparent;
+      border-bottom-color: #f4f4f4;
+      border-radius: 50%;
+      transform: rotate(180deg);
+      opacity: 0.9;
+    }
 
-        #sidebarOverlay.show {
-            display: block;
-        }
+    .wifi::before,
+    .wifi::after {
+      content: "";
+      position: absolute;
+      inset: 3px 3px auto 3px;
+      border: 2px solid transparent;
+      border-bottom-color: #f4f4f4;
+      border-radius: 50%;
+    }
 
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -260px;
-            width: 240px;
-            height: 100vh;
-            background: var(--sidebar-bg);
-            color: #fff;
-            z-index: 1000;
-            transition: left 0.25s ease;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 12px 0 28px rgba(15, 23, 42, 0.2);
-        }
+    .wifi::after {
+      inset: 7px 7px auto 7px;
+    }
 
-        .sidebar.open {
-            left: 0;
-        }
+    .battery {
+      width: 28px;
+      height: 14px;
+      border-radius: 4px;
+      border: 2px solid #f5f5f5;
+      position: relative;
+      display: inline-block;
+      margin-left: 2px;
+    }
 
-        .sidebar-header {
-            padding: 18px 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+    .battery::after {
+      content: "";
+      position: absolute;
+      right: -4px;
+      top: 3px;
+      width: 3px;
+      height: 6px;
+      border-radius: 1px;
+      background: #f5f5f5;
+    }
 
-        .sidebar-brand {
-            font-size: 1.05rem;
-            font-weight: 800;
-            letter-spacing: 0.02em;
-        }
+    .battery::before {
+      content: "";
+      position: absolute;
+      inset: 2px 2px 2px 2px;
+      background: linear-gradient(90deg, #f2d64f 0 70%, #f2d64f 70% 100%);
+      border-radius: 2px;
+    }
 
-        .sidebar-user {
-            padding: 14px 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            background: rgba(15, 23, 42, 0.9);
-        }
+    .status-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-        .sidebar-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            object-fit: cover;
-            background: #cbd5e1;
-        }
+    .signal {
+      display: flex;
+      align-items: end;
+      gap: 3px;
+      height: 14px;
+    }
 
-        .sidebar-user-name {
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
+    .signal span {
+      display: block;
+      width: 3px;
+      background: #f5f5f5;
+      border-radius: 2px 2px 0 0;
+    }
 
-        .sidebar-menu {
-            list-style: none;
-            padding: 10px 0;
-            flex: 1;
-            overflow-y: auto;
-        }
+    .signal span:nth-child(1) { height: 4px; }
+    .signal span:nth-child(2) { height: 7px; }
+    .signal span:nth-child(3) { height: 10px; }
+    .signal span:nth-child(4) { height: 13px; }
 
-        .sidebar-menu li a {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            color: #cbd5e1;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: background 0.2s ease, color 0.2s ease;
-        }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 30px;
+      height: 20px;
+      background: #e4d36d;
+      color: #212121;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 0 8px;
+      margin-left: 2px;
+    }
 
-        .sidebar-menu li a:hover,
-        .sidebar-menu li.active a {
-            background: rgba(148, 163, 184, 0.15);
-            color: #fff;
-        }
+    .topbar {
+      position: relative;
+      background: #d8d7d5;
+      padding: 10px 18px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
 
-        .sidebar-footer {
-            padding: 12px 16px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-        }
+    .topbar .domain {
+      font-size: 21px;
+      font-weight: 700;
+      color: #1f2326;
+      letter-spacing: 0.02em;
+    }
 
-        .sidebar-logout-btn {
-            background: transparent;
-            border: none;
-            color: #f87171;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            padding: 10px 12px;
-            border-radius: 8px;
-            transition: background 0.2s ease;
-        }
+    .icon-btn {
+      position: absolute;
+      right: 18px;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: none;
+      background: rgba(255,255,255,0.35);
+      color: #1d2228;
+      font-size: 22px;
+      cursor: pointer;
+    }
 
-        .sidebar-logout-btn:hover {
-            background: rgba(248, 113, 113, 0.08);
-        }
+    .back-btn {
+      position: absolute;
+      left: 18px;
+      width: 28px;
+      height: 28px;
+      border: none;
+      background: transparent;
+      color: #1d2228;
+      font-size: 32px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
 
-        .app-header {
-            position: relative;
-            background: var(--card-bg);
-            padding: 22px 20px 18px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            margin-bottom: 16px;
-            text-align: center;
-        }
+    .page {
+      position: relative;
+      height: calc(100% - 52px - 60px);
+      background: #dcdad7;
+      overflow: hidden;
+    }
 
-        .logo-img {
-            display: block;
-            height: 42px;
-            object-fit: contain;
-            margin: 0 auto 8px;
-        }
+    .list-wrap {
+      position: absolute;
+      inset: 0;
+      transition: transform 0.3s ease;
+      background: #dcdad7;
+    }
 
-        .app-header h1 {
-            font-size: clamp(1.2rem, 2vw, 1.55rem);
-            font-weight: 800;
-            color: var(--primary);
-        }
+    .phone.menu-open .list-wrap {
+      transform: translateX(24%);
+    }
 
-        .app-header p {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
+    .menu {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 75%;
+      height: 100%;
+      background: rgba(70, 76, 81, 0.96);
+      color: #f4f4f4;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      padding-top: 18px;
+      z-index: 2;
+    }
 
-        .menu-toggle-btn {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: #f1f5f9;
-            border: 1px solid var(--border);
-            color: var(--primary);
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            cursor: pointer;
-        }
+    .phone.menu-open .menu {
+      transform: translateX(0);
+    }
 
-        .top-bar-btns {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-        }
+    .menu-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 0 18px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
 
-        .btn-outline {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: var(--danger);
-            padding: 7px 10px;
-            border-radius: 6px;
-            font-size: 0.72rem;
-            font-weight: 700;
-            cursor: pointer;
-        }
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #db3d3d, #a61515);
+      font-weight: 900;
+      font-size: 18px;
+      color: white;
+    }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 12px;
-            margin-bottom: 16px;
-        }
+    .brand-name {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      opacity: 0.95;
+    }
 
-        .stat-card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            padding: 18px 16px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            text-align: center;
-        }
+    .user-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 18px 14px;
+      font-size: 17px;
+      color: rgba(255,255,255,0.92);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
 
-        .stat-number {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--primary);
-        }
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #e9e9e9, #8c8c8c);
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15);
+    }
 
-        .stat-label {
-            font-size: 0.72rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-top: 4px;
-        }
+    .avatar::before {
+      content: "";
+      position: absolute;
+      left: 10px;
+      top: 7px;
+      width: 16px;
+      height: 16px;
+      background: #8d8d8d;
+      border-radius: 50%;
+    }
 
-        .card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-        }
+    .avatar::after {
+      content: "";
+      position: absolute;
+      left: 7px;
+      bottom: 0;
+      width: 22px;
+      height: 16px;
+      background: #7a7a7a;
+      border-radius: 12px 12px 0 0;
+    }
 
-        .card h2 {
-            font-size: 1.08rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 16px;
-        }
+    .menu-items {
+      list-style: none;
+      margin: 0;
+      padding: 10px 0 0;
+    }
 
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 12px;
-            margin-bottom: 12px;
-        }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      font-size: 16px;
+      color: rgba(255,255,255,0.88);
+      font-weight: 600;
+    }
 
-        .form-group {
-            margin-bottom: 12px;
-        }
+    .menu-item .mini-grid {
+      width: 18px;
+      height: 18px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2px;
+      opacity: 0.8;
+    }
 
-        .form-group label {
-            display: block;
-            font-size: 0.76rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-        }
+    .mini-grid span {
+      display: block;
+      background: rgba(255,255,255,0.55);
+      border-radius: 2px;
+    }
 
-        input[type="text"],
-        input[type="password"],
-        input[type="number"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 0.9rem;
-            background: #f8fafc;
-            color: var(--text-main);
-        }
+    .menu-item.active {
+      background: rgba(255,255,255,0.05);
+      border-left: 4px solid rgba(255,255,255,0.3);
+      padding-left: 14px;
+    }
 
-        input:focus,
-        select:focus,
-        textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-            background: #fff;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-        }
+    .logout {
+      position: absolute;
+      left: 18px;
+      bottom: 22px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 18px;
+      color: rgba(255,255,255,0.88);
+    }
 
-        .sizes-grid-container {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            background: #f8fafc;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
+    .logout-icon {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.7);
+      border-left: none;
+      border-radius: 0 10px 10px 0;
+      position: relative;
+    }
 
-        .size-box {
-            flex: 1 1 40px;
-            min-width: 40px;
-            text-align: center;
-            background: #fff;
-            padding: 8px 6px;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-        }
+    .logout-icon::before {
+      content: "";
+      position: absolute;
+      left: -8px;
+      top: 4px;
+      width: 10px;
+      height: 10px;
+      border-left: 2px solid rgba(255,255,255,0.7);
+      border-bottom: 2px solid rgba(255,255,255,0.7);
+      transform: rotate(45deg);
+    }
 
-        .size-box span {
-            display: block;
-            font-size: 0.68rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            margin-bottom: 2px;
-        }
+    .main {
+      padding: 0 12px 0;
+    }
 
-        .size-box input {
-            width: 100%;
-            text-align: center;
-            padding: 4px;
-            font-weight: 700;
-            font-size: 0.8rem;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            background: white;
-        }
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 8px 10px;
+      font-weight: 800;
+      font-size: 18px;
+      color: #1f2326;
+    }
 
-        .btn-primary {
-            width: 100%;
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            padding: 12px 14px;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
+    .hamburger {
+      width: 22px;
+      height: 18px;
+      position: relative;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
 
-        .btn-primary:hover {
-            background: #1d4ed8;
-        }
+    .hamburger span {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: #23262a;
+      border-radius: 2px;
+    }
 
-        .btn-secondary {
-            background: #64748b;
-            color: #fff;
-            border: none;
-            padding: 12px 14px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            cursor: pointer;
-        }
+    .hamburger span:nth-child(1) { top: 0; }
+    .hamburger span:nth-child(2) { top: 7px; }
+    .hamburger span:nth-child(3) { top: 14px; }
 
-        .import-box {
-            background: #f8fafc;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px dashed var(--border);
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
+    .product-card {
+      background: rgba(255,255,255,0.32);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 10px;
+      padding: 0 0 10px;
+      margin: 4px 2px 12px;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.4);
+    }
 
-        .filter-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
+    .product-row {
+      display: grid;
+      grid-template-columns: 1.25fr 1.2fr;
+      gap: 12px;
+      align-items: center;
+    }
 
-        .search-input, .filter-select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 0.9rem;
-            background: white;
-        }
+    .shoe-art {
+      height: 140px;
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+      margin-left: 4px;
+    }
 
-        .table-wrap {
-            overflow-x: auto;
-        }
+    .shoe {
+      position: relative;
+      width: 190px;
+      height: 68px;
+      background: linear-gradient(135deg, #0b0b0c 0%, #1c1d20 18%, #000 100%);
+      border-radius: 30px 18px 18px 28px / 20px 16px 18px 24px;
+      box-shadow: inset -18px -8px 0 rgba(255,255,255,0.06), inset 8px 10px 0 rgba(255,255,255,0.05);
+      transform: rotate(-2deg);
+    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #fff;
-        }
+    .shoe::before,
+    .shoe::after {
+      content: "";
+      position: absolute;
+      background: linear-gradient(180deg, rgba(0,0,0,0.7), rgba(0,0,0,0.2));
+    }
 
-        th, td {
-            border-bottom: 1px solid var(--border);
-            padding: 10px 8px;
-            text-align: left;
-            font-size: 0.82rem;
-        }
+    .shoe::before {
+      width: 120px;
+      height: 25px;
+      left: 18px;
+      top: 15px;
+      border-radius: 18px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.07);
+    }
 
-        th {
-            background: #f8fafc;
-            color: var(--primary);
-            font-weight: 700;
-        }
+    .shoe::after {
+      width: 18px;
+      height: 16px;
+      right: 28px;
+      bottom: -10px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.9), rgba(0,0,0,0.5));
+      border-radius: 10px 0 0 10px;
+    }
 
-        .status {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 999px;
-            font-size: 0.7rem;
-            font-weight: 700;
-        }
+    .shoe-part {
+      position: absolute;
+      width: 20px;
+      height: 34px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.9);
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,0.03);
+      left: 18px;
+      top: 4px;
+      transform: rotate(12deg);
+    }
 
-        .status.in-stock {
-            background: rgba(22, 163, 74, 0.12);
-            color: var(--success);
-        }
+    .shoe-part:nth-child(2) { left: 50px; }
+    .shoe-part:nth-child(3) { left: 82px; }
 
-        .status.low {
-            background: rgba(234, 179, 8, 0.15);
-            color: #a16207;
-        }
+    .shoe-shadow {
+      position: absolute;
+      bottom: 20px;
+      width: 150px;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.18);
+      filter: blur(2px);
+      transform: translateY(16px);
+    }
 
-        .status.out {
-            background: rgba(220, 38, 38, 0.12);
-            color: var(--danger);
-        }
+    .prod-info {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+      padding-right: 10px;
+    }
 
-        @media (max-width: 700px) {
-            .stats-grid,
-            .form-row,
-            .filter-row {
-                grid-template-columns: 1fr;
-            }
+    .title-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      min-height: 38px;
+      font-weight: 700;
+      font-size: 15px;
+      line-height: 1.2;
+      color: #1c1e20;
+    }
 
-            .app-header {
-                padding-top: 54px;
-            }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 56px;
+      height: 26px;
+      background: #2d8bfd;
+      color: white;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 800;
+      padding: 0 8px;
+      box-shadow: inset 0 -1px 0 rgba(0,0,0,0.15);
+    }
 
-            .top-bar-btns {
-                right: 10px;
-            }
-        }
-    </style>
+    .product-code {
+      font-size: 18px;
+      font-weight: 800;
+      color: #1d2023;
+      letter-spacing: 0.02em;
+    }
+
+    .size-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 4px;
+      margin-top: 2px;
+    }
+
+    .size-box {
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(0,0,0,0.18);
+      background: rgba(255,255,255,0.2);
+      font-weight: 700;
+      font-size: 14px;
+      color: #262a2e;
+    }
+
+    .size-box.small {
+      font-size: 13px;
+    }
+
+    .size-box.empty {
+      opacity: 0.7;
+    }
+
+    .inventory {
+      margin-top: 10px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 18px;
+      color: #1c1e20;
+    }
+
+    .red-btn {
+      margin: 10px 8px 0;
+      height: 42px;
+      border: none;
+      border-radius: 8px;
+      width: calc(100% - 16px);
+      background: linear-gradient(180deg, #fd5b5b, #ef3d3d);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      box-shadow: 0 4px 0 rgba(181, 36, 36, 0.28);
+      cursor: pointer;
+    }
+
+    .product-meta {
+      margin: 0 14px 0 12px;
+      padding: 12px 0 0;
+      border-top: 1px solid rgba(0,0,0,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 800;
+      font-size: 14px;
+      color: #1d2023;
+    }
+
+    .product-meta .code {
+      font-size: 20px;
+      min-width: 98px;
+      text-align: right;
+      display: inline-block;
+    }
+
+    .bottom-controls {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 116px;
+      background: rgba(255,255,255,0.18);
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 18px 16px 16px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .nav-item {
+      width: 33.33%;
+      text-align: center;
+      color: #1d2228;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      font-weight: 700;
+      background: rgba(0,0,0,0.06);
+    }
+
+    .nav-item.primary .nav-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #f5f5f5, #dfe4e9);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+      font-size: 36px;
+      line-height: 1;
+      color: #1d2228;
+    }
+
+    .nav-item.primary {
+      transform: translateY(-8px);
+    }
+
+    .nav-item .badge {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #f3f4f6;
+      border: 1px solid rgba(0,0,0,0.08);
+      font-size: 12px;
+      color: #1d2228;
+      font-weight: 800;
+      margin-top: -4px;
+    }
+
+    .phone.menu-open .sidebar-button {
+      display: none;
+    }
+
+    @media (max-width: 520px) {
+      .phone {
+        width: min(100vw, 420px);
+        height: 100vh;
+        border-radius: 0;
+      }
+      body {
+        padding: 0;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div id="sidebarOverlay"></div>
-
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-brand">VANDER</div>
-            <button class="btn-outline" type="button" id="closeSidebarBtn">X</button>
-        </div>
-
-        <div class="sidebar-user">
-            <img src="https://via.placeholder.com/36" alt="User" class="sidebar-avatar" />
-            <div class="sidebar-user-name">Admin Atelier</div>
-        </div>
-
-        <ul class="sidebar-menu">
-            <li class="active"><a href="#">Dashboard</a></li>
-            <li><a href="#">Produse</a></li>
-            <li><a href="#">Comenzi</a></li>
-            <li><a href="#">Stocuri</a></li>
-            <li><a href="#">Clienti</a></li>
-            <li><a href="#">Facturi</a></li>
-            <li><a href="#">Setări</a></li>
-        </ul>
-
-        <div class="sidebar-footer">
-            <button class="sidebar-logout-btn" type="button">🡢 Deconectare</button>
-        </div>
-    </aside>
-
-    <div class="container">
-        <header class="app-header">
-            <button class="menu-toggle-btn" id="menuToggleBtn" type="button">☰</button>
-            <div class="top-bar-btns">
-                <button class="btn-outline" type="button">LOGOUT</button>
-            </div>
-            <img class="logo-img" src="https://via.placeholder.com/150x40?text=VANDER" alt="VANDER logo" />
-            <h1>Gestiune Atelier</h1>
-            <p>Control complet al produselor, stocurilor și comenzilor</p>
-        </header>
-
-        <section class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-number">128</div>
-                <div class="stat-label">Produse</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">42</div>
-                <div class="stat-label">Comenzi</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">96%</div>
-                <div class="stat-label">Stoc disponibil</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">€ 18.4k</div>
-                <div class="stat-label">Vânzări</div>
-            </div>
-        </section>
-
-        <section class="card">
-            <h2>Adăugare produs</h2>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="numeProdus">Nume produs</label>
-                    <input id="numeProdus" type="text" value="Pantalon Denim" />
-                </div>
-                <div class="form-group">
-                    <label for="codProdus">Cod produs</label>
-                    <input id="codProdus" type="text" value="VD-2048" />
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="categorie">Categorie</label>
-                    <select id="categorie">
-                        <option>Men</option>
-                        <option>Women</option>
-                        <option>Kids</option>
-                        <option>Accesorii</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="pret">Preț de vânzare</label>
-                    <input id="pret" type="number" value="149" />
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Mărimi</label>
-                <div class="sizes-grid-container">
-                    <div class="size-box">
-                        <span>XS</span>
-                        <input type="number" value="6" />
-                    </div>
-                    <div class="size-box">
-                        <span>S</span>
-                        <input type="number" value="12" />
-                    </div>
-                    <div class="size-box">
-                        <span>M</span>
-                        <input type="number" value="18" />
-                    </div>
-                    <div class="size-box">
-                        <span>L</span>
-                        <input type="number" value="14" />
-                    </div>
-                    <div class="size-box">
-                        <span>XL</span>
-                        <input type="number" value="8" />
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="observatii">Observații</label>
-                <textarea id="observatii" rows="3">Material: denim premium, cusături rezistente, livrare în 48h.</textarea>
-            </div>
-
-            <button class="btn-primary" type="button">Salvează produs</button>
-        </section>
-
-        <section class="card">
-            <h2>Import date</h2>
-            <div class="import-box">
-                <button class="btn-secondary" type="button">Import CSV</button>
-                <button class="btn-secondary" type="button">Import Excel</button>
-                <span>Fișiere acceptate: .csv, .xlsx</span>
-            </div>
-        </section>
-
-        <section class="card">
-            <h2>Stocuri disponibile</h2>
-
-            <div class="filter-row">
-                <input class="search-input" type="text" placeholder="Caută produs, cod sau categorie..." />
-                <select class="filter-select">
-                    <option>Toate</option>
-                    <option>Disponibil</option>
-                    <option>Stoc redus</option>
-                    <option>Epuizat</option>
-                </select>
-            </div>
-
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Produs</th>
-                            <th>Cod</th>
-                            <th>Categorie</th>
-                            <th>Stoc</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Pantalon Denim</td>
-                            <td>VD-2048</td>
-                            <td>Men</td>
-                            <td>24</td>
-                            <td><span class="status in-stock">Disponibil</span></td>
-                        </tr>
-                        <tr>
-                            <td>Jachetă Urban</td>
-                            <td>VD-1182</td>
-                            <td>Women</td>
-                            <td>7</td>
-                            <td><span class="status low">Stoc redus</span></td>
-                        </tr>
-                        <tr>
-                            <td>Tricou Basic</td>
-                            <td>VD-7710</td>
-                            <td>Kids</td>
-                            <td>0</td>
-                            <td><span class="status out">Epuizat</span></td>
-                        </tr>
-                        <tr>
-                            <td>Geantă Travel</td>
-                            <td>VD-3860</td>
-                            <td>Accesorii</td>
-                            <td>15</td>
-                            <td><span class="status in-stock">Disponibil</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+  <div class="phone" id="phone">
+    <div class="statusbar">
+      <div class="status-left">
+        <span>08:52</span>
+        <span class="wifi" aria-hidden="true"></span>
+      </div>
+      <div class="status-right">
+        <div class="signal" aria-label="signal"><span></span><span></span><span></span><span></span></div>
+        <div class="battery" aria-label="battery"></div>
+        <span class="status-pill">17</span>
+      </div>
     </div>
 
-    <script>
-        const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        const menuToggleBtn = document.getElementById('menuToggleBtn');
-        const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+    <div class="topbar">
+      <button class="back-btn" type="button" aria-label="Back">←</button>
+      <div class="domain">supp.ssell.ro</div>
+      <button class="icon-btn" type="button" aria-label="Open menu" id="toggleMenu">☰</button>
+    </div>
 
-        function openSidebar() {
-            sidebar.classList.add('open');
-            sidebarOverlay.classList.add('show');
-        }
+    <div class="page">
+      <aside class="menu" aria-label="Meniu navigare">
+        <div class="menu-header">
+          <div class="brand-mark">S</div>
+          <div class="brand-name">SUPERLATIVE</div>
+        </div>
 
-        function closeSidebar() {
-            sidebar.classList.remove('open');
-            sidebarOverlay.classList.remove('show');
-        }
+        <div class="user-row">
+          <div class="avatar"></div>
+          <span>Madalin Mandocescu</span>
+        </div>
 
-        menuToggleBtn.addEventListener('click', openSidebar);
-        closeSidebarBtn.addEventListener('click', closeSidebar);
-        sidebarOverlay.addEventListener('click', closeSidebar);
-    </script>
+        <ul class="menu-items">
+          <li class="menu-item active"><span class="mini-grid"><span></span><span></span><span></span><span></span></span> Comenzi noi</li>
+          <li class="menu-item"><span class="mini-grid"><span></span><span></span><span></span><span></span></span> TOP Produse</li>
+          <li class="menu-item"><span class="mini-grid"><span></span><span></span><span></span><span></span></span> Toate Produsele</li>
+          <li class="menu-item"><span class="mini-grid"><span></span><span></span><span></span><span></span></span> Pantofi</li>
+          <li class="menu-item"><span class="mini-grid"><span></span><span></span><span></span><span></span></span> Ghete/Botine/Cizme</li>
+          <li class="menu-item"><span class="mini-grid"><span></span><span></span><span></span><span></span></span> Vanzari produse</li>
+        </ul>
+
+        <div class="logout">
+          <span class="logout-icon"></span>
+          <span>Logout</span>
+        </div>
+      </aside>
+
+      <div class="list-wrap">
+        <div class="main">
+          <div class="title-row">
+            <span class="hamburger" id="hamburgerToggle" aria-label="Open menu"><span></span><span></span><span></span></span>
+            <span>TOATE PRODUSELE</span>
+          </div>
+
+          <article class="product-card">
+            <div class="product-row">
+              <div class="shoe-art">
+                <div class="shoe-shadow"></div>
+                <div class="shoe">
+                  <span class="shoe-part"></span>
+                  <span class="shoe-part"></span>
+                  <span class="shoe-part"></span>
+                </div>
+              </div>
+
+              <div class="prod-info">
+                <div class="title-line">
+                  <span>Ghete barbati din piele naturala</span>
+                  <span>neagra 20253</span>
+                  <span class="tag">top</span>
+                </div>
+
+                <div class="size-grid">
+                  <div class="size-box">39</div>
+                  <div class="size-box">40</div>
+                  <div class="size-box">41</div>
+                  <div class="size-box">42</div>
+                  <div class="size-box">43</div>
+                  <div class="size-box">44</div>
+                  <div class="size-box empty">0</div>
+                  <div class="size-box empty">1</div>
+                  <div class="size-box empty">2</div>
+                  <div class="size-box empty">2</div>
+                  <div class="size-box empty">2</div>
+                  <div class="size-box empty">0</div>
+                </div>
+
+                <div class="inventory">Total in inventar: <strong>7</strong></div>
+              </div>
+            </div>
+            <button class="red-btn" type="button">Opreste vanzarea</button>
+            <div class="product-meta">
+              <span>F104 N</span>
+              <span class="code">160</span>
+            </div>
+          </article>
+
+          <article class="product-card">
+            <div class="product-row">
+              <div class="shoe-art">
+                <div class="shoe-shadow"></div>
+                <div class="shoe" style="transform:rotate(-1deg) scale(0.96);">
+                  <span class="shoe-part"></span>
+                  <span class="shoe-part"></span>
+                  <span class="shoe-part"></span>
+                </div>
+              </div>
+
+              <div class="prod-info">
+                <div class="title-line">
+                  <span>Pantofi barbati din piele naturala</span>
+                  <span>neagra 20254</span>
+                  <span class="tag" style="background:#2ca4ff;">top</span>
+                </div>
+
+                <div class="size-grid">
+                  <div class="size-box">39</div>
+                  <div class="size-box">40</div>
+                  <div class="size-box">41</div>
+                  <div class="size-box">42</div>
+                  <div class="size-box">43</div>
+                  <div class="size-box">44</div>
+                  <div class="size-box empty">0</div>
+                  <div class="size-box empty">2</div>
+                  <div class="size-box empty">1</div>
+                  <div class="size-box empty">2</div>
+                  <div class="size-box empty">0</div>
+                  <div class="size-box empty">0</div>
+                </div>
+
+                <div class="inventory">Total in inventar: <strong>5</strong></div>
+              </div>
+            </div>
+            <button class="red-btn" type="button">Opreste vanzarea</button>
+            <div class="product-meta">
+              <span>4052 N</span>
+              <span class="code">135</span>
+            </div>
+          </article>
+
+          <article class="product-card">
+            <div class="product-row">
+              <div class="shoe-art">
+                <div class="shoe-shadow"></div>
+                <div class="shoe" style="transform: rotate(-3deg) scale(0.98);">
+                  <span class="shoe-part"></span>
+                  <span class="shoe-part"></span>
+                  <span class="shoe-part"></span>
+                </div>
+              </div>
+
+              <div class="prod-info">
+                <div class="title-line">
+                  <span>Pantofi barbati din piele naturala</span>
+                  <span>neagra 20255</span>
+                  <span class="tag" style="background:#2ca4ff;">top</span>
+                </div>
+
+                <div class="size-grid">
+                  <div class="size-box">39</div>
+                  <div class="size-box">40</div>
+                  <div class="size-box">41</div>
+                  <div class="size-box">42</div>
+                  <div class="size-box">43</div>
+                  <div class="size-box">44</div>
+                  <div class="size-box empty">1</div>
+                  <div class="size-box empty">2</div>
+                  <div class="size-box empty">4</div>
+                  <div class="size-box empty">3</div>
+                  <div class="size-box empty">2</div>
+                  <div class="size-box empty">1</div>
+                </div>
+
+                <div class="inventory">Total in inventar: <strong>13</strong></div>
+              </div>
+            </div>
+            <button class="red-btn" type="button">Opreste vanzarea</button>
+          </article>
+        </div>
+
+        <div class="bottom-controls">
+          <div class="nav-item">
+            <div class="nav-icon">⌕</div>
+            <span>Întreabă orice</span>
+          </div>
+          <div class="nav-item primary">
+            <div class="nav-icon">＋</div>
+            <span>Filă nouă</span>
+          </div>
+          <div class="nav-item">
+            <div class="badge">34</div>
+            <span>Toate filele</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const phone = document.getElementById('phone');
+    const toggleMenu = document.getElementById('toggleMenu');
+    const hamburgerToggle = document.getElementById('hamburgerToggle');
+
+    function togglePhoneMenu() {
+      phone.classList.toggle('menu-open');
+    }
+
+    toggleMenu.addEventListener('click', togglePhoneMenu);
+    hamburgerToggle.addEventListener('click', togglePhoneMenu);
+  </script>
 </body>
 </html>
