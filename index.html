@@ -1,752 +1,213 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VANDER - Editare Produse</title>
-  <style>
-    :root {
-      --bg-dark: #4a4d52;
-      --bar-dark: rgba(18, 22, 26, 0.96);
-      --screen-bg: #dfe0dc;
-      --surface: rgba(255,255,255,0.32);
-      --surface-2: rgba(255,255,255,0.2);
-      --line: rgba(0,0,0,0.12);
-      --text: #1c1d20;
-      --muted: #6b7280;
-      --blue: #2d8bfd;
-      --green: #18b98a;
-      --green-deep: #0f8e6d;
-      --red: #ef4f4f;
-      --red-deep: #cf3a3a;
-      --yellow: #f6d365;
-      --shadow: 0 16px 28px rgba(0,0,0,0.14);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VANDER - Gestiune Atelier</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --danger: #dc2626;
+            --danger-bg: #ef4444;
+            --success: #16a34a;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+            --radius: 10px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --sidebar-bg: #1e293b;
+        }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    html, body { height: 100%; background: var(--bg-dark); }
-    body {
-      display: grid;
-      place-items: center;
-      color: var(--text);
-      overflow: hidden;
-      padding: 0;
-    }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); padding: 15px 10px; line-height: 1.5; }
+        .container { max-width: 900px; margin: 0 auto; }
 
-    .phone {
-      position: relative;
-      width: 420px;
-      height: 100vh;
-      max-height: 920px;
-      background: var(--screen-bg);
-      overflow: hidden;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.22);
-    }
+        /* Sidebar Styling - Mai îngust */
+        #sidebarOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 999; display: none; }
+        .sidebar { position: fixed; top: 0; left: -240px; width: 240px; height: 100%; background: var(--sidebar-bg); color: #fff; z-index: 1000; transition: left 0.3s ease; display: flex; flex-direction: column; box-shadow: 4px 0 10px rgba(0,0,0,0.3); }
+        .sidebar.open { left: 0; }
+        .sidebar-header { padding: 16px; border-bottom: 1px solid #334155; display: flex; align-items: center; justify-content: space-between; }
+        .sidebar-brand { font-size: 1.05rem; font-weight: 800; letter-spacing: 0.5px; }
+        .sidebar-user { padding: 15px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #334155; background: #0f172a; }
+        .sidebar-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background: #cbd5e1; }
+        .sidebar-user-name { font-size: 0.85rem; font-weight: 600; }
+        .sidebar-menu { list-style: none; padding: 8px 0; flex-grow: 1; overflow-y: auto; }
+        .sidebar-menu li a { display: flex; align-items: center; gap: 10px; padding: 11px 16px; color: #cbd5e1; text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.2s, color 0.2s; cursor: pointer; }
+        .sidebar-menu li a:hover, .sidebar-menu li.active a { background: #334155; color: #fff; }
+        .sidebar-footer { padding: 12px 16px; border-top: 1px solid #334155; }
+        .sidebar-logout-btn { background: transparent; border: none; color: #f87171; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; width: 100%; padding: 8px; border-radius: 6px; }
+        .sidebar-logout-btn:hover { background: rgba(248, 113, 113, 0.1); }
 
-    .statusbar {
-      height: 52px;
-      background: var(--bar-dark);
-      color: #f6f8fa;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 18px;
-      font-size: 17px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-    }
+        /* Header */
+        .app-header { background: var(--card-bg); padding: 20px; border-radius: var(--radius); box-shadow: var(--shadow); text-align: center; margin-bottom: 16px; border: 1px solid var(--border); position: relative; }
+        .logo-img { height: 40px; object-fit: contain; margin-bottom: 8px; }
+        .app-header h1 { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
+        .app-header p { color: var(--text-muted); font-size: 0.8rem; }
+        
+        .menu-toggle-btn { position: absolute; top: 15px; left: 15px; background: #f1f5f9; border: 1px solid var(--border); color: var(--primary); padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .top-bar-btns { position: absolute; top: 15px; right: 15px; }
+        .btn-outline { background: #fef2f2; border: 1px solid #fecaca; color: var(--danger); padding: 5px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
 
-    .status-left, .status-right { display: flex; align-items: center; gap: 10px; }
-    .signal { display: flex; align-items: end; gap: 3px; height: 14px; }
-    .signal span {
-      display: block;
-      width: 3px;
-      border-radius: 2px 2px 0 0;
-      background: rgba(255,255,255,0.92);
-    }
-    .signal span:nth-child(1){ height: 4px; }
-    .signal span:nth-child(2){ height: 7px; }
-    .signal span:nth-child(3){ height: 9px; }
-    .signal span:nth-child(4){ height: 12px; }
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+        .stat-card { background: var(--card-bg); padding: 15px; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); text-align: center; }
+        .stat-number { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+        .stat-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; }
 
-    .battery {
-      width: 28px;
-      height: 12px;
-      border: 2px solid rgba(255,255,255,0.9);
-      border-radius: 3px;
-      position: relative;
-      background: transparent;
-    }
-    .battery::before {
-      content: "";
-      position: absolute;
-      left: 2px;
-      top: 2px;
-      width: 16px;
-      height: 4px;
-      border-radius: 2px;
-      background: #ebd765;
-    }
-    .battery::after {
-      content: "";
-      position: absolute;
-      right: -4px;
-      top: 2px;
-      width: 2px;
-      height: 5px;
-      border-radius: 1px;
-      background: rgba(255,255,255,0.9);
-    }
+        /* Cards */
+        .card { background: var(--card-bg); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+        .card h2 { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 15px; }
 
-    .network-badge {
-      min-width: 32px;
-      height: 20px;
-      background: #f0d95a;
-      color: #1d1d1f;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 800;
-      padding: 0 8px;
-    }
+        /* Form elements */
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--primary); margin-bottom: 5px; text-transform: uppercase; }
+        input[type="text"], input[type="password"], input[type="number"], select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; background: #f8fafc; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); background: #fff; }
+        
+        .sizes-grid-container { display: flex; gap: 6px; flex-wrap: wrap; background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid var(--border); }
+        .size-box { text-align: center; background: white; padding: 6px; border-radius: 4px; border: 1px solid var(--border); flex: 1; min-width: 40px; }
+        .size-box span { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 2px; }
+        .size-box input { width: 100%; text-align: center; padding: 4px; font-weight: 700; font-size: 0.85rem; border: 1px solid var(--border); border-radius: 4px; }
 
-    .topbar {
-      height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-bottom: 1px solid rgba(0,0,0,0.06);
-      background: rgba(0,0,0,0.05);
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-    }
+        /* Buttons */
+        .btn-primary { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; border-radius: 6px; font-size: 0.95rem; font-weight: 700; cursor: pointer; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-secondary { background: #64748b; color: white; border: none; padding: 12px; border-radius: 6px; font-size: 0.90rem; font-weight: 700; cursor: pointer; }
 
-    .title-row {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 16px 18px 12px;
-      font-weight: 800;
-      font-size: 17px;
-      text-transform: uppercase;
-      letter-spacing: 0.02em;
-    }
+        /* Import Box */
+        .import-box { background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px dashed var(--border); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
-    .hamburger { width: 22px; height: 18px; position: relative; display: inline-block; }
-    .hamburger span {
-      position: absolute;
-      left: 0;
-      width: 100%;
-      height: 3px;
-      background: #1e2125;
-      border-radius: 2px;
-    }
-    .hamburger span:nth-child(1){ top: 0; }
-    .hamburger span:nth-child(2){ top: 7px; }
-    .hamburger span:nth-child(3){ top: 14px; }
+        /* Search & Filter inputs */
+        .filter-row { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .search-input, .filter-select { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; background: #f8fafc; }
 
-    .content {
-      height: calc(100vh - 52px - 48px - 120px);
-      overflow-y: auto;
-      padding: 0 12px 12px;
-      scrollbar-width: none;
-    }
-    .content::-webkit-scrollbar { display: none; }
+        /* Card produs stilizat cu poză mărită */
+        .product-card-style { background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; display: flex; gap: 14px; align-items: flex-start; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .product-thumb { width: 110px; height: 110px; object-fit: contain; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 6px; flex-shrink: 0; }
+        .product-details { flex-grow: 1; }
+        .product-name-sku { font-size: 0.9rem; font-weight: 700; color: var(--primary); margin-bottom: 6px; line-height: 1.3; }
+        
+        .stock-table-grid { background: #e2e8f0; border-radius: 6px; padding: 2px; margin-bottom: 8px; overflow-x: auto; }
+        .stock-header-row, .stock-values-row { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; gap: 1px; }
+        .stock-cell-head { background: #cbd5e1; font-size: 0.7rem; font-weight: 800; padding: 4px 2px; color: #334155; }
+        .stock-cell-val { background: #ffffff; font-size: 0.8rem; font-weight: 700; padding: 6px 2px; color: var(--primary); }
 
-    .product-card {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 10px;
-      margin-bottom: 12px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.45);
-    }
+        .inventory-total { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-align: right; }
+        
+        .btn-stop-sale { width: 100%; background: var(--danger-bg); color: white; border: none; padding: 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.3px; }
+        .btn-stop-sale:hover { background: var(--danger); }
 
-    .product-layout {
-      display: grid;
-      grid-template-columns: 150px 1fr;
-      gap: 10px;
-      align-items: start;
-    }
+        .product-bottom-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+        .product-bottom-inputs input { padding: 6px 10px; font-size: 0.85rem; background: #fff; }
 
-    .shoe-box {
-      height: 150px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      background: linear-gradient(180deg, rgba(255,255,255,0.24), rgba(255,255,255,0.08));
-      border: 1px solid rgba(0,0,0,0.05);
-    }
-    .shoe-box img {
-      width: 125%;
-      height: 100%;
-      object-fit: cover;
-      filter: drop-shadow(0 8px 12px rgba(0,0,0,0.12));
-      transform: scale(1.18);
-      background: transparent;
-    }
+        .item-actions-row { display: flex; gap: 6px; margin-top: 8px; }
+        .btn-mini-edit { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; cursor: pointer; flex: 1; }
+        .btn-mini-del { background: #ffe4e6; color: #be123c; border: 1px solid #fecaca; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; cursor: pointer; flex: 1; }
 
-    .field-group {
-      display: grid;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
+        /* Login Overlay */
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .login-card { background: white; padding: 30px 20px; border-radius: var(--radius); width: 100%; max-width: 380px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); text-align: center; }
 
-    .field-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .field-row label {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .product-input,
-    .product-price,
-    .product-code,
-    .size-input {
-      width: 100%;
-      border: 1px solid rgba(0,0,0,0.15);
-      background: rgba(255,255,255,0.42);
-      border-radius: 8px;
-      padding: 8px 9px;
-      color: var(--text);
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    .product-input {
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .product-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 8px;
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-
-    .size-grid {
-      display: grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-      gap: 6px;
-      margin-top: 2px;
-    }
-
-    .size-box {
-      border: 1px solid rgba(0,0,0,0.14);
-      background: rgba(255,255,255,0.34);
-      border-radius: 8px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 68px;
-      padding: 4px 2px;
-    }
-
-    .size-box span {
-      font-size: 11px;
-      font-weight: 800;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
-
-    .size-box input {
-      width: 100%;
-      border: none;
-      background: transparent;
-      text-align: center;
-      font-weight: 800;
-      font-size: 13px;
-      color: var(--text);
-      outline: none;
-    }
-
-    .meta-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid rgba(0,0,0,0.08);
-      font-size: 14px;
-      font-weight: 700;
-      color: #1f2125;
-    }
-
-    .meta-row .price {
-      min-width: 60px;
-      text-align: right;
-      font-size: 15px;
-    }
-
-    .toggle-wrap {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .switch {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      min-width: 52px;
-      height: 28px;
-      border-radius: 999px;
-      background: rgba(0,0,0,0.12);
-      padding: 4px;
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
-    .switch::before {
-      content: "";
-      width: 20px;
-      height: 20px;
-      background: white;
-      border-radius: 50%;
-      transform: translateX(0);
-      transition: transform 0.2s ease;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-    .switch.active {
-      background: var(--green);
-    }
-    .switch.active::before { transform: translateX(24px); }
-
-    .action-bar {
-      display: flex;
-      gap: 8px;
-      padding: 12px;
-      border-top: 1px solid rgba(0,0,0,0.08);
-      background: rgba(255,255,255,0.18);
-    }
-
-    .btn {
-      border: none;
-      border-radius: 10px;
-      padding: 11px 14px;
-      font-size: 14px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: transform 0.12s ease, opacity 0.2s ease;
-    }
-    .btn:active { transform: translateY(1px); }
-    .btn.primary {
-      background: linear-gradient(180deg, var(--green) 0%, var(--green-deep) 100%);
-      color: white;
-      box-shadow: 0 4px 0 rgba(12, 127, 103, 0.24);
-      flex: 1;
-    }
-    .btn.secondary {
-      background: linear-gradient(180deg, var(--blue) 0%, #1e6ee8 100%);
-      color: white;
-      box-shadow: 0 4px 0 rgba(18, 63, 154, 0.24);
-      flex: 1;
-    }
-    .btn.danger {
-      background: linear-gradient(180deg, var(--red) 0%, var(--red-deep) 100%);
-      color: white;
-      box-shadow: 0 4px 0 rgba(153, 43, 43, 0.24);
-    }
-
-    .login-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(17, 18, 20, 0.72);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 40;
-      backdrop-filter: blur(2px);
-    }
-
-    .login-box {
-      width: min(86%, 300px);
-      background: rgba(255,255,255,0.95);
-      border-radius: 18px;
-      box-shadow: var(--shadow);
-      padding: 20px 18px 16px;
-    }
-
-    .login-box h2 {
-      text-align: center;
-      font-size: 18px;
-      margin-bottom: 14px;
-      color: #1f2937;
-    }
-
-    .login-form {
-      display: grid;
-      gap: 12px;
-    }
-
-    .login-form input {
-      width: 100%;
-      border: 1px solid rgba(0,0,0,0.15);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 14px;
-      background: #f9fafb;
-      color: #111827;
-    }
-
-    .login-form button {
-      border: none;
-      border-radius: 10px;
-      padding: 11px 12px;
-      background: linear-gradient(180deg, var(--green) 0%, var(--green-deep) 100%);
-      color: white;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .hidden { display: none !important; }
-
-    @media (max-width: 420px) {
-      .phone { width: 100vw; }
-    }
-  </style>
+        #syncStatus { font-size: 0.7rem; color: var(--success); margin-top: 4px; font-weight: 700; text-transform: uppercase; }
+    </style>
 </head>
 <body>
-  <div class="phone">
-    <div class="login-overlay" id="loginOverlay">
-      <div class="login-box">
-        <h2>Autentificare</h2>
-        <form class="login-form" id="loginForm">
-          <input type="password" id="loginPassword" placeholder="Introdu codul de acces" autocomplete="off" required />
-          <button type="submit">Intră în aplicație</button>
-        </form>
-      </div>
+
+    <!-- Ecranul de Autentificare -->
+    <div id="loginOverlay">
+        <div class="login-card">
+            <img src="logo.png" alt="VANDER" style="height: 40px; margin-bottom: 15px;" onerror="this.style.display='none'">
+            <h2 style="margin-bottom: 15px; font-size: 1.2rem; color: var(--primary);">Autentificare Atelier</h2>
+            <form id="loginForm">
+                <div class="form-group" style="text-align: left;">
+                    <label>Utilizator</label>
+                    <input type="text" id="loginUser" required placeholder="ex: vander" />
+                </div>
+                <div class="form-group" style="text-align: left;">
+                    <label>Parolă</label>
+                    <input type="password" id="loginPass" required placeholder="••••••••" />
+                </div>
+                <button type="submit" id="loginBtn" class="btn-primary" style="margin-top: 5px;">Intră în Aplicație</button>
+            </form>
+        </div>
     </div>
 
-    <div id="appMainContent">
-      <div class="statusbar">
-        <div class="status-left">
-          <span>08:52</span>
-          <span style="font-size: 18px;">◔</span>
+    <!-- Meniu Lateral (Sidebar) - Mai îngust și filtrabil -->
+    <div id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <nav class="sidebar" id="appSidebar">
+        <div class="sidebar-header">
+            <span class="sidebar-brand">VANDER <span style="font-size:0.7rem; color:#94a3b8;">admin</span></span>
+            <button onclick="toggleSidebar()" style="background:none; border:none; color:#fff; font-size:1.1rem; cursor:pointer;">✕</button>
         </div>
-        <div class="status-right">
-          <div class="signal" aria-label="signal">
-            <span></span><span></span><span></span><span></span>
-          </div>
-          <div class="battery" aria-label="battery"></div>
-          <span class="network-badge">17</span>
+        <div class="sidebar-user">
+            <img src="logo.png" alt="Avatar" class="sidebar-avatar" onerror="this.src='logo.png'">
+            <div>
+                <div class="sidebar-user-name">Madalin Mandocescu</div>
+                <div style="font-size: 0.7rem; color: #94a3b8;">Administrator</div>
+            </div>
         </div>
-      </div>
-
-      <div class="topbar">supp.ssell.ro</div>
-
-      <div class="title-row">
-        <div class="hamburger" aria-label="menu">
-          <span></span><span></span><span></span>
+        <ul class="sidebar-menu">
+            <li><a onclick="filterByCategory('')">📋 Toate Produsele</a></li>
+            <li><a onclick="filterByCategory('Pantofi sport')">👟 Pantofi Sport</a></li>
+            <li><a onclick="filterByCategory('Pantofi eleganți')">👞 Pantofi Eleganți</a></li>
+            <li><a onclick="filterByCategory('Pantofi casual')">👞 Pantofi Casual</a></li>
+            <li><a onclick="filterByCategory('Ghete')">👢 Ghete / Botine / Cizme</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button type="button" id="sidebarLogoutBtn" class="sidebar-logout-btn">
+                <span>🚪 Logout</span>
+            </button>
         </div>
-        <div>Toate produsele</div>
-      </div>
+    </nav>
 
-      <div class="content" id="productList"></div>
-
-      <div class="action-bar">
-        <button class="btn secondary" id="addProductBtn" type="button">+ Adaugă produs</button>
-        <button class="btn primary" id="saveProductsBtn" type="button">Salvează</button>
-      </div>
-    </div>
-  </div>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDdI_ae-3iwkgxk9I-OMhgw_2OA3WtLwn8",
-      authDomain: "vander-9e026.firebaseapp.com",
-      databaseURL: "https://vander-9e026-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "vander-9e026",
-      storageBucket: "vander-9e026.firebasestorage.app",
-      messagingSenderId: "317349329202",
-      appId: "1:317349329202:web:68ed0cdf0f75637801bf2b"
-    };
-
-    const AUTH_KEY = 'vander_is_logged';
-    const standardSizes = [39, 40, 41, 42, 43, 44, 45];
-    const DEFAULT_PRODUCTS = [
-      {
-        id: 'F104N',
-        name: 'Ghete bărbați din piele naturală',
-        code: 'F104N',
-        color: 'Negru',
-        price: 160,
-        image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80',
-        active: true,
-        sizes: {39: 2, 40: 3, 41: 4, 42: 3, 43: 2, 44: 1, 45: 0}
-      },
-      {
-        id: '4052N',
-        name: 'Pantofi bărbați din piele naturală',
-        code: '4052N',
-        color: 'Negru',
-        price: 135,
-        image: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=900&q=80',
-        active: true,
-        sizes: {39: 1, 40: 2, 41: 2, 42: 3, 43: 2, 44: 1, 45: 0}
-      },
-      {
-        id: '20255',
-        name: 'Pantofi casual premium',
-        code: '20255',
-        color: 'Negru',
-        price: 149,
-        image: 'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=900&q=80',
-        active: true,
-        sizes: {39: 0, 40: 2, 41: 4, 42: 2, 43: 3, 44: 2, 45: 1}
-      }
-    ];
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const productsRef = ref(db, 'vander_produse');
-
-    let products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
-
-    const loginOverlay = document.getElementById('loginOverlay');
-    const appMainContent = document.getElementById('appMainContent');
-    const loginForm = document.getElementById('loginForm');
-    const productList = document.getElementById('productList');
-    const addProductBtn = document.getElementById('addProductBtn');
-    const saveProductsBtn = document.getElementById('saveProductsBtn');
-
-    function normalizeSizes(rawSizes = {}) {
-      const normalized = {};
-      standardSizes.forEach((size) => {
-        const value = Array.isArray(rawSizes)
-          ? Number(rawSizes[standardSizes.indexOf(size)] || 0)
-          : Number(rawSizes[size] || 0);
-        normalized[size] = Number.isFinite(value) ? value : 0;
-      });
-      return normalized;
-    }
-
-    function normalizeProduct(product, index = 0) {
-      const normalized = {
-        id: product.id || `prod-${Date.now()}-${index}`,
-        name: product.name || `Produs ${index + 1}`,
-        code: product.code || `COD-${index + 1}`,
-        color: product.color || 'Negru',
-        price: Number(product.price || 0),
-        image: product.image || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80',
-        active: product.active !== false,
-        sizes: normalizeSizes(product.sizes || {})
-      };
-      return normalized;
-    }
-
-    function getTotalStock(product) {
-      return Object.values(product.sizes || {}).reduce((sum, count) => sum + Number(count || 0), 0);
-    }
-
-    function renderProducts() {
-      productList.innerHTML = products.map((product, index) => {
-        const amount = getTotalStock(product);
-        return `
-          <article class="product-card" data-index="${index}">
-            <div class="product-layout">
-              <div class="shoe-box">
-                <img src="${product.image}" alt="${product.name}" />
-              </div>
-
-              <div>
-                <div class="field-group">
-                  <div class="field-row">
-                    <label>Nume</label>
-                  </div>
-                  <input class="product-input" data-field="name" data-index="${index}" value="${escapeHtml(product.name)}" />
-                </div>
-
-                <div class="field-group">
-                  <div class="field-row">
-                    <label>Cod</label>
-                    <span style="font-size:11px; color: var(--muted); font-weight:800;">${amount} buc.</span>
-                  </div>
-                  <input class="product-code" data-field="code" data-index="${index}" value="${escapeHtml(product.code)}" />
-                </div>
-
-                <div class="field-group">
-                  <div class="field-row">
-                    <label>Preț</label>
-                    <span style="font-size:11px; color: var(--muted); font-weight:800;">Lei</span>
-                  </div>
-                  <input class="product-price" type="number" min="0" data-field="price" data-index="${index}" value="${Number(product.price || 0)}" />
-                </div>
-              </div>
+    <div class="container" id="appMainContent" style="display: none;">
+        <!-- Header -->
+        <header class="app-header">
+            <button type="button" class="menu-toggle-btn" onclick="toggleSidebar()">
+                ☰ Meniu
+            </button>
+            <div class="top-bar-btns">
+                <button type="button" id="logoutBtn" class="btn-outline">Ieșire</button>
             </div>
+            <img src="logo.png" alt="VANDER Atelier" class="logo-img" onerror="this.style.display='none'" />
+            <h1>VANDER - Gestiune Atelier</h1>
+            <p>Registru digital de stoc și mărimi</p>
+            <div id="syncStatus">● Conectat la Firebase Realtime DB</div>
+        </header>
 
-            <div class="product-row">
-              <span>${product.color || 'Negru'}</span>
-              <span style="color:#111827;">ID: ${product.id}</span>
+        <!-- Statistici -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="statTotalModels">0</div>
+                <div class="stat-label">Modele</div>
             </div>
-
-            <div class="size-grid">
-              ${standardSizes.map((size) => `
-                <div class="size-box">
-                  <span>${size}</span>
-                  <input type="number" min="0" data-size="${size}" data-index="${index}" value="${Number(product.sizes[size] || 0)}" />
-                </div>
-              `).join('')}
+            <div class="stat-card">
+                <div class="stat-number" id="statTotalPieces">0</div>
+                <div class="stat-label">Total Perechi</div>
             </div>
+        </section>
 
-            <div class="toggle-wrap">
-              <span style="font-size:12px; font-weight:800; text-transform: uppercase; color: var(--muted);">Disponibil</span>
-              <button class="switch ${product.active ? 'active' : ''}" data-toggle="active" data-index="${index}" type="button" aria-label="Toggle disponibil"></button>
+        <!-- Import CSV -->
+        <section class="card">
+            <h2>📦 Importă Stoc din Tabel (CSV)</h2>
+            <div class="import-box">
+                <input type="file" id="csvFileInput" accept=".csv" style="flex-grow: 1; font-size: 0.8rem;" />
+                <button type="button" id="importCsvBtn" class="btn-secondary" style="padding: 8px 12px; font-size: 0.8rem;">Importă</button>
             </div>
+        </section>
 
-            <div class="meta-row">
-              <span>Stoc total</span>
-              <span class="price">${amount}</span>
-            </div>
-          </article>
-        `;
-      }).join('');
-
-      document.querySelectorAll('[data-field]').forEach((input) => {
-        input.addEventListener('input', (event) => {
-          const index = Number(event.target.dataset.index);
-          const field = event.target.dataset.field;
-          if (!products[index]) return;
-
-          if (field === 'price') {
-            products[index][field] = Number(event.target.value || 0);
-          } else {
-            products[index][field] = event.target.value;
-          }
-        });
-      });
-
-      document.querySelectorAll('[data-size]').forEach((input) => {
-        input.addEventListener('input', (event) => {
-          const index = Number(event.target.dataset.index);
-          const size = Number(event.target.dataset.size);
-          if (!products[index]) return;
-          products[index].sizes[size] = Number(event.target.value || 0);
-          renderProducts();
-        });
-      });
-
-      document.querySelectorAll('[data-toggle]').forEach((button) => {
-        button.addEventListener('click', (event) => {
-          const index = Number(event.target.dataset.index);
-          if (!products[index]) return;
-          products[index].active = !products[index].active;
-          renderProducts();
-        });
-      });
-    }
-
-    function escapeHtml(value) {
-      return String(value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-
-    function saveProductsToFirebase() {
-      const safeProducts = products.map((product, index) => normalizeProduct(product, index));
-      set(productsRef, safeProducts)
-        .then(() => {
-          products = safeProducts;
-          renderProducts();
-        })
-        .catch((error) => {
-          console.error('Eroare la salvarea în Firebase:', error);
-          alert('A apărut o eroare la salvarea datelor. Verifică configurația Firebase.');
-        });
-    }
-
-    function addProduct() {
-      const newProduct = {
-        id: `prod-${Date.now()}`,
-        name: 'Produs nou',
-        code: `NEW-${products.length + 1}`,
-        color: 'Negru',
-        price: 0,
-        image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80',
-        active: true,
-        sizes: {39: 0, 40: 0, 41: 0, 42: 0, 43: 0, 44: 0, 45: 0}
-      };
-      products.push(newProduct);
-      renderProducts();
-      saveProductsToFirebase();
-    }
-
-    function isLoggedIn() {
-      return localStorage.getItem(AUTH_KEY) === 'true';
-    }
-
-    function setLoggedIn(flag) {
-      localStorage.setItem(AUTH_KEY, flag ? 'true' : 'false');
-      loginOverlay.classList.toggle('hidden', flag);
-      appMainContent.classList.toggle('hidden', !flag);
-    }
-
-    function initAuth() {
-      const password = '1234';
-      loginForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const entered = document.getElementById('loginPassword').value;
-        if (entered === password) {
-          setLoggedIn(true);
-          document.getElementById('loginPassword').value = '';
-          syncFromFirebase();
-        } else {
-          alert('Cod incorect. Folosește 1234 pentru demo.');
-        }
-      });
-    }
-
-    function syncFromFirebase() {
-      onValue(productsRef, (snapshot) => {
-        const data = snapshot.val();
-        if (Array.isArray(data) && data.length) {
-          products = data.map(normalizeProduct);
-        } else if (data && typeof data === 'object') {
-          products = Object.values(data).map(normalizeProduct);
-        } else {
-          products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
-        }
-        renderProducts();
-      }, {
-        onlyOnce: false
-      });
-    }
-
-    loginForm.addEventListener('submit', (event) => event.preventDefault());
-    addProductBtn.addEventListener('click', addProduct);
-    saveProductsBtn.addEventListener('click', saveProductsToFirebase);
-
-    initAuth();
-    setLoggedIn(isLoggedIn());
-    syncFromFirebase();
-  </script>
-</body>
-</html>
+        <!-- Adăugare / Editare Model -->
+        <section class="card">
+            <h2 id="formTitle">✨ Adaugă Model Individual</h2>
+            <form id="addProductForm">
+                <input type="hidden" id="editProductId" value="" />
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Denumire Produs *</label>
+                        <input type="text" id="prodName" required placeholder="ex: Pantofi Ceremonie" />
+                    </div>
+                    <div class="
