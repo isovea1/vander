@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VANDER - Gestiune Atelier</title>
-    <!-- Includere Flatpickr CSS -->
+    <!-- Flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <!-- Includere Flatpickr Shortcut Buttons Plugin CSS -->
+    <!-- Flatpickr Shortcut Buttons Plugin CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/shortcutButtons/style.css">
     <style>
         :root {
@@ -307,7 +307,7 @@
             </div>
         </section>
 
-        <!-- Istoric Activitate cu o singură căsuță de calendar și opțiuni predefinite -->
+        <!-- Istoric Activitate cu interval și butoane predefinite -->
         <section class="card">
             <h2>📅 Istoric Activitate și Vânzări</h2>
             <div class="single-calendar-box">
@@ -335,7 +335,7 @@
         </section>
     </div>
 
-    <!-- Script Flatpickr JS și Plugin-uri -->
+    <!-- Flatpickr JS și Plugin-uri -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ro.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/shortcutButtons/shortcutButtons.js"></script>
@@ -357,7 +357,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const productsRef = ref(db, 'vander_produse');
-        const historyRef = ref(db, 'vander_istoric');
 
         const AUTH_KEY = 'vander_is_logged';
         let products = [];
@@ -369,7 +368,7 @@
         let selectedStartDate = todayStr;
         let selectedEndDate = todayStr;
 
-        // Configurare Flatpickr cu butoane predefinite (Ieri, Ultimele 7 zile, Luna curentă, Luna trecută)
+        // Configurare Flatpickr
         flatpickr("#historyDateRange", {
             mode: "range",
             dateFormat: "Y-m-d",
@@ -381,28 +380,28 @@
                         { label: "Astăzi" },
                         { label: "Ieri" },
                         { label: "Ultimele 7 zile" },
-                        { label: "Luna curentă" },
-                        { label: "Luna trecută" }
+                        { label: "Ultimele 30 zile" },
+                        { label: "Luna aceasta" }
                     ],
                     onClick: (index, fp) => {
                         let dStart = new Date();
                         let dEnd = new Date();
 
                         if (index === 0) {
-                            dStart = new Date();
-                            dEnd = new Date();
+                            dStart = todayObj;
+                            dEnd = todayObj;
                         } else if (index === 1) {
                             dStart.setDate(todayObj.getDate() - 1);
-                            dEnd = new Date(dStart);
+                            dEnd = dStart;
                         } else if (index === 2) {
                             dStart.setDate(todayObj.getDate() - 6);
-                            dEnd = new Date();
+                            dEnd = todayObj;
                         } else if (index === 3) {
-                            dStart = new Date(todayObj.getFullYear(), todayObj.getMonth(), 1);
-                            dEnd = new Date();
+                            dStart.setDate(todayObj.getDate() - 29);
+                            dEnd = todayObj;
                         } else if (index === 4) {
-                            dStart = new Date(todayObj.getFullYear(), todayObj.getMonth() - 1, 1);
-                            dEnd = new Date(todayObj.getFullYear(), todayObj.getMonth(), 0);
+                            dStart = new Date(todayObj.getFullYear(), todayObj.getMonth(), 1);
+                            dEnd = todayObj;
                         }
 
                         selectedStartDate = dStart.toISOString().split('T')[0];
@@ -479,9 +478,7 @@
 
             if (user === 'vander' && pass === 'atelier2026') {
                 localStorage.setItem(AUTH_KEY, 'true');
-                loginOverlay.style.display = 'none';
-                appMainContent.style.display = 'block';
-                initRealtimeSync();
+                checkAuth(); // Ascunde imediat ecranul de login și încarcă aplicația
             } else {
                 alert('Utilizator sau parolă incorectă!');
             }
