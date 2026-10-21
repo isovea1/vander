@@ -125,11 +125,19 @@
 
         .inventory-total { font-size: 0.62rem; font-weight: 700; color: var(--text-muted); margin-bottom: 2px; text-align: right; }
 
-        .btn-stop-sale { width: 100%; background: var(--danger-bg); color: white; border: none; padding: 5px; border-radius: 4px; font-size: 0.68rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.3px; }
+        /* Container pentru a ține butonul Oprește Vânzarea și Prețul pe aceeași linie */
+        .sale-price-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
+            margin-top: 2px;
+            margin-bottom: 2px;
+        }
+
+        .btn-stop-sale { width: 100%; background: var(--danger-bg); color: white; border: none; padding: 5px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.3px; display: flex; align-items: center; justify-content: center; text-align: center; }
         .btn-stop-sale:hover { background: var(--danger); }
 
-        /* Prețul afișat curat pe un rând dedicat */
-        .product-price-box { width: 100%; background: #f8fafc; border: 1px solid var(--border); border-radius: 4px; padding: 4px 8px; font-size: 0.75rem; font-weight: 700; color: var(--primary); text-align: center; margin-top: 2px; }
+        .product-price-box { width: 100%; background: #f8fafc; border: 1px solid var(--border); border-radius: 4px; padding: 5px; font-size: 0.72rem; font-weight: 700; color: var(--primary); text-align: center; display: flex; align-items: center; justify-content: center; }
 
         .item-actions-row { display: flex; gap: 4px; margin-top: 2px; }
         .btn-mini-edit { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 4px 6px; border-radius: 4px; font-size: 0.58rem; font-weight: 700; cursor: pointer; flex: 1; }
@@ -479,10 +487,9 @@
 
                             <div class="inventory-total">Total în inventar: <b>${totalStock}</b></div>
 
-                            <button type="button" class="btn-stop-sale" onclick="alert('Funcție stoc gestionată pentru ${p.name}')">Oprește vânzarea</button>
-
-                            <div class="product-price-box">
-                                ${p.price || 0} RON
+                            <div class="sale-price-row">
+                                <button type="button" class="btn-stop-sale" onclick="alert('Funcție stoc gestionată pentru ${p.name}')">Oprește vânzarea</button>
+                                <div class="product-price-box">${p.price || 0} RON</div>
                             </div>
 
                             <div class="item-actions-row">
@@ -546,116 +553,4 @@
             document.getElementById('formTitle').innerText = "✨ Adaugă Model Individual";
             document.getElementById('saveProductBtn').innerText = "Salvează Produsul";
             document.getElementById('cancelEditBtn').style.display = 'none';
-            document.querySelectorAll('.size-input').forEach(inp => inp.value = 0);
-            
-            toggleAddProductForm();
-        }
-
-        document.getElementById('importCsvBtn').addEventListener('click', () => {
-            const fileInput = document.getElementById('csvFileInput');
-            if(!fileInput.files[0]) {
-                alert('Selectează un fișier CSV mai întâi!');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const lines = e.target.result.split('\n');
-                let count = 0;
-
-                lines.forEach((line, index) => {
-                    if(index === 0 || !line.trim()) return;
-                    const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-                    if(cols.length >= 5) {
-                        products.push({
-                            id: Date.now() + Math.random(),
-                            name: cols[0], color: cols[1], sku: cols[2],
-                            price: parseFloat(cols[3]) || 0, category: cols[4],
-                            notes: cols[12] || 'Importat CSV', image: '',
-                            stock: {
-                                "39": parseInt(cols[5]) || 0, "40": parseInt(cols[6]) || 0,
-                                "41": parseInt(cols[7]) || 0, "42": parseInt(cols[8]) || 0,
-                                "43": parseInt(cols[9]) || 0, "44": parseInt(cols[10]) || 0,
-                                "45": parseInt(cols[11]) || 0
-                            }
-                        });
-                        count++;
-                    }
-                });
-
-                saveToFirebase();
-                alert(`Importate ${count} produse cu succes în baza de date online!`);
-            };
-            reader.readAsText(fileInput.files[0]);
-        });
-
-        document.getElementById('addProductForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            let editId = document.getElementById('editProductId').value;
-            let stock = {};
-            document.querySelectorAll('.size-input').forEach(inp => {
-                let val = parseInt(inp.value) || 0;
-                if(val > 0) {
-                    stock[inp.dataset.size] = val;
-                }
-            });
-
-            const prodData = {
-                name: document.getElementById('prodName').value,
-                color: document.getElementById('prodColor').value,
-                sku: document.getElementById('prodSku').value,
-                price: document.getElementById('prodPrice').value,
-                category: document.getElementById('prodCategory').value,
-                notes: document.getElementById('prodNotes').value,
-                stock: stock
-            };
-
-            const fileInput = document.getElementById('prodImgFile');
-
-            function finishSave(imageUrl) {
-                if(editId) {
-                    products = products.map(p => {
-                        if(p && p.id == editId) {
-                            return {
-                                ...p,
-                                ...prodData,
-                                image: imageUrl !== undefined ? imageUrl : (p.image || "")
-                            };
-                        }
-                        return p;
-                    });
-                } else {
-                    const newProd = {
-                        id: Date.now(),
-                        ...prodData,
-                        image: imageUrl || ""
-                    };
-                    products.push(newProd);
-                }
-
-                saveToFirebase();
-                cancelEdit();
-                alert(editId ? 'Produs actualizat cu succes!' : 'Produs salvat cu succes!');
-            }
-
-            if(fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    finishSave(evt.target.result);
-                };
-                reader.readAsDataURL(fileInput.files[0]);
-            } else {
-                let existingImg = undefined;
-                if(editId) {
-                    let oldP = products.find(p => p && p.id == editId);
-                    if(oldP) existingImg = oldP.image;
-                }
-                finishSave(existingImg);
-            }
-        });
-
-        document.getElementById('searchInput').addEventListener('input', renderProducts);
-        document.getElementById('categoryFilter').addEventListener('change', renderProducts);
-    </script>
-</body>
-</html>
+            document.querySelectorAll('.size-input').forEach(inp =>
