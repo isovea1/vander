@@ -85,7 +85,6 @@
         .filter-row { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-bottom: 12px; }
         .search-input, .filter-select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: #f8fafc; }
 
-        /* Stil pentru căsuța unică de calendar cu interval */
         .single-calendar-box { display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; gap: 8px; margin-bottom: 10px; }
         .calendar-icon-styled { font-size: 1.1rem; }
         .single-calendar-input { border: none; background: transparent; font-size: 0.85rem; font-weight: 600; color: var(--primary); width: 100%; outline: none; cursor: pointer; }
@@ -308,12 +307,12 @@
             </div>
         </section>
 
-        <!-- Istoric Activitate cu O SINGURĂ căsuță de calendar (interval de date + butoane predefinite) -->
+        <!-- Istoric Activitate cu o singură căsuță de calendar și opțiuni predefinite -->
         <section class="card">
             <h2>📅 Istoric Activitate și Vânzări</h2>
             <div class="single-calendar-box">
                 <span class="calendar-icon-styled">📅</span>
-                <input type="text" id="historyDateRange" class="single-calendar-input" placeholder="Selectează intervalul de date..." readonly />
+                <input type="text" id="historyDateRange" class="single-calendar-input" placeholder="Selectează perioada..." readonly />
             </div>
             <div id="historyListContainer">
                 <div style="text-align: center; color: var(--text-muted); font-size: 0.75rem; padding: 10px;">Nicio înregistrare în intervalul selectat.</div>
@@ -370,7 +369,7 @@
         let selectedStartDate = todayStr;
         let selectedEndDate = todayStr;
 
-        // Inițializare Calendar Flatpickr cu interval și butoane predefinite
+        // Configurare Flatpickr cu butoane predefinite (Ieri, Ultimele 7 zile, Luna curentă, Luna trecută)
         flatpickr("#historyDateRange", {
             mode: "range",
             dateFormat: "Y-m-d",
@@ -390,23 +389,18 @@
                         let dEnd = new Date();
 
                         if (index === 0) {
-                            // Astăzi
                             dStart = new Date();
                             dEnd = new Date();
                         } else if (index === 1) {
-                            // Ieri
                             dStart.setDate(todayObj.getDate() - 1);
                             dEnd = new Date(dStart);
                         } else if (index === 2) {
-                            // Ultimele 7 zile
                             dStart.setDate(todayObj.getDate() - 6);
                             dEnd = new Date();
                         } else if (index === 3) {
-                            // Luna curentă
                             dStart = new Date(todayObj.getFullYear(), todayObj.getMonth(), 1);
                             dEnd = new Date();
                         } else if (index === 4) {
-                            // Luna trecută
                             dStart = new Date(todayObj.getFullYear(), todayObj.getMonth() - 1, 1);
                             dEnd = new Date(todayObj.getFullYear(), todayObj.getMonth(), 0);
                         }
@@ -485,7 +479,9 @@
 
             if (user === 'vander' && pass === 'atelier2026') {
                 localStorage.setItem(AUTH_KEY, 'true');
-                checkAuth();
+                loginOverlay.style.display = 'none';
+                appMainContent.style.display = 'block';
+                initRealtimeSync();
             } else {
                 alert('Utilizator sau parolă incorectă!');
             }
