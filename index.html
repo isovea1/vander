@@ -25,7 +25,7 @@
         body { background-color: var(--bg); color: var(--text-main); padding: 15px 10px; line-height: 1.5; }
         .container { max-width: 900px; margin: 0 auto; }
 
-        /* Sidebar Styling - Mai îngust */
+        /* Sidebar Styling */
         #sidebarOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 999; display: none; }
         .sidebar { position: fixed; top: 0; left: -240px; width: 240px; height: 100%; background: var(--sidebar-bg); color: #fff; z-index: 1000; transition: left 0.3s ease; display: flex; flex-direction: column; }
         .sidebar.open { left: 0; }
@@ -85,7 +85,7 @@
         .filter-row { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 15px; }
         .search-input, .filter-select { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; background: #f8fafc; }
 
-        /* Card produs stilizat cu poză mărită */
+        /* Card produs final compact */
         .product-card-style {
             background: #ffffff;
             border: 1px solid var(--border);
@@ -107,11 +107,9 @@
             border: 1px solid var(--border);
             border-radius: 8px;
             padding: 0;
-            flex-shrink: 0;
             display: block;
         }
         .product-details {
-            flex-grow: 1;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -152,7 +150,6 @@
 </head>
 <body>
 
-    <!-- Ecranul de Autentificare -->
     <div id="loginOverlay">
         <div class="login-card">
             <img src="logo.png" alt="VANDER" style="height: 40px; margin-bottom: 15px;" onerror="this.style.display='none'">
@@ -171,7 +168,6 @@
         </div>
     </div>
 
-    <!-- Meniu Lateral (Sidebar) - Mai îngust și filtrabil -->
     <div id="sidebarOverlay" onclick="toggleSidebar()"></div>
     <nav class="sidebar" id="appSidebar">
         <div class="sidebar-header">
@@ -186,11 +182,11 @@
             </div>
         </div>
         <ul class="sidebar-menu">
-            <li><a onclick="filterByCategory('')">📋 Toate Produsele</a></li>
-            <li><a onclick="filterByCategory('Pantofi sport')">👟 Pantofi Sport</a></li>
-            <li><a onclick="filterByCategory('Pantofi eleganți')">👞 Pantofi Eleganți</a></li>
-            <li><a onclick="filterByCategory('Pantofi casual')">👞 Pantofi Casual</a></li>
-            <li><a onclick="filterByCategory('Ghete')">👢 Ghete / Botine / Cizme</a></li>
+            <li><a href="#" onclick="filterByCategory('')">📋 Toate Produsele</a></li>
+            <li><a href="#" onclick="filterByCategory('Pantofi sport')">👟 Pantofi Sport</a></li>
+            <li><a href="#" onclick="filterByCategory('Pantofi eleganți')">👞 Pantofi Eleganți</a></li>
+            <li><a href="#" onclick="filterByCategory('Pantofi casual')">👞 Pantofi Casual</a></li>
+            <li><a href="#" onclick="filterByCategory('Ghete')">👢 Ghete / Botine / Cizme</a></li>
         </ul>
         <div class="sidebar-footer">
             <button type="button" id="sidebarLogoutBtn" class="sidebar-logout-btn">
@@ -200,7 +196,6 @@
     </nav>
 
     <div class="container" id="appMainContent" style="display: none;">
-        <!-- Header -->
         <header class="app-header">
             <button type="button" class="menu-toggle-btn" onclick="toggleSidebar()">
                 ☰ Meniu
@@ -214,7 +209,6 @@
             <div id="syncStatus">● Conectat la Firebase Realtime DB</div>
         </header>
 
-        <!-- Statistici -->
         <section class="stats-grid">
             <div class="stat-card">
                 <div class="stat-number" id="statTotalModels">0</div>
@@ -226,7 +220,6 @@
             </div>
         </section>
 
-        <!-- Import CSV -->
         <section class="card">
             <h2>📦 Importă Stoc din Tabel (CSV)</h2>
             <div class="import-box">
@@ -235,7 +228,6 @@
             </div>
         </section>
 
-        <!-- Adăugare / Editare Model -->
         <section class="card">
             <h2 id="formTitle">✨ Adaugă Model Individual</h2>
             <form id="addProductForm">
@@ -290,7 +282,6 @@
             </form>
         </section>
 
-        <!-- Lista Stoc cu Filtru -->
         <section class="card">
             <h2>📋 Stoc Atelier</h2>
             <div class="filter-row">
@@ -307,7 +298,6 @@
         </section>
     </div>
 
-    <!-- Script Firebase & Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
@@ -336,6 +326,19 @@
         const logoutBtn = document.getElementById('logoutBtn');
         const sidebarLogoutBtn = document.getElementById('sidebarLogoutBtn');
         const syncStatus = document.getElementById('syncStatus');
+
+        function filterByCategory(category) {
+            const categoryFilter = document.getElementById('categoryFilter');
+            if (categoryFilter) {
+                categoryFilter.value = category || '';
+            }
+            if (typeof renderProducts === 'function') {
+                renderProducts();
+            }
+            toggleSidebar();
+        }
+
+        window.filterByCategory = filterByCategory;
 
         window.toggleSidebar = function() {
             const sidebar = document.getElementById('appSidebar');
@@ -398,7 +401,7 @@
         }
 
         function saveToFirebase() {
-            set(productsRef, products).catch((error) => {
+            set(productsRef, products).catch(() => {
                 alert("Eroare la salvarea în baza de date online!");
             });
         }
@@ -459,7 +462,7 @@
                             
                             <div class="inventory-total">Total în inventar: <b>${totalStock}</b></div>
                             
-                            <button type="button" class="btn-stop-sale" onclick="alert('Funcție stoc gestionată pentru ${p.name}')">Oprește vanzarea</button>
+                            <button type="button" class="btn-stop-sale" onclick="alert('Funcție stoc gestionată pentru ${p.name}')">Oprește vânzarea</button>
 
                             <div class="product-bottom-inputs">
                                 <input type="text" value="${p.name} ${p.color}" readonly style="background:#f1f5f9; color:#334155;" />
