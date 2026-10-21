@@ -83,7 +83,7 @@
             padding: 12px;
             margin-bottom: 12px;
             display: grid;
-            grid-template-columns: 240px 1fr; /* Fotografie și mai mare */
+            grid-template-columns: 240px 1fr;
             gap: 14px;
             align-items: center;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
@@ -91,7 +91,7 @@
         .product-thumb {
             width: 100%;
             height: 100%;
-            min-height: 240px; /* Înălțime mărită considerabil pentru poză mare */
+            min-height: 240px;
             object-fit: contain;
             object-position: center;
             background: #ffffff;
@@ -115,7 +115,6 @@
             word-break: break-word;
         }
 
-        /* Casete mărimi stoc extrem de compacte */
         .stock-table-grid { background: #e2e8f0; border-radius: 4px; padding: 1px; margin-bottom: 3px; overflow-x: auto; }
         .stock-header-row, .stock-values-row { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; gap: 1px; }
         .stock-cell-head { background: #cbd5e1; font-size: 0.58rem; font-weight: 800; padding: 1px 0; color: #334155; }
@@ -439,7 +438,7 @@
                         <img src="${p.image || 'logo.png'}" class="product-thumb" onerror="this.src='logo.png'">
                         <div class="product-details">
                             <div class="product-name-sku">
-                                ${p.name} ${p.color} ⦿ - <b>39*VND${p.sku || '0000'}</b>
+                                ${p.name} ${p.color} ⦿ - <b>VND${p.sku || '0000'}</b>
                             </div>
 
                             <div class="stock-table-grid">
