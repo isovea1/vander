@@ -1,136 +1,4 @@
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import {
-        getAuth,
-        signInAnonymously,
-        onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import {
-        getFirestore,
-        collection,
-        addDoc,
-        deleteDoc,
-        doc,
-        onSnapshot,
-        serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyDdI_ae-3iwkgxk9I-OMhgw_2OA3WtLwn8",
-        authDomain: "vander-9e026.firebaseapp.com",
-        databaseURL: "https://vander-9e026-default-rtdb.europe-west1.firebasedatabase.app",
-        projectId: "vander-9e026",
-        storageBucket: "vander-9e026.firebasestorage.app",
-        messagingSenderId: "317349329202",
-        appId: "1:317349329202:web:68ed0cdf0f75637801bf2b"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    let allImplantData = [];
-
-    async function initFirebase() {
-        try {
-            await signInAnonymously(auth);
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    startRealtimeSync();
-                }
-            });
-        } catch (error) {
-            console.error("Firebase auth error:", error);
-            loadFallbackLocalStorage();
-        }
-    }
-
-    function startRealtimeSync() {
-        const colRef = collection(db, "implanturi_cabinet");
-
-        onSnapshot(colRef, (snapshot) => {
-            allImplantData = [];
-            snapshot.forEach((docSnap) => {
-                allImplantData.push({ id: docSnap.id, ...docSnap.data() });
-            });
-            renderTableAndStats(allImplantData);
-        }, (error) => {
-            console.error("Firestore sync error:", error);
-            loadFallbackLocalStorage();
-        });
-    }
-
-    async function addNewImplantToCloud(implantObj) {
-        try {
-            await addDoc(collection(db, "implanturi_cabinet"), {
-                ...implantObj,
-                createdAt: serverTimestamp()
-            });
-            return true;
-        } catch (error) {
-            console.error("Cloud save failed:", error);
-            let local = JSON.parse(localStorage.getItem("implanturi_cabinet_fallback")) || [];
-            local.push({ id: "local_" + Date.now(), ...implantObj });
-            localStorage.setItem("implanturi_cabinet_fallback", JSON.stringify(local));
-            allImplantData = local;
-            renderTableAndStats(allImplantData);
-            return false;
-        }
-    }
-
-    async function deleteImplantFromCloud(id) {
-        if (id.startsWith("local_")) {
-            let local = JSON.parse(localStorage.getItem("implanturi_cabinet_fallback")) || [];
-            local = local.filter((item) => item.id !== id);
-            localStorage.setItem("implanturi_cabinet_fallback", JSON.stringify(local));
-            allImplantData = local;
-            renderTableAndStats(allImplantData);
-            return;
-        }
-
-        try {
-            await deleteDoc(doc(db, "implanturi_cabinet", id));
-        } catch (error) {
-            console.error("Delete failed:", error);
-            alert("Nu s-a putut șterge înregistrarea din cloud.");
-        }
-    }
-
-    function loadFallbackLocalStorage() {
-        let local = JSON.parse(localStorage.getItem("implanturi_cabinet_fallback"));
-        if (!local) {
-            local = [
-                {
-                    id: "local_1",
-                    numePacient: "Popescu Maria",
-                    dataImplantului: "2026-02-10",
-                    tipImplant: "Straumann BLT 4.1",
-                    bontProtetic: "Da",
-                    facturareBont: "Facturat",
-                    serviciuPacient: "Consult de specialitate"
-                },
-                {
-                    id: "local_2",
-                    numePacient: "Ionescu Andrei",
-                    dataImplantului: "2026-03-01",
-                    tipImplant: "Megagen AnyRidge 3.5",
-                    bontProtetic: "Da",
-                    facturareBont: "Nefacturat",
-                    serviciuPacient: "Implantologie"
-                }
-            ];
-            localStorage.setItem("implanturi_cabinet_fallback", JSON.stringify(local));
-        }
-        allImplantData = local;
-        renderTableAndStats(allImplantData);
-    }
-
-    window.addNewImplantToCloud = addNewImplantToCloud;
-    window.deleteImplantFromCloud = deleteImplantFromCloud;
-    window.getAllData = () => allImplantData;
-
-    initFirebase();
-</script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
@@ -168,7 +36,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center space-x-3">
                 <div class="bg-brand-600 text-white p-2.5 rounded-xl shadow-md">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.02-.328c-.85 0-1.6.48-1.915 1.178l-2.19 4.63a.75.75 0 01-.702.486H9.4a.75.75 0 01-.7-.487l-2.19-4.63A2 2 0 004.58 15.1a2 2 0 00-1.02.328 2 2 0 00-.972 1.777L5.75 21.2a2 2 0 001.98 1.5h8.54a2 2 0 001.98-1.5l3.16-3.995A2 2 0 0019.428 15.428zM12 2a4 4 0 014 4v7H8V6a4 4 0 014-4z"></path></svg>
                 </div>
                 <div>
                     <h1 class="text-xl font-bold text-slate-900 tracking-tight">Cabinet Stomatologic</h1>
@@ -200,7 +68,7 @@
                     <h3 id="statTotal" class="text-3xl font-bold text-slate-900 mt-1">0</h3>
                 </div>
                 <div class="bg-sky-50 text-brand-600 p-3 rounded-xl">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6M16 9V5a2 2 0 00-2-2h-2a2 2 0 00-2 2v4m10 0v6a2 2 0 01-2 2h-2a2 2 0 01-2-2v-6m10 0H4"></path></svg>
                 </div>
             </div>
 
@@ -220,7 +88,7 @@
                     <h3 id="statBilled" class="text-3xl font-bold text-blue-600 mt-1">0</h3>
                 </div>
                 <div class="bg-blue-50 text-blue-600 p-3 rounded-xl">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"></path></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M4 7.5A2.5 2.5 0 016.5 5h11A2.5 2.5 0 0120 7.5v9A2.5 2.5 0 0117.5 19h-11A2.5 2.5 0 014 16.5v-9z"></path></svg>
                 </div>
             </div>
 
@@ -242,7 +110,7 @@
                     <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </span>
-                    <input type="text" id="searchInput" oninput="filterData()" placeholder="Caută după pacient sau brand implant..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+                    <input type="text" id="searchInput" oninput="filterData()" placeholder="Caută după pacient sau brand implant..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
                 </div>
                 <div class="text-xs text-slate-500 font-medium">
                     Sincronizare în timp real activată
@@ -282,31 +150,31 @@
             <form id="implantForm" onsubmit="handleFormSubmit(event)" class="p-6 space-y-4">
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Nume și Prenume Pacient</label>
-                    <input type="text" id="numePacient" required placeholder="Ex: Popescu Ion" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white">
+                    <input type="text" id="numePacient" required placeholder="Ex: Popescu Ion" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Data Implantului</label>
-                        <input type="date" id="dataInplantului" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white">
+                        <input type="date" id="dataInplantului" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Tip / Brand Implant</label>
-                        <input type="text" id="tipImplant" required placeholder="Ex: Straumann BLT 4.1" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white">
+                        <input type="text" id="tipImplant" required placeholder="Ex: Straumann BLT 4.1" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">A primit bont protetic?</label>
-                        <select id="bontProtetic" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white">
+                        <select id="bontProtetic" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
                             <option value="Da">Da</option>
                             <option value="Nu">Nu</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Facturare Bont Protetic</label>
-                        <select id="facturareBont" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white">
+                        <select id="facturareBont" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
                             <option value="Facturat">Facturat</option>
                             <option value="Nefacturat">Nefacturat</option>
                             <option value="Inclus în pachet">Inclus în pachet</option>
@@ -342,57 +210,55 @@
     <!-- Firebase App Module Setup -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import {
+            getAuth,
+            signInAnonymously,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            deleteDoc,
+            doc,
+            onSnapshot,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Global environment bindings provided by runner environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'dental-implant-app-default';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "AIzaSyDummyKeyForLocalPreview",
-            authDomain: "dummy.firebaseapp.com",
-            projectId: "dummy-project"
+        const firebaseConfig = {
+            apiKey: "AIzaSyDdI_ae-3iwkgxk9I-OMhgw_2OA3WtLwn8",
+            authDomain: "vander-9e026.firebaseapp.com",
+            databaseURL: "https://vander-9e026-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "vander-9e026",
+            storageBucket: "vander-9e026.firebasestorage.app",
+            messagingSenderId: "317349329202",
+            appId: "1:317349329202:web:68ed0cdf0f75637801bf2b"
         };
 
-        let db = null;
-        let auth = null;
-        let unsubscribe = null;
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
         let allImplantData = [];
 
-        window.initFirebaseApp = async function() {
+        async function initFirebase() {
             try {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                // Authentication step as per rules
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
+                await signInAnonymously(auth);
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
-                        document.getElementById('connectionStatus').className = "flex items-center space-x-2 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full text-xs font-medium border border-emerald-200";
-                        document.getElementById('connectionStatus').innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>Sincronizat Cloud</span>`;
-                        
-                        // Subscribe to real-time data collection according to RULE 1 & 2
-                        startRealtimeSync(user.uid);
+                        startRealtimeSync();
                     }
                 });
-            } catch (err) {
-                console.warn("Firebase offline/fallback mode:", err);
-                document.getElementById('connectionStatus').className = "flex items-center space-x-2 bg-amber-50 text-amber-700 px-3 py-1.5 rounded-full text-xs font-medium border border-amber-200";
-                document.getElementById('connectionStatus').innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500"></span><span>Mod Local (Offline)</span>`;
+            } catch (error) {
+                console.error("Firebase auth error:", error);
                 loadFallbackLocalStorage();
             }
-        };
+        }
 
-        function startRealtimeSync(uid) {
-            // RULE 1 path: public collection for collaborative cabinet data
-            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'implanturi_cabinet');
-            
-            unsubscribe = onSnapshot(colRef, (snapshot) => {
+        function startRealtimeSync() {
+            const colRef = collection(db, "implanturi_cabinet");
+
+            onSnapshot(colRef, (snapshot) => {
                 allImplantData = [];
                 snapshot.forEach((docSnap) => {
                     allImplantData.push({ id: docSnap.id, ...docSnap.data() });
@@ -404,64 +270,76 @@
             });
         }
 
-        window.addNewImplantToCloud = async function(implantObj) {
-            if (db && auth && auth.currentUser) {
-                try {
-                    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'implanturi_cabinet');
-                    await addDoc(colRef, implantObj);
-                    return;
-                } catch (e) {
-                    console.error("Cloud save failed, falling back to local:", e);
-                }
+        async function addNewImplantToCloud(implantObj) {
+            try {
+                await addDoc(collection(db, "implanturi_cabinet"), {
+                    ...implantObj,
+                    createdAt: serverTimestamp()
+                });
+                return true;
+            } catch (error) {
+                console.error("Cloud save failed:", error);
+                let local = JSON.parse(localStorage.getItem("implanturi_cabinet_fallback")) || [];
+                local.push({ id: "local_" + Date.now(), ...implantObj });
+                localStorage.setItem("implanturi_cabinet_fallback", JSON.stringify(local));
+                allImplantData = local;
+                renderTableAndStats(allImplantData);
+                return false;
             }
-            // Fallback localStorage save
-            let local = JSON.parse(localStorage.getItem('implanturi_cabinet_fallback')) || [];
-            local.push({ id: 'local_' + Date.now(), ...implantObj });
-            localStorage.setItem('implanturi_cabinet_fallback', JSON.stringify(local));
-            allImplantData = local;
-            renderTableAndStats(allImplantData);
-        };
+        }
 
-        window.deleteImplantFromCloud = async function(id) {
-            if (id.startsWith('local_')) {
-                let local = JSON.parse(localStorage.getItem('implanturi_cabinet_fallback')) || [];
-                local = local.filter(item => item.id !== id);
-                localStorage.setItem('implanturi_cabinet_fallback', JSON.stringify(local));
+        async function deleteImplantFromCloud(id) {
+            if (id.startsWith("local_")) {
+                let local = JSON.parse(localStorage.getItem("implanturi_cabinet_fallback")) || [];
+                local = local.filter((item) => item.id !== id);
+                localStorage.setItem("implanturi_cabinet_fallback", JSON.stringify(local));
                 allImplantData = local;
                 renderTableAndStats(allImplantData);
                 return;
             }
 
-            if (db && auth && auth.currentUser) {
-                try {
-                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'implanturi_cabinet', id));
-                } catch (e) {
-                    console.error("Cloud delete failed:", e);
-                    showCustomModal("Erore", "Nu s-a putut șterge înregistrarea din cloud.");
-                }
+            try {
+                await deleteDoc(doc(db, "implanturi_cabinet", id));
+            } catch (error) {
+                console.error("Delete failed:", error);
+                alert("Nu s-a putut șterge înregistrarea din cloud.");
             }
-        };
+        }
 
         function loadFallbackLocalStorage() {
-            let local = JSON.parse(localStorage.getItem('implanturi_cabinet_fallback'));
+            let local = JSON.parse(localStorage.getItem("implanturi_cabinet_fallback"));
             if (!local) {
-                // Default initial sample data if empty
                 local = [
-                    { id: 'local_1', numePacient: 'Popescu Maria', dataInplantului: '2026-02-10', tipImplant: 'Straumann BLT 4.1', bontProtetic: 'Da', facturareBont: 'Facturat' },
-                    { id: 'local_2', numePacient: 'Ionescu Andrei', dataInplantului: '2026-03-01', tipImplant: 'Megagen AnyRidge 3.5', bontProtetic: 'Da', facturareBont: 'Nefacturat' }
+                    {
+                        id: "local_1",
+                        numePacient: "Popescu Maria",
+                        dataInplantului: "2026-02-10",
+                        tipImplant: "Straumann BLT 4.1",
+                        bontProtetic: "Da",
+                        facturareBont: "Facturat",
+                        serviciuPacient: "Consult de specialitate"
+                    },
+                    {
+                        id: "local_2",
+                        numePacient: "Ionescu Andrei",
+                        dataInplantului: "2026-03-01",
+                        tipImplant: "Megagen AnyRidge 3.5",
+                        bontProtetic: "Da",
+                        facturareBont: "Nefacturat",
+                        serviciuPacient: "Implantologie"
+                    }
                 ];
-                localStorage.setItem('implanturi_cabinet_fallback', JSON.stringify(local));
+                localStorage.setItem("implanturi_cabinet_fallback", JSON.stringify(local));
             }
             allImplantData = local;
             renderTableAndStats(allImplantData);
         }
 
-        // Initialize on load
-        window.addEventListener('DOMContentLoaded', () => {
-            initFirebaseApp();
-        });
-
+        window.addNewImplantToCloud = addNewImplantToCloud;
+        window.deleteImplantFromCloud = deleteImplantFromCloud;
         window.getAllData = () => allImplantData;
+
+        initFirebase();
     </script>
 
     <!-- UI Logic Script -->
@@ -488,9 +366,9 @@
                         : 'bg-rose-50 text-rose-700 border border-rose-200';
 
                     const billingBadge = item.facturareBont === 'Facturat' 
-                        ? 'bg-sky-50 text-sky-700 border border-sky-200'
-                        : item.facturareBont === 'Nefacturat'
-                        ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                        ? 'bg-sky-50 text-sky-700 border border-sky-200' 
+                        : item.facturareBont === 'Nefacturat' 
+                        ? 'bg-amber-50 text-amber-700 border border-amber-200' 
                         : 'bg-slate-100 text-slate-700 border border-slate-200';
 
                     const tr = document.createElement('tr');
@@ -503,7 +381,7 @@
                         <td class="py-3.5 px-6"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${billingBadge}">${escapeHTML(item.facturareBont)}</span></td>
                         <td class="py-3.5 px-6 text-right">
                             <button onclick="confirmDelete('${item.id}')" class="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg transition-colors" title="Șterge">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M3 7h18m-8 0V4h4v3"></path></svg>
                             </button>
                         </td>
                     `;
@@ -511,7 +389,6 @@
                 });
             }
 
-            // Update stats cards
             document.getElementById('statTotal').innerText = totalCount;
             document.getElementById('statAbutmentYes').innerText = abutmentYesCount;
             document.getElementById('statBilled').innerText = billedCount;
@@ -526,7 +403,6 @@
 
         function openModal() {
             document.getElementById('implantModal').classList.remove('hidden');
-            // Set default date to today
             document.getElementById('dataInplantului').value = new Date().toISOString().split('T')[0];
         }
 
@@ -537,16 +413,17 @@
 
         async function handleFormSubmit(e) {
             e.preventDefault();
-            const nouImplant = {
-                numePacient: document.getElementById('numePacient').value.trim(),
-                dataInplantului: document.getElementById('dataInplantului').value,
-                tipImplant: document.getElementById('tipImplant').value.trim(),
-                bontProtetic: document.getElementById('bontProtetic').value,
-                facturareBont: document.getElementById('facturareBont').value,
-                createdAt: new Date().toISOString()
+
+            const payload = {
+                numePacient: document.getElementById("numePacient").value.trim(),
+                serviciuPacient: document.getElementById("serviciuPacient").value,
+                dataImplantului: document.getElementById("dataInplantului").value,
+                tipImplant: document.getElementById("tipImplant").value.trim(),
+                bontProtetic: document.getElementById("bontProtetic").value,
+                facturareBont: document.getElementById("facturareBont").value
             };
 
-            await window.addNewImplantToCloud(nouImplant);
+            await addNewImplantToCloud(payload);
             closeModal();
         }
 
@@ -563,8 +440,8 @@
             const term = document.getElementById('searchInput').value.toLowerCase();
             const allData = window.getAllData();
             const filtered = allData.filter(item => 
-                item.numePacient.toLowerCase().includes(term) || 
-                item.tipImplant.toLowerCase().includes(term)
+                (item.numePacient || '').toLowerCase().includes(term) || 
+                (item.tipImplant || '').toLowerCase().includes(term)
             );
             renderTableAndStats(filtered);
         }
