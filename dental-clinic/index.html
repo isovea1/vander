@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmileCare | Cabinet Stomatologic</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">S</div>
+        <div>
+          <div class="brand-name">SmileCare</div>
+          <div class="brand-sub">Cabinet stomatologic</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a href="#dashboard">Dashboard</a>
+        <a href="#appointments">Programări</a>
+        <a href="#services">Servicii</a>
+        <a href="#patients">Pacienți</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="ghost-btn" type="button">Raport</button>
+        <button class="primary-btn" type="button">Programare nouă</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" id="dashboard">
+        <div class="hero-copy">
+          <div class="eyebrow">Cabinet digital</div>
+          <h1>Gestionarea clinicii tale, mai clară și mai rapidă.</h1>
+          <p>
+            O aplicație separată, dedicată programărilor, pacienților, tratamentelor și monitorizării activității cabinetului stomatologic.
+          </p>
+
+          <div class="hero-actions">
+            <button class="primary-btn" type="button">Adaugă pacient</button>
+            <button class="secondary-btn" type="button">Vezi programările</button>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-box">
+              <strong>328</strong>
+              <span>Pacienți</span>
+            </div>
+            <div class="stat-box">
+              <strong>52</strong>
+              <span>Programări</span>
+            </div>
+            <div class="stat-box">
+              <strong>96%</strong>
+              <span>Mulțumiri</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-panel">
+          <div class="panel-card">
+            <div class="panel-header">
+              <span>Overview</span>
+              <span class="live-pill">Live</span>
+            </div>
+
+            <div class="panel-body">
+              <div class="smile-mark">😊</div>
+              <h2>SmileCare</h2>
+              <p>Dashboard pentru managementul clinicilor dentare moderne.</p>
+
+              <div class="mini-chart" aria-hidden="true">
+                <span style="height: 36%"></span>
+                <span style="height: 52%"></span>
+                <span style="height: 74%"></span>
+                <span style="height: 66%"></span>
+                <span style="height: 92%"></span>
+                <span style="height: 100%"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="appointments">
+        <div class="section-head">
+          <h2>Programări de astăzi</h2>
+          <span id="todayDate">Azi</span>
+        </div>
+
+        <div class="two-col">
+          <div class="card appointments-card">
+            <div class="list">
+              <div class="appointment-item">
+                <div class="appointment-info">
+                  <div class="avatar blue">A</div>
+                  <div>
+                    <div class="name">Andreea Popescu</div>
+                    <div class="meta">Consult + detartraj • 09:30</div>
+                  </div>
+                </div>
+                <span class="status confirmed">Confirmat</span>
+              </div>
+
+              <div class="appointment-item">
+                <div class="appointment-info">
+                  <div class="avatar green">M</div>
+                  <div>
+                    <div class="name">Mihai Ionescu</div>
+                    <div class="meta">Albire profesională • 11:00</div>
+                  </div>
+                </div>
+                <span class="status waiting">Așteaptă</span>
+              </div>
+
+              <div class="appointment-item">
+                <div class="appointment-info">
+                  <div class="avatar purple">R</div>
+                  <div>
+                    <div class="name">Roxana Vasilescu</div>
+                    <div class="meta">Evaluare implant • 13:30</div>
+                  </div>
+                </div>
+                <span class="status review">Review</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card form-card">
+            <h3>Programare nouă</h3>
+            <form>
+              <div class="field">
+                <label>Nume pacient</label>
+                <input type="text" placeholder="Ex: Elena Marin" />
+              </div>
+
+              <div class="field">
+                <label>Serviciu</label>
+                <select>
+                  <option>Consult de specialitate</option>
+                  <option>Detartraj</option>
+                  <option>Albire</option>
+                  <option>Implantologie</option>
+                  <option>Ortodonție</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label>Data</label>
+                <input type="date" />
+              </div>
+
+              <button class="primary-btn full" type="submit">Salvează programarea</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="services">
+        <div class="section-head">
+          <h2>Servicii</h2>
+          <span>Tratamente disponibile</span>
+        </div>
+
+        <div class="pricing-grid">
+          <article class="price-card">
+            <div class="card-icon">🦷</div>
+            <h3>Consultație</h3>
+            <div class="price">150 RON</div>
+            <ul>
+              <li>Evaluare orală</li>
+              <li>Diagnostic inițial</li>
+              <li>Plan de tratament</li>
+            </ul>
+          </article>
+
+          <article class="price-card">
+            <div class="card-icon">✨</div>
+            <h3>Albire</h3>
+            <div class="price">450 RON</div>
+            <ul>
+              <li>Albire profesională</li>
+              <li>Material premium</li>
+              <li>Follow-up</li>
+            </ul>
+          </article>
+
+          <article class="price-card">
+            <div class="card-icon">🛠️</div>
+            <h3>Detartraj</h3>
+            <div class="price">250 RON</div>
+            <ul>
+              <li>Curățare profundă</li>
+              <li>Polizare</li>
+              <li>Consultare post-tratament</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="patients">
+        <div class="section-head">
+          <h2>Pacienți</h2>
+          <span>Recenti</span>
+        </div>
+
+        <div class="patient-table-card card">
+          <table>
+            <thead>
+              <tr>
+                <th>Pacient</th>
+                <th>Serviciu</th>
+                <th>Ultima vizită</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Elena Marin</td>
+                <td>Consultație</td>
+                <td>12 Apr 2026</td>
+                <td><span class="status-table ok">Activ</span></td>
+              </tr>
+              <tr>
+                <td>Victor Radu</td>
+                <td>Albire</td>
+                <td>09 Apr 2026</td>
+                <td><span class="status-table pending">În așteptare</span></td>
+              </tr>
+              <tr>
+                <td>Maria Ionescu</td>
+                <td>Detartraj</td>
+                <td>07 Apr 2026</td>
+                <td><span class="status-table ok">Activ</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
