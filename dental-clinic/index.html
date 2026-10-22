@@ -239,16 +239,14 @@
             onAuthStateChanged
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import {
-            getFirestore,
-            collection,
-            addDoc,
-            deleteDoc,
-            doc,
-            onSnapshot,
+            getDatabase,
+            ref,
+            push,
+            remove,
+            onValue,
             query,
-            orderBy,
-            serverTimestamp
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+            orderByChild
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC_RnK2BGRex1PriYaYku0fDZxvlTB8kIc",
@@ -263,10 +261,9 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        const db = getDatabase(app);
 
         let allImplantData = [];
-        let isCloudAvailable = false;
         const LOCAL_FALLBACK_KEY = "implanturi_cabinet_fallback";
 
         function showToast(message, type = "info") {
@@ -310,27 +307,6 @@
             }
         }
 
-        function handleCloudConfigError(message, allowFallback = true) {
-            console.error(message);
-            isCloudAvailable = false;
-            setConnectionStatus("error", "Cloud indisponibil");
-
-            if (allowFallback) {
-                const local = getLocalFallbackData();
-                if (local.length) {
-                    allImplantData = local;
-                    renderTableAndStats(local);
-                    showToast("Salvare locală activă — sincronizare cloud indisponibilă.", "warning");
-                }
-            }
-
-            showCustomModal(
-                "Cloud Firebase neconfigurat",
-                "Pentru sincronizarea între dispozitive, activează Firestore Database în Firebase Console și setează reguli de acces pentru utilizatorii autentificați.\n\nRegula recomandată:\nallow read, write: if request.auth != null;",
-                false
-            );
-        }
-
         function getLocalFallbackData() {
             try {
                 return JSON.parse(localStorage.getItem(LOCAL_FALLBACK_KEY)) || [];
@@ -356,54 +332,43 @@
                 });
             } catch (error) {
                 console.error("Firebase auth error:", error);
-                handleCloudConfigError("Autentificarea anonimă Firebase a eșuat.");
+                setConnectionStatus("error", "Eroare autentificare");
             }
         }
 
         function startRealtimeSync() {
-            const q = query(collection(db, "implanturi_cabinet"), orderBy("createdAt", "desc"));
-
-            onSnapshot(q, (snapshot) => {
+            const implantRef = ref(db, "implanturi_cabinet");
+            
+            onValue(implantRef, (snapshot) => {
                 allImplantData = [];
-                snapshot.forEach((docSnap) => {
-                    allImplantData.push({ id: docSnap.id, ...docSnap.data() });
+                snapshot.forEach((childSnap) => {
+                    allImplantData.push({ id: childSnap.key, ...childSnap.val() });
                 });
 
-                isCloudAvailable = true;
+                // Sortează descrescător după data creării
+                allImplantData.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
                 setConnectionStatus("success", "Sincronizare activă");
                 renderTableAndStats(allImplantData);
             }, (error) => {
-                console.error("Firestore sync error:", error);
-                handleCloudConfigError("Firestore nu este activat sau nu are permisiuni de acces.");
+                console.error("RTDB sync error:", error);
+                setConnectionStatus("error", "Eroare sincronizare");
             });
         }
 
         async function addNewImplantToCloud(implantObj) {
             try {
-                const docRef = await addDoc(collection(db, "implanturi_cabinet"), {
+                const implantRef = ref(db, "implanturi_cabinet");
+                const newRef = push(implantRef, {
                     ...implantObj,
-                    createdAt: serverTimestamp()
+                    createdAt: Date.now()
                 });
 
                 showToast("Înregistrarea a fost salvată în cloud.", "success");
-                return docRef.id;
+                return newRef.key;
             } catch (error) {
                 console.error("Cloud save failed:", error);
-
-                const local = getLocalFallbackData();
-                const offlineRecord = {
-                    id: "local_" + Date.now(),
-                    ...implantObj,
-                    createdAt: new Date().toISOString()
-                };
-
-                local.unshift(offlineRecord);
-                saveLocalFallbackData(local);
-
-                allImplantData = local;
-                renderTableAndStats(local);
-
-                showToast("Salvare locală (offline) — datele nu vor fi sincronizate până la reconectare.", "warning");
+                showToast("Eroare la salvarea în cloud.", "error");
                 return null;
             }
         }
@@ -419,41 +384,11 @@
             }
 
             try {
-                await deleteDoc(doc(db, "implanturi_cabinet", id));
+                await remove(ref(db, "implanturi_cabinet/" + id));
                 showToast("Înregistrarea a fost ștearsă din cloud.", "success");
             } catch (error) {
                 console.error("Delete failed:", error);
-                showToast("Nu s-a putut șterge din cloud. Verifică permisiunile Firebase.", "error");
-            }
-        }
-
-        function seedFallbackDataIfNeeded() {
-            const local = getLocalFallbackData();
-            if (!local.length) {
-                const defaultData = [
-                    {
-                        id: "local_1",
-                        numePacient: "Popescu Maria",
-                        dataInplantului: "2026-02-10",
-                        tipImplant: "Straumann BLT 4.1",
-                        bontProtetic: "Da",
-                        facturareBont: "Facturat",
-                        createdAt: "2026-02-10T10:00:00.000Z"
-                    },
-                    {
-                        id: "local_2",
-                        numePacient: "Ionescu Andrei",
-                        dataInplantului: "2026-03-01",
-                        tipImplant: "Megagen AnyRidge 3.5",
-                        bontProtetic: "Da",
-                        facturareBont: "Nefacturat",
-                        createdAt: "2026-03-01T10:00:00.000Z"
-                    }
-                ];
-
-                saveLocalFallbackData(defaultData);
-                allImplantData = defaultData;
-                renderTableAndStats(defaultData);
+                showToast("Nu s-a putut șterge din cloud.", "error");
             }
         }
 
@@ -461,7 +396,6 @@
         window.deleteImplantFromCloud = deleteImplantFromCloud;
         window.getAllData = () => allImplantData;
 
-        seedFallbackDataIfNeeded();
         initFirebase();
     </script>
 
@@ -560,8 +494,6 @@
 
             const savedId = await window.addNewImplantToCloud(payload);
             if (savedId) {
-                closeModal();
-            } else {
                 closeModal();
             }
         }
