@@ -416,12 +416,16 @@
 
             const payload = {
                 numePacient: document.getElementById("numePacient").value.trim(),
-                serviciuPacient: document.getElementById("serviciuPacient").value,
-                dataImplantului: document.getElementById("dataInplantului").value,
+                dataInplantului: document.getElementById("dataInplantului").value,
                 tipImplant: document.getElementById("tipImplant").value.trim(),
                 bontProtetic: document.getElementById("bontProtetic").value,
                 facturareBont: document.getElementById("facturareBont").value
             };
+
+            if (!payload.numePacient || !payload.dataInplantului || !payload.tipImplant) {
+                alert("Completează toate câmpurile obligatorii.");
+                return;
+            }
 
             await addNewImplantToCloud(payload);
             closeModal();
