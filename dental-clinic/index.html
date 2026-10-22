@@ -1,248 +1,462 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SmileCare | Cabinet Stomatologic</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evidență Implanturi și Bonturi Protetice - Cabinet Stomatologic</title>
+    <!-- Tailwind CSS for modern responsive styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
-<body>
-  <div class="container">
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand-mark">S</div>
-        <div>
-          <div class="brand-name">SmileCare</div>
-          <div class="brand-sub">Cabinet stomatologic</div>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-brand-600 text-white p-2.5 rounded-xl shadow-md">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900 tracking-tight">Cabinet Stomatologic</h1>
+                    <p class="text-xs text-slate-500">Registru Digital Implanturi & Bonturi Protetice</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <div id="connectionStatus" class="flex items-center space-x-2 bg-amber-50 text-amber-700 px-3 py-1.5 rounded-full text-xs font-medium border border-amber-200">
+                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                    <span id="statusText">Se conectează la Cloud...</span>
+                </div>
+                <button onclick="openModal()" class="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-brand-500/20 transition-all flex items-center space-x-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    <span>Implant Nou</span>
+                </button>
+            </div>
         </div>
-      </div>
-
-      <nav class="nav">
-        <a href="#dashboard">Dashboard</a>
-        <a href="#appointments">Programări</a>
-        <a href="#services">Servicii</a>
-        <a href="#patients">Pacienți</a>
-      </nav>
-
-      <div class="header-actions">
-        <button class="ghost-btn" type="button">Raport</button>
-        <button class="primary-btn" type="button">Programare nouă</button>
-      </div>
     </header>
 
-    <main>
-      <section class="hero" id="dashboard">
-        <div class="hero-copy">
-          <div class="eyebrow">Cabinet digital</div>
-          <h1>Gestionarea clinicii tale, mai clară și mai rapidă.</h1>
-          <p>
-            O aplicație separată, dedicată programărilor, pacienților, tratamentelor și monitorizării activității cabinetului stomatologic.
-          </p>
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
 
-          <div class="hero-actions">
-            <button class="primary-btn" type="button">Adaugă pacient</button>
-            <button class="secondary-btn" type="button">Vezi programările</button>
-          </div>
-
-          <div class="stats-grid">
-            <div class="stat-box">
-              <strong>328</strong>
-              <span>Pacienți</span>
-            </div>
-            <div class="stat-box">
-              <strong>52</strong>
-              <span>Programări</span>
-            </div>
-            <div class="stat-box">
-              <strong>96%</strong>
-              <span>Mulțumiri</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="hero-panel">
-          <div class="panel-card">
-            <div class="panel-header">
-              <span>Overview</span>
-              <span class="live-pill">Live</span>
-            </div>
-
-            <div class="panel-body">
-              <div class="smile-mark">😊</div>
-              <h2>SmileCare</h2>
-              <p>Dashboard pentru managementul clinicilor dentare moderne.</p>
-
-              <div class="mini-chart" aria-hidden="true">
-                <span style="height: 36%"></span>
-                <span style="height: 52%"></span>
-                <span style="height: 74%"></span>
-                <span style="height: 66%"></span>
-                <span style="height: 92%"></span>
-                <span style="height: 100%"></span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" id="appointments">
-        <div class="section-head">
-          <h2>Programări de astăzi</h2>
-          <span id="todayDate">Azi</span>
-        </div>
-
-        <div class="two-col">
-          <div class="card appointments-card">
-            <div class="list">
-              <div class="appointment-item">
-                <div class="appointment-info">
-                  <div class="avatar blue">A</div>
-                  <div>
-                    <div class="name">Andreea Popescu</div>
-                    <div class="meta">Consult + detartraj • 09:30</div>
-                  </div>
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Implanturi</p>
+                    <h3 id="statTotal" class="text-3xl font-bold text-slate-900 mt-1">0</h3>
                 </div>
-                <span class="status confirmed">Confirmat</span>
-              </div>
-
-              <div class="appointment-item">
-                <div class="appointment-info">
-                  <div class="avatar green">M</div>
-                  <div>
-                    <div class="name">Mihai Ionescu</div>
-                    <div class="meta">Albire profesională • 11:00</div>
-                  </div>
+                <div class="bg-sky-50 text-brand-600 p-3 rounded-xl">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                 </div>
-                <span class="status waiting">Așteaptă</span>
-              </div>
-
-              <div class="appointment-item">
-                <div class="appointment-info">
-                  <div class="avatar purple">R</div>
-                  <div>
-                    <div class="name">Roxana Vasilescu</div>
-                    <div class="meta">Evaluare implant • 13:30</div>
-                  </div>
-                </div>
-                <span class="status review">Review</span>
-              </div>
             </div>
-          </div>
 
-          <div class="card form-card">
-            <h3>Programare nouă</h3>
-            <form>
-              <div class="field">
-                <label>Nume pacient</label>
-                <input type="text" placeholder="Ex: Elena Marin" />
-              </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Bonturi Primit: DA</p>
+                    <h3 id="statAbutmentYes" class="text-3xl font-bold text-emerald-600 mt-1">0</h3>
+                </div>
+                <div class="bg-emerald-50 text-emerald-600 p-3 rounded-xl">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+            </div>
 
-              <div class="field">
-                <label>Serviciu</label>
-                <select>
-                  <option>Consult de specialitate</option>
-                  <option>Detartraj</option>
-                  <option>Albire</option>
-                  <option>Implantologie</option>
-                  <option>Ortodonție</option>
-                </select>
-              </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Bonturi Facturate</p>
+                    <h3 id="statBilled" class="text-3xl font-bold text-blue-600 mt-1">0</h3>
+                </div>
+                <div class="bg-blue-50 text-blue-600 p-3 rounded-xl">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"></path></svg>
+                </div>
+            </div>
 
-              <div class="field">
-                <label>Data</label>
-                <input type="date" />
-              </div>
-
-              <button class="primary-btn full" type="submit">Salvează programarea</button>
-            </form>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" id="services">
-        <div class="section-head">
-          <h2>Servicii</h2>
-          <span>Tratamente disponibile</span>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Bonturi Nefacturate</p>
+                    <h3 id="statUnbilled" class="text-3xl font-bold text-amber-600 mt-1">0</h3>
+                </div>
+                <div class="bg-amber-50 text-amber-600 p-3 rounded-xl">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+            </div>
         </div>
 
-        <div class="pricing-grid">
-          <article class="price-card">
-            <div class="card-icon">🦷</div>
-            <h3>Consultație</h3>
-            <div class="price">150 RON</div>
-            <ul>
-              <li>Evaluare orală</li>
-              <li>Diagnostic inițial</li>
-              <li>Plan de tratament</li>
-            </ul>
-          </article>
+        <!-- Table Container Card -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="relative w-full sm:w-96">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </span>
+                    <input type="text" id="searchInput" oninput="filterData()" placeholder="Caută după pacient sau brand implant..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+                </div>
+                <div class="text-xs text-slate-500 font-medium">
+                    Sincronizare în timp real activată
+                </div>
+            </div>
 
-          <article class="price-card">
-            <div class="card-icon">✨</div>
-            <h3>Albire</h3>
-            <div class="price">450 RON</div>
-            <ul>
-              <li>Albire profesională</li>
-              <li>Material premium</li>
-              <li>Follow-up</li>
-            </ul>
-          </article>
-
-          <article class="price-card">
-            <div class="card-icon">🛠️</div>
-            <h3>Detartraj</h3>
-            <div class="price">250 RON</div>
-            <ul>
-              <li>Curățare profundă</li>
-              <li>Polizare</li>
-              <li>Consultare post-tratament</li>
-            </ul>
-          </article>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-600 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
+                            <th class="py-3.5 px-6">Pacient</th>
+                            <th class="py-3.5 px-6">Data Implant</th>
+                            <th class="py-3.5 px-6">Tip / Brand Implant</th>
+                            <th class="py-3.5 px-6">Bont Protetic</th>
+                            <th class="py-3.5 px-6">Facturare Bont</th>
+                            <th class="py-3.5 px-6 text-right">Acțiuni</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-slate-100 text-sm">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
         </div>
-      </section>
-
-      <section class="section" id="patients">
-        <div class="section-head">
-          <h2>Pacienți</h2>
-          <span>Recenti</span>
-        </div>
-
-        <div class="patient-table-card card">
-          <table>
-            <thead>
-              <tr>
-                <th>Pacient</th>
-                <th>Serviciu</th>
-                <th>Ultima vizită</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Elena Marin</td>
-                <td>Consultație</td>
-                <td>12 Apr 2026</td>
-                <td><span class="status-table ok">Activ</span></td>
-              </tr>
-              <tr>
-                <td>Victor Radu</td>
-                <td>Albire</td>
-                <td>09 Apr 2026</td>
-                <td><span class="status-table pending">În așteptare</span></td>
-              </tr>
-              <tr>
-                <td>Maria Ionescu</td>
-                <td>Detartraj</td>
-                <td>07 Apr 2026</td>
-                <td><span class="status-table ok">Activ</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
     </main>
-  </div>
 
-  <script src="app.js"></script>
+    <!-- Modal Formular Adăugare -->
+    <div id="implantModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all">
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-slate-900 text-lg">Adaugă Implant Nou</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <form id="implantForm" onsubmit="handleFormSubmit(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Nume și Prenume Pacient</label>
+                    <input type="text" id="numePacient" required placeholder="Ex: Popescu Ion" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Data Implantului</label>
+                        <input type="date" id="dataInplantului" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Tip / Brand Implant</label>
+                        <input type="text" id="tipImplant" required placeholder="Ex: Straumann BLT 4.1" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">A primit bont protetic?</label>
+                        <select id="bontProtetic" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white">
+                            <option value="Da">Da</option>
+                            <option value="Nu">Nu</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Facturare Bont Protetic</label>
+                        <select id="facturareBont" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white">
+                            <option value="Facturat">Facturat</option>
+                            <option value="Nefacturat">Nefacturat</option>
+                            <option value="Inclus în pachet">Inclus în pachet</option>
+                            <option value="Nu e cazul">Nu e cazul (Fără bont)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="pt-4 flex justify-end space-x-3">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-all">Anulează</button>
+                    <button type="submit" class="px-5 py-2.5 text-sm font-semibold bg-brand-600 hover:bg-brand-700 text-white rounded-xl shadow-lg shadow-brand-500/20 transition-all">Salvează Înregistrarea</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom Modal for Alerts/Confirmations -->
+    <div id="customModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 text-center">
+            <h4 id="customModalTitle" class="text-lg font-bold text-slate-900 mb-2">Notificare</h4>
+            <p id="customModalText" class="text-sm text-slate-600 mb-6">Mesaj...</p>
+            <div id="customModalButtons" class="flex justify-center space-x-3">
+                <button onclick="closeCustomModal()" class="px-5 py-2 bg-brand-600 text-white rounded-xl text-sm font-semibold hover:bg-brand-700">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 mt-12 text-center text-xs text-slate-400">
+        Cabinet Stomatologic &bull; Sistem Gestiune Implanturi & Bonturi Protetice
+    </footer>
+
+    <!-- Firebase App Module Setup -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global environment bindings provided by runner environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'dental-implant-app-default';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyDummyKeyForLocalPreview",
+            authDomain: "dummy.firebaseapp.com",
+            projectId: "dummy-project"
+        };
+
+        let db = null;
+        let auth = null;
+        let unsubscribe = null;
+        let allImplantData = [];
+
+        window.initFirebaseApp = async function() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Authentication step as per rules
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        document.getElementById('connectionStatus').className = "flex items-center space-x-2 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full text-xs font-medium border border-emerald-200";
+                        document.getElementById('connectionStatus').innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>Sincronizat Cloud</span>`;
+                        
+                        // Subscribe to real-time data collection according to RULE 1 & 2
+                        startRealtimeSync(user.uid);
+                    }
+                });
+            } catch (err) {
+                console.warn("Firebase offline/fallback mode:", err);
+                document.getElementById('connectionStatus').className = "flex items-center space-x-2 bg-amber-50 text-amber-700 px-3 py-1.5 rounded-full text-xs font-medium border border-amber-200";
+                document.getElementById('connectionStatus').innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500"></span><span>Mod Local (Offline)</span>`;
+                loadFallbackLocalStorage();
+            }
+        };
+
+        function startRealtimeSync(uid) {
+            // RULE 1 path: public collection for collaborative cabinet data
+            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'implanturi_cabinet');
+            
+            unsubscribe = onSnapshot(colRef, (snapshot) => {
+                allImplantData = [];
+                snapshot.forEach((docSnap) => {
+                    allImplantData.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                renderTableAndStats(allImplantData);
+            }, (error) => {
+                console.error("Firestore sync error:", error);
+                loadFallbackLocalStorage();
+            });
+        }
+
+        window.addNewImplantToCloud = async function(implantObj) {
+            if (db && auth && auth.currentUser) {
+                try {
+                    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'implanturi_cabinet');
+                    await addDoc(colRef, implantObj);
+                    return;
+                } catch (e) {
+                    console.error("Cloud save failed, falling back to local:", e);
+                }
+            }
+            // Fallback localStorage save
+            let local = JSON.parse(localStorage.getItem('implanturi_cabinet_fallback')) || [];
+            local.push({ id: 'local_' + Date.now(), ...implantObj });
+            localStorage.setItem('implanturi_cabinet_fallback', JSON.stringify(local));
+            allImplantData = local;
+            renderTableAndStats(allImplantData);
+        };
+
+        window.deleteImplantFromCloud = async function(id) {
+            if (id.startsWith('local_')) {
+                let local = JSON.parse(localStorage.getItem('implanturi_cabinet_fallback')) || [];
+                local = local.filter(item => item.id !== id);
+                localStorage.setItem('implanturi_cabinet_fallback', JSON.stringify(local));
+                allImplantData = local;
+                renderTableAndStats(allImplantData);
+                return;
+            }
+
+            if (db && auth && auth.currentUser) {
+                try {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'implanturi_cabinet', id));
+                } catch (e) {
+                    console.error("Cloud delete failed:", e);
+                    showCustomModal("Erore", "Nu s-a putut șterge înregistrarea din cloud.");
+                }
+            }
+        };
+
+        function loadFallbackLocalStorage() {
+            let local = JSON.parse(localStorage.getItem('implanturi_cabinet_fallback'));
+            if (!local) {
+                // Default initial sample data if empty
+                local = [
+                    { id: 'local_1', numePacient: 'Popescu Maria', dataInplantului: '2026-02-10', tipImplant: 'Straumann BLT 4.1', bontProtetic: 'Da', facturareBont: 'Facturat' },
+                    { id: 'local_2', numePacient: 'Ionescu Andrei', dataInplantului: '2026-03-01', tipImplant: 'Megagen AnyRidge 3.5', bontProtetic: 'Da', facturareBont: 'Nefacturat' }
+                ];
+                localStorage.setItem('implanturi_cabinet_fallback', JSON.stringify(local));
+            }
+            allImplantData = local;
+            renderTableAndStats(allImplantData);
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            initFirebaseApp();
+        });
+
+        window.getAllData = () => allImplantData;
+    </script>
+
+    <!-- UI Logic Script -->
+    <script>
+        function renderTableAndStats(data) {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+
+            let totalCount = data.length;
+            let abutmentYesCount = 0;
+            let billedCount = 0;
+            let unbilledCount = 0;
+
+            if (data.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-12 text-slate-400">Nu există înregistrări în sistem.</td></tr>`;
+            } else {
+                data.forEach((item) => {
+                    if (item.bontProtetic === 'Da') abutmentYesCount++;
+                    if (item.facturareBont === 'Facturat') billedCount++;
+                    if (item.facturareBont === 'Nefacturat') unbilledCount++;
+
+                    const badgeClass = item.bontProtetic === 'Da' 
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                        : 'bg-rose-50 text-rose-700 border border-rose-200';
+
+                    const billingBadge = item.facturareBont === 'Facturat' 
+                        ? 'bg-sky-50 text-sky-700 border border-sky-200'
+                        : item.facturareBont === 'Nefacturat'
+                        ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                        : 'bg-slate-100 text-slate-700 border border-slate-200';
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50/80 transition-colors";
+                    tr.innerHTML = `
+                        <td class="py-3.5 px-6 font-medium text-slate-900">${escapeHTML(item.numePacient)}</td>
+                        <td class="py-3.5 px-6 text-slate-600">${escapeHTML(item.dataInplantului)}</td>
+                        <td class="py-3.5 px-6 text-slate-600">${escapeHTML(item.tipImplant)}</td>
+                        <td class="py-3.5 px-6"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${badgeClass}">${escapeHTML(item.bontProtetic)}</span></td>
+                        <td class="py-3.5 px-6"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${billingBadge}">${escapeHTML(item.facturareBont)}</span></td>
+                        <td class="py-3.5 px-6 text-right">
+                            <button onclick="confirmDelete('${item.id}')" class="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg transition-colors" title="Șterge">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            }
+
+            // Update stats cards
+            document.getElementById('statTotal').innerText = totalCount;
+            document.getElementById('statAbutmentYes').innerText = abutmentYesCount;
+            document.getElementById('statBilled').innerText = billedCount;
+            document.getElementById('statUnbilled').innerText = unbilledCount;
+        }
+
+        function escapeHTML(str) {
+            return String(str || '').replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        function openModal() {
+            document.getElementById('implantModal').classList.remove('hidden');
+            // Set default date to today
+            document.getElementById('dataInplantului').value = new Date().toISOString().split('T')[0];
+        }
+
+        function closeModal() {
+            document.getElementById('implantModal').classList.add('hidden');
+            document.getElementById('implantForm').reset();
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            const nouImplant = {
+                numePacient: document.getElementById('numePacient').value.trim(),
+                dataInplantului: document.getElementById('dataInplantului').value,
+                tipImplant: document.getElementById('tipImplant').value.trim(),
+                bontProtetic: document.getElementById('bontProtetic').value,
+                facturareBont: document.getElementById('facturareBont').value,
+                createdAt: new Date().toISOString()
+            };
+
+            await window.addNewImplantToCloud(nouImplant);
+            closeModal();
+        }
+
+        function confirmDelete(id) {
+            showCustomModal(
+                "Confirmare ștergere", 
+                "Sigur doriți să ștergeți această înregistrare din registru?", 
+                true, 
+                () => { window.deleteImplantFromCloud(id); closeCustomModal(); }
+            );
+        }
+
+        function filterData() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const allData = window.getAllData();
+            const filtered = allData.filter(item => 
+                item.numePacient.toLowerCase().includes(term) || 
+                item.tipImplant.toLowerCase().includes(term)
+            );
+            renderTableAndStats(filtered);
+        }
+
+        function showCustomModal(title, text, showCancel = false, onConfirm = null) {
+            document.getElementById('customModalTitle').innerText = title;
+            document.getElementById('customModalText').innerText = text;
+            const buttonsDiv = document.getElementById('customModalButtons');
+            
+            if (showCancel && onConfirm) {
+                buttonsDiv.innerHTML = `
+                    <button onclick="closeCustomModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium hover:bg-slate-200">Anulează</button>
+                    <button id="modalConfirmBtn" class="px-5 py-2 bg-rose-600 text-white rounded-xl text-sm font-semibold hover:bg-rose-700">Șterge</button>
+                `;
+                document.getElementById('modalConfirmBtn').onclick = onConfirm;
+            } else {
+                buttonsDiv.innerHTML = `<button onclick="closeCustomModal()" class="px-5 py-2 bg-brand-600 text-white rounded-xl text-sm font-semibold hover:bg-brand-700">OK</button>`;
+            }
+            document.getElementById('customModal').classList.remove('hidden');
+        }
+
+        function closeCustomModal() {
+            document.getElementById('customModal').classList.add('hidden');
+        }
+    </script>
 </body>
 </html>
