@@ -170,7 +170,7 @@
     <div id="implantModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all">
             <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <h3 class="font-bold text-slate-900 text-lg">Adaugă Implant Nou</h3>
+                <h3 id="modalTitle" class="font-bold text-slate-900 text-lg">Adaugă Implant Nou</h3>
                 <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg" aria-label="Închide modal">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -212,8 +212,8 @@
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Furnizor Bont Protetic</label>
                         <select id="facturareBont" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-500">
-                            <option value="Inovation Dent">1 - Inovation Dent</option>
-                            <option value="Custom Dental">2 - Custom Dental</option>
+                            <option value="Inovation Dent">Inovation Dent</option>
+                            <option value="Custom Dental">Custom Dental</option>
                         </select>
                     </div>
                 </div>
@@ -259,6 +259,7 @@
             getDatabase,
             ref,
             push,
+            update,
             remove,
             onValue
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
@@ -278,6 +279,7 @@
         const db = getDatabase(app);
 
         let allImplantData = [];
+        let editingId = null; // Reține ID-ul înregistrării pe care o edităm (dacă e cazul)
 
         function showToast(message, type = "info") {
             const container = document.getElementById("toastContainer");
@@ -339,20 +341,26 @@
             });
         }
 
-        async function addNewImplantToCloud(implantObj) {
+        async function saveImplantToCloud(implantObj) {
             try {
-                const implantRef = ref(db, "implanturi_cabinet");
-                const newRef = push(implantRef, {
-                    ...implantObj,
-                    createdAt: Date.now()
-                });
-
-                showToast("Înregistrarea a fost salvată în cloud.", "success");
-                return newRef.key;
+                if (editingId) {
+                    // Actualizare înregistrare existentă
+                    await update(ref(db, "implanturi_cabinet/" + editingId), implantObj);
+                    showToast("Înregistrarea a fost actualizată cu succes.", "success");
+                } else {
+                    // Adăugare înregistrare nouă
+                    const implantRef = ref(db, "implanturi_cabinet");
+                    await push(implantRef, {
+                        ...implantObj,
+                        createdAt: Date.now()
+                    });
+                    showToast("Înregistrarea a fost salvată în cloud.", "success");
+                }
+                return true;
             } catch (error) {
                 console.error("Cloud save failed:", error);
                 showToast("Eroare la salvarea în cloud.", "error");
-                return null;
+                return false;
             }
         }
 
@@ -366,7 +374,7 @@
             }
         }
 
-        window.addNewImplantToCloud = addNewImplantToCloud;
+        window.saveImplantToCloud = saveImplantToCloud;
         window.deleteImplantFromCloud = deleteImplantFromCloud;
         window.getAllData = () => allImplantData;
 
@@ -420,7 +428,12 @@
                         <td class="py-3.5 px-6 text-slate-600">${escapeHTML(item.aditieOsoasa || '-')}</td>
                         <td class="py-3.5 px-6 text-slate-600">${escapeHTML(item.capaVindecare || '-')}</td>
                         <td class="py-3.5 px-6 font-medium text-slate-700">${escapeHTML(nextVisitDate)}</td>
-                        <td class="py-3.5 px-6 text-right">
+                        <td class="py-3.5 px-6 text-right space-x-1">
+                            <button onclick="editImplant('${item.id}')" class="text-slate-400 hover:text-sky-600 p-1.5 rounded-lg transition-colors" title="Editează">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                            </button>
                             <button onclick="confirmDelete('${item.id}')" class="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg transition-colors" title="Șterge">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M10 7V4a1 1 0 011-1h2a1 1 0 011 1v3"></path>
@@ -452,13 +465,38 @@
         }
 
         function openModal() {
-            document.getElementById("implantModal").classList.remove("hidden");
+            editingId = null; // Resetare ID editare (este adăugare nouă)
+            document.getElementById("modalTitleinnerText")?.remove();
+            document.getElementById("modalTitle").innerText = "Adaugă Implant Nou";
+            document.getElementById("implantForm").reset();
             document.getElementById("dataInplantului").value = new Date().toISOString().split("T")[0];
+            document.getElementById("implantModal").classList.remove("hidden");
+        }
+
+        function editImplant(id) {
+            const item = allImplantData.find(i => i.id === id);
+            if (!item) return;
+
+            editingId = id; // Setăm ID-ul pentru a ști ce înregistrare modificăm
+            document.getElementById("modalTitle").innerText = "Editează Înregistrarea";
+
+            // Completăm formularul cu datele existente
+            document.getElementById("numePacient").value = item.numePacient || "";
+            document.getElementById("dataInplantului").value = item.dataInplantului || "";
+            document.getElementById("cadran").value = item.cadran || "";
+            document.getElementById("tipImplant").value = item.tipImplant || "";
+            document.getElementById("bontProtetic").value = item.bontProtetic || "Da";
+            document.getElementById("facturareBont").value = item.facturareBont || "Inovation Dent";
+            document.getElementById("aditieOsoasa").value = item.aditieOsoasa || "";
+            document.getElementById("capaVindecare").value = item.capaVindecare || "";
+
+            document.getElementById("implantModal").classList.remove("hidden");
         }
 
         function closeModal() {
             document.getElementById("implantModal").classList.add("hidden");
             document.getElementById("implantForm").reset();
+            editingId = null;
         }
 
         async function handleFormSubmit(e) {
@@ -480,8 +518,8 @@
                 return;
             }
 
-            const savedId = await window.addNewImplantToCloud(payload);
-            if (savedId) {
+            const success = await window.saveImplantToCloud(payload);
+            if (success) {
                 closeModal();
             }
         }
