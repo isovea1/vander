@@ -1,4 +1,136 @@
-<!DOCTYPE html>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import {
+        getAuth,
+        signInAnonymously,
+        onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import {
+        getFirestore,
+        collection,
+        addDoc,
+        deleteDoc,
+        doc,
+        onSnapshot,
+        serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDdI_ae-3iwkgxk9I-OMhgw_2OA3WtLwn8",
+        authDomain: "vander-9e026.firebaseapp.com",
+        databaseURL: "https://vander-9e026-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "vander-9e026",
+        storageBucket: "vander-9e026.firebasestorage.app",
+        messagingSenderId: "317349329202",
+        appId: "1:317349329202:web:68ed0cdf0f75637801bf2b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let allImplantData = [];
+
+    async function initFirebase() {
+        try {
+            await signInAnonymously(auth);
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    startRealtimeSync();
+                }
+            });
+        } catch (error) {
+            console.error("Firebase auth error:", error);
+            loadFallbackLocalStorage();
+        }
+    }
+
+    function startRealtimeSync() {
+        const colRef = collection(db, "implanturi_cabinet");
+
+        onSnapshot(colRef, (snapshot) => {
+            allImplantData = [];
+            snapshot.forEach((docSnap) => {
+                allImplantData.push({ id: docSnap.id, ...docSnap.data() });
+            });
+            renderTableAndStats(allImplantData);
+        }, (error) => {
+            console.error("Firestore sync error:", error);
+            loadFallbackLocalStorage();
+        });
+    }
+
+    async function addNewImplantToCloud(implantObj) {
+        try {
+            await addDoc(collection(db, "implanturi_cabinet"), {
+                ...implantObj,
+                createdAt: serverTimestamp()
+            });
+            return true;
+        } catch (error) {
+            console.error("Cloud save failed:", error);
+            let local = JSON.parse(localStorage.getItem("implanturi_cabinet_fallback")) || [];
+            local.push({ id: "local_" + Date.now(), ...implantObj });
+            localStorage.setItem("implanturi_cabinet_fallback", JSON.stringify(local));
+            allImplantData = local;
+            renderTableAndStats(allImplantData);
+            return false;
+        }
+    }
+
+    async function deleteImplantFromCloud(id) {
+        if (id.startsWith("local_")) {
+            let local = JSON.parse(localStorage.getItem("implanturi_cabinet_fallback")) || [];
+            local = local.filter((item) => item.id !== id);
+            localStorage.setItem("implanturi_cabinet_fallback", JSON.stringify(local));
+            allImplantData = local;
+            renderTableAndStats(allImplantData);
+            return;
+        }
+
+        try {
+            await deleteDoc(doc(db, "implanturi_cabinet", id));
+        } catch (error) {
+            console.error("Delete failed:", error);
+            alert("Nu s-a putut șterge înregistrarea din cloud.");
+        }
+    }
+
+    function loadFallbackLocalStorage() {
+        let local = JSON.parse(localStorage.getItem("implanturi_cabinet_fallback"));
+        if (!local) {
+            local = [
+                {
+                    id: "local_1",
+                    numePacient: "Popescu Maria",
+                    dataImplantului: "2026-02-10",
+                    tipImplant: "Straumann BLT 4.1",
+                    bontProtetic: "Da",
+                    facturareBont: "Facturat",
+                    serviciuPacient: "Consult de specialitate"
+                },
+                {
+                    id: "local_2",
+                    numePacient: "Ionescu Andrei",
+                    dataImplantului: "2026-03-01",
+                    tipImplant: "Megagen AnyRidge 3.5",
+                    bontProtetic: "Da",
+                    facturareBont: "Nefacturat",
+                    serviciuPacient: "Implantologie"
+                }
+            ];
+            localStorage.setItem("implanturi_cabinet_fallback", JSON.stringify(local));
+        }
+        allImplantData = local;
+        renderTableAndStats(allImplantData);
+    }
+
+    window.addNewImplantToCloud = addNewImplantToCloud;
+    window.deleteImplantFromCloud = deleteImplantFromCloud;
+    window.getAllData = () => allImplantData;
+
+    initFirebase();
+</script><!DOCTYPE html>
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
