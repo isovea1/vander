@@ -279,7 +279,7 @@
         const db = getDatabase(app);
 
         let allImplantData = [];
-        let editingId = null; // Reține ID-ul înregistrării pe care o edităm (dacă e cazul)
+        window.editingId = null; // Stare globală pentru editare
 
         function showToast(message, type = "info") {
             const container = document.getElementById("toastContainer");
@@ -343,12 +343,10 @@
 
         async function saveImplantToCloud(implantObj) {
             try {
-                if (editingId) {
-                    // Actualizare înregistrare existentă
-                    await update(ref(db, "implanturi_cabinet/" + editingId), implantObj);
+                if (window.editingId) {
+                    await update(ref(db, "implanturi_cabinet/" + window.editingId), implantObj);
                     showToast("Înregistrarea a fost actualizată cu succes.", "success");
                 } else {
-                    // Adăugare înregistrare nouă
                     const implantRef = ref(db, "implanturi_cabinet");
                     await push(implantRef, {
                         ...implantObj,
@@ -465,8 +463,7 @@
         }
 
         function openModal() {
-            editingId = null; // Resetare ID editare (este adăugare nouă)
-            document.getElementById("modalTitleinnerText")?.remove();
+            window.editingId = null;
             document.getElementById("modalTitle").innerText = "Adaugă Implant Nou";
             document.getElementById("implantForm").reset();
             document.getElementById("dataInplantului").value = new Date().toISOString().split("T")[0];
@@ -474,13 +471,12 @@
         }
 
         function editImplant(id) {
-            const item = allImplantData.find(i => i.id === id);
+            const item = window.getAllData().find(i => i.id === id);
             if (!item) return;
 
-            editingId = id; // Setăm ID-ul pentru a ști ce înregistrare modificăm
+            window.editingId = id;
             document.getElementById("modalTitle").innerText = "Editează Înregistrarea";
 
-            // Completăm formularul cu datele existente
             document.getElementById("numePacient").value = item.numePacient || "";
             document.getElementById("dataInplantului").value = item.dataInplantului || "";
             document.getElementById("cadran").value = item.cadran || "";
@@ -496,7 +492,7 @@
         function closeModal() {
             document.getElementById("implantModal").classList.add("hidden");
             document.getElementById("implantForm").reset();
-            editingId = null;
+            window.editingId = null;
         }
 
         async function handleFormSubmit(e) {
