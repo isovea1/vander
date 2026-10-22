@@ -23,87 +23,627 @@
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             --sidebar-bg: #1e293b;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg); color: var(--text-main); padding: 10px 6px; line-height: 1.4; }
-        .container { max-width: 900px; margin: 0 auto; }
-        #sidebarOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 999; display: none; }
-        .sidebar { position: fixed; top: 0; left: -240px; width: 240px; height: 100%; background: var(--sidebar-bg); color: #fff; z-index: 1000; transition: left 0.3s ease; display: flex; flex-direction: column; }
-        .sidebar.open { left: 0; }
-        .sidebar-header { padding: 16px; border-bottom: 1px solid #334155; display: flex; align-items: center; justify-content: space-between; }
-        .sidebar-brand { font-size: 1.05rem; font-weight: 800; letter-spacing: 0.5px; }
-        .sidebar-user { padding: 15px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #334155; background: #0f172a; }
-        .sidebar-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background: #cbd5e1; }
-        .sidebar-user-name { font-size: 0.85rem; font-weight: 600; }
-        .sidebar-menu { list-style: none; padding: 8px 0; flex-grow: 1; overflow-y: auto; }
-        .sidebar-menu li a { display: flex; align-items: center; gap: 10px; padding: 11px 16px; color: #cbd5e1; text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.2s, color 0.2s; }
-        .sidebar-menu li a:hover, .sidebar-menu li.active a { background: #334155; color: #fff; }
-        .sidebar-footer { padding: 12px 16px; border-top: 1px solid #334155; }
-        .sidebar-logout-btn { background: transparent; border: none; color: #f87171; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; width: 100%; padding: 8px; border-radius: 6px; }
-        .sidebar-logout-btn:hover { background: rgba(248, 113, 113, 0.1); }
-        .app-header { background: var(--card-bg); padding: 15px; border-radius: var(--radius); box-shadow: var(--shadow); text-align: center; margin-bottom: 12px; border: 1px solid var(--border); position: relative; }
-        .logo-img { height: 35px; object-fit: contain; margin-bottom: 6px; }
-        .app-header h1 { font-size: 1.15rem; font-weight: 800; color: var(--primary); }
-        .app-header p { color: var(--text-muted); font-size: 0.75rem; }
-        .menu-toggle-btn { position: absolute; top: 12px; left: 12px; background: #f1f5f9; border: 1px solid var(--border); color: var(--primary); padding: 5px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; }
-        .top-bar-btns { position: absolute; top: 12px; right: 12px; }
-        .btn-outline { background: #fef2f2; border: 1px solid #fecaca; color: var(--danger); padding: 4px 6px; border-radius: 6px; font-size: 0.65rem; font-weight: 600; cursor: pointer; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-        .stat-card { background: var(--card-bg); padding: 10px; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); text-align: center; }
-        .stat-number { font-size: 1.2rem; font-weight: 800; color: var(--primary); }
-        .stat-label { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; }
-        .card { background: var(--card-bg); border-radius: var(--radius); padding: 15px; margin-bottom: 12px; box-shadow: var(--shadow); border: 1px solid var(--border); }
-        .card h2 { font-size: 1rem; font-weight: 700; color: var(--primary); margin-bottom: 10px; }
-        .accordion-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
-        .accordion-header h2 { margin-bottom: 0; }
-        .accordion-icon { font-size: 1.1rem; font-weight: bold; transition: transform 0.3s ease; }
-        #formContainer { display: none; margin-top: 12px; border-top: 1px solid var(--border); padding-top: 12px; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .form-group { margin-bottom: 10px; }
-        .form-group label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--primary); margin-bottom: 4px; text-transform: uppercase; }
-        input[type="text"], input[type="password"], input[type="number"], select, textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: #f8fafc; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); background: #fff; }
-        .sizes-grid-container { display: flex; gap: 5px; flex-wrap: wrap; background: #f8fafc; padding: 8px; border-radius: 6px; border: 1px solid var(--border); }
-        .size-box { text-align: center; background: white; padding: 4px; border-radius: 4px; border: 1px solid var(--border); flex: 1; min-width: 35px; }
-        .size-box span { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 2px; }
-        .size-box input { width: 100%; text-align: center; padding: 3px; font-weight: 700; font-size: 0.8rem; border: 1px solid var(--border); border-radius: 4px; }
-        .btn-primary { width: 100%; background: var(--accent); color: white; border: none; padding: 10px; border-radius: 6px; font-size: 0.9rem; font-weight: 700; cursor: pointer; }
-        .btn-primary:hover { background: #1d4ed8; }
-        .btn-secondary { background: #64748b; color: white; border: none; padding: 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer; }
-        .import-box { background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px dashed var(--border); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .filter-row { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-bottom: 12px; }
-        .search-input, .filter-select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: #f8fafc; }
-        .single-calendar-box { display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; gap: 8px; margin-bottom: 10px; }
-        .calendar-icon-styled { font-size: 1.1rem; }
-        .single-calendar-input { border: none; background: transparent; font-size: 0.85rem; font-weight: 600; color: var(--primary); width: 100%; outline: none; cursor: pointer; }
-        .history-item { background: #ffffff; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; margin-bottom: 6px; font-size: 0.78rem; display: flex; justify-content: space-between; align-items: center; }
-        .product-card-style { background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius); padding: 10px; margin-bottom: 10px; display: grid; grid-template-columns: 140px 1fr; gap: 12px; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .product-thumb { width: 100%; height: 140px; object-fit: contain; object-position: center; background: #ffffff; border: 1px solid var(--border); border-radius: 8px; padding: 4px; display: block; }
-        .product-details { display: flex; flex-direction: column; justify-content: space-between; gap: 4px; }
-        .product-name-sku { font-size: 0.72rem; font-weight: 700; color: var(--primary); line-height: 1.2; word-break: break-word; }
-        .stock-table-grid { background: #e2e8f0; border-radius: 4px; padding: 1px; margin-bottom: 2px; overflow-x: auto; }
-        .stock-header-row, .stock-values-row { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; gap: 1px; }
-        .stock-cell-head { background: #cbd5e1; font-size: 0.55rem; font-weight: 800; padding: 2px 0; color: #334155; }
-        .stock-cell-val { background: #ffffff; font-size: 0.65rem; font-weight: 700; padding: 3px 0; color: var(--primary); }
-        
-        /* Clase pentru stoc critic (1-4 bucăți) */
-        .stock-cell-val.low-stock { background-color: var(--warning-light); color: #b45309; border: 1px solid var(--warning-bg); font-weight: 900; }
-        .stock-cell-val.out-stock { background-color: #fee2e2; color: var(--danger); font-weight: 900; }
 
-        .inventory-total { font-size: 0.62rem; font-weight: 700; color: var(--text-muted); margin-bottom: 2px; text-align: right; }
-        .sale-price-row { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 2px; margin-bottom: 2px; }
-        .btn-stop-sale { width: 100%; background: var(--danger-bg); color: white; border: none; padding: 5px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.3px; display: flex; align-items: center; justify-content: center; text-align: center; }
-        .btn-stop-sale:hover { background: var(--danger); }
-        .product-price-box { width: 100%; background: #f8fafc; border: 1px solid var(--border); border-radius: 4px; padding: 5px; font-size: 0.72rem; font-weight: 700; color: var(--primary); text-align: center; display: flex; align-items: center; justify-content: center; }
-        .item-actions-row { display: flex; gap: 4px; margin-top: 2px; }
-        .btn-mini-edit { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 4px 6px; border-radius: 4px; font-size: 0.58rem; font-weight: 700; cursor: pointer; flex: 1; }
-        .btn-mini-del { background: #ffe4e6; color: #be123c; border: 1px solid #fecaca; padding: 4px 6px; border-radius: 4px; font-size: 0.58rem; font-weight: 700; cursor: pointer; flex: 1; }
-        @media (max-width: 400px) {
-            .product-card-style { grid-template-columns: 110px 1fr; gap: 8px; }
-            .product-thumb { height: 110px; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
-        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        .login-card { background: white; padding: 25px 15px; border-radius: var(--radius); width: 100%; max-width: 350px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); text-align: center; }
-        #syncStatus { font-size: 0.65rem; color: var(--success); margin-top: 3px; font-weight: 700; text-transform: uppercase; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            padding: 10px 6px;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        #sidebarOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 999;
+            display: none;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -240px;
+            width: 240px;
+            height: 100%;
+            background: var(--sidebar-bg);
+            color: #fff;
+            z-index: 1000;
+            transition: left 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-brand {
+            font-size: 1.05rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-user {
+            padding: 15px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #334155;
+            background: #0f172a;
+        }
+
+        .sidebar-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #cbd5e1;
+        }
+
+        .sidebar-user-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 8px 0;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 16px;
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: background 0.2s ease;
+        }
+
+        .sidebar-menu li a:hover,
+        .sidebar-menu li.active a {
+            background: #334155;
+            color: #fff;
+        }
+
+        .sidebar-footer {
+            padding: 12px 16px;
+            border-top: 1px solid #334155;
+        }
+
+        .sidebar-logout-btn {
+            background: transparent;
+            border: none;
+            color: #f87171;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 6px;
+        }
+
+        .sidebar-logout-btn:hover {
+            background: rgba(248, 113, 113, 0.1);
+        }
+
+        .app-header {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .logo-img {
+            height: 35px;
+            object-fit: contain;
+            margin-bottom: 6px;
+        }
+
+        .app-header h1 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .app-header p {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .menu-toggle-btn {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            color: var(--primary);
+            padding: 5px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .top-bar-btns {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+        }
+
+        .btn-outline {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: var(--danger);
+            padding: 4px 6px;
+            border-radius: 6px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 10px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 15px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .card h2 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .accordion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .accordion-header h2 {
+            margin-bottom: 0;
+        }
+
+        .accordion-icon {
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+
+        #formContainer {
+            display: none;
+            margin-top: 12px;
+            border-top: 1px solid var(--border);
+            padding-top: 12px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        input[type="text"], input[type="password"], input[type="email"], input[type="number"], select, textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            background: #f8fafc;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: #fff;
+        }
+
+        .sizes-grid-container {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            background: #f8fafc;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .size-box {
+            text-align: center;
+            background: white;
+            padding: 4px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            flex: 1;
+            min-width: 35px;
+        }
+
+        .size-box span {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .size-box input {
+            width: 100%;
+            text-align: center;
+            padding: 3px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: #64748b;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .import-box {
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px dashed var(--border);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .search-input, .filter-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            background: #f8fafc;
+        }
+
+        .single-calendar-box {
+            display: flex;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 10px;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .calendar-icon-styled {
+            font-size: 1.1rem;
+        }
+
+        .single-calendar-input {
+            border: none;
+            background: transparent;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+            width: 100%;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .history-item {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-bottom: 6px;
+            font-size: 0.78rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .product-card-style {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px;
+            margin-bottom: 10px;
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 10px;
+        }
+
+        .product-thumb {
+            width: 100%;
+            height: 140px;
+            object-fit: contain;
+            object-position: center;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 4px;
+            display: block;
+        }
+
+        .product-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 4px;
+        }
+
+        .product-name-sku {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
+        .stock-table-grid {
+            background: #e2e8f0;
+            border-radius: 4px;
+            padding: 1px;
+            margin-bottom: 2px;
+            overflow-x: auto;
+        }
+
+        .stock-header-row,
+        .stock-values-row {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            gap: 1px;
+        }
+
+        .stock-cell-head {
+            background: #cbd5e1;
+            font-size: 0.55rem;
+            font-weight: 800;
+            padding: 2px 0;
+            color: #334155;
+        }
+
+        .stock-cell-val {
+            background: #ffffff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 3px 0;
+            color: var(--primary);
+        }
+
+        .stock-cell-val.low-stock {
+            background-color: var(--warning-light);
+            color: #b45309;
+            border: 1px solid var(--warning-bg);
+            font-weight: 900;
+        }
+
+        .inventory-total {
+            font-size: 0.62rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+            text-align: right;
+        }
+
+        .sale-price-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
+            margin-top: 2px;
+            margin-bottom: 2px;
+        }
+
+        .btn-stop-sale {
+            width: 100%;
+            background: var(--danger-bg);
+            color: white;
+            border: none;
+            padding: 5px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .btn-stop-sale:hover {
+            background: var(--danger);
+        }
+
+        .product-price-box {
+            width: 100%;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 5px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-align: center;
+        }
+
+        .item-actions-row {
+            display: flex;
+            gap: 4px;
+            margin-top: 2px;
+        }
+
+        .btn-mini-edit {
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+            padding: 4px 6px;
+            border-radius: 4px;
+            font-size: 0.58rem;
+            font-weight: 700;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .btn-mini-del {
+            background: #ffe4e6;
+            color: #be123c;
+            border: 1px solid #fecaca;
+            padding: 4px 6px;
+            border-radius: 4px;
+            font-size: 0.58rem;
+            font-weight: 700;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        @media (max-width: 400px) {
+            .product-card-style {
+                grid-template-columns: 110px 1fr;
+                gap: 8px;
+            }
+
+            .product-thumb {
+                height: 110px;
+            }
+        }
+
+        #loginOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .login-card {
+            background: white;
+            padding: 25px 15px;
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 350px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        #syncStatus {
+            font-size: 0.65rem;
+            color: var(--success);
+            margin-top: 3px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
@@ -113,8 +653,8 @@
             <h2 style="margin-bottom: 12px; font-size: 1.1rem; color: var(--primary);">Autentificare Atelier</h2>
             <form id="loginForm">
                 <div class="form-group" style="text-align: left;">
-                    <label>Utilizator</label>
-                    <input type="text" id="loginUser" required placeholder="ex: vander" />
+                    <label>Email admin</label>
+                    <input type="email" id="loginUser" required placeholder="admin@vander.ro" />
                 </div>
                 <div class="form-group" style="text-align: left;">
                     <label>Parolă</label>
@@ -124,7 +664,9 @@
             </form>
         </div>
     </div>
+
     <div id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
     <nav class="sidebar" id="appSidebar">
         <div class="sidebar-header">
             <span class="sidebar-brand">VANDER <span style="font-size:0.7rem; color:#94a3b8;">admin</span></span>
@@ -150,6 +692,7 @@
             </button>
         </div>
     </nav>
+
     <div class="container" id="appMainContent" style="display: none;">
         <header class="app-header">
             <button type="button" class="menu-toggle-btn" onclick="toggleSidebar()">☰ Meniu</button>
@@ -161,7 +704,7 @@
             <p>Registru digital de stoc și mărimi</p>
             <div id="syncStatus">● Conectat la Firebase Realtime DB</div>
         </header>
-        
+
         <section class="stats-grid">
             <div class="stat-card">
                 <div class="stat-number" id="statTotalModels">0</div>
@@ -184,6 +727,7 @@
                 <button type="button" id="importCsvBtn" class="btn-secondary" style="padding: 6px 10px; font-size: 0.75rem;">Importă</button>
             </div>
         </section>
+
         <section class="card">
             <div class="accordion-header" onclick="toggleAddProductForm()">
                 <h2 id="formTitle" style="margin-bottom: 0;">✨ Adaugă Model Individual</h2>
@@ -242,6 +786,7 @@
                 </form>
             </div>
         </section>
+
         <section class="card">
             <h2>📅 Istoric Activitate și Vânzări</h2>
             <div class="single-calendar-box">
@@ -252,6 +797,7 @@
                 <div style="text-align: center; color: var(--text-muted); font-size: 0.75rem; padding: 10px;">Nicio înregistrare în intervalul selectat.</div>
             </div>
         </section>
+
         <section class="card">
             <h2>📋 Stoc Atelier</h2>
             <div class="filter-row">
@@ -267,11 +813,20 @@
             <div id="productsList"></div>
         </section>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ro.js"></script>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+        import {
+            getAuth,
+            signInWithEmailAndPassword,
+            signOut,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+
         const firebaseConfig = {
             apiKey: "AIzaSyDdI_ae-3iwkgxk9I-OMhgw_2OA3WtLwn8",
             authDomain: "vander-9e026.firebaseapp.com",
@@ -281,16 +836,19 @@
             messagingSenderId: "317349329202",
             appId: "1:317349329202:web:68ed0cdf0f75637801bf2b"
         };
+
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const auth = getAuth(app);
         const productsRef = ref(db, 'vander_produse');
         const historyRef = ref(db, 'vander_istoric');
-        const AUTH_KEY = 'vander_is_logged';
+
         let products = [];
         let historyLogs = [];
         const standardSizes = ["39", "40", "41", "42", "43", "44", "45"];
         let selectedStartDate = new Date().toISOString().split('T')[0];
         let selectedEndDate = new Date().toISOString().split('T')[0];
+
         flatpickr("#historyDateRange", {
             mode: "range",
             dateFormat: "Y-m-d",
@@ -308,18 +866,21 @@
                 }
             }
         });
+
         const loginOverlay = document.getElementById('loginOverlay');
         const appMainContent = document.getElementById('appMainContent');
         const loginForm = document.getElementById('loginForm');
         const logoutBtn = document.getElementById('logoutBtn');
         const sidebarLogoutBtn = document.getElementById('sidebarLogoutBtn');
         const syncStatus = document.getElementById('syncStatus');
+
         window.toggleSidebar = function() {
             const sidebar = document.getElementById('appSidebar');
             const overlay = document.getElementById('sidebarOverlay');
             sidebar.classList.toggle('open');
             overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
         }
+
         window.toggleAddProductForm = function() {
             const container = document.getElementById('formContainer');
             const icon = document.getElementById('accordionIcon');
@@ -331,51 +892,107 @@
                 icon.style.transform = 'rotate(180deg)';
             }
         }
+
         function filterByCategory(category) {
             const categoryFilter = document.getElementById('categoryFilter');
-            if (categoryFilter) { categoryFilter.value = category || ''; }
-            if (typeof renderProducts === 'function') renderProducts();
+            if (categoryFilter) {
+                categoryFilter.value = category || '';
+            }
+            if (typeof renderProducts === 'function') {
+                renderProducts();
+            }
             toggleSidebar();
             document.getElementById('productsList').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         window.filterByCategory = filterByCategory;
+
         function checkAuth() {
-            if (localStorage.getItem(AUTH_KEY) === 'true') {
-                loginOverlay.style.display = 'none';
-                appMainContent.style.display = 'block';
-                initRealtimeSync();
-            } else {
-                loginOverlay.style.display = 'flex';
-                appMainContent.style.display = 'none';
-            }
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    loginOverlay.style.display = 'none';
+                    appMainContent.style.display = 'block';
+                    initRealtimeSync();
+                } else {
+                    loginOverlay.style.display = 'flex';
+                    appMainContent.style.display = 'none';
+                    products = [];
+                    historyLogs = [];
+                    renderProducts();
+                    renderHistory();
+                }
+            });
         }
-        loginForm.addEventListener('submit', (e) => {
+
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const user = document.getElementById('loginUser').value.trim();
+
+            const email = document.getElementById('loginUser').value.trim();
             const pass = document.getElementById('loginPass').value.trim();
-            if (user === 'vander' && pass === 'atelier2026') {
-                localStorage.setItem(AUTH_KEY, 'true');
-                checkAuth();
-            } else {
-                alert('Utilizator sau parolă incorectă!');
+            const loginBtn = document.getElementById('loginBtn');
+
+            if (!email || !pass) {
+                alert('Introdu email și parolă.');
+                return;
+            }
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Se conectează...';
+
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+            } catch (error) {
+                console.error(error);
+                alert('Autentificare eșuată. Verificați email-ul și parola.');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Intră în Aplicație';
             }
         });
-        function handleLogout() {
-            localStorage.removeItem(AUTH_KEY);
-            checkAuth();
+
+        async function handleLogout() {
+            try {
+                await signOut(auth);
+                loginOverlay.style.display = 'flex';
+                appMainContent.style.display = 'none';
+            } catch (error) {
+                console.error(error);
+                alert('A apărut o eroare la ieșire.');
+            }
         }
+
         logoutBtn.addEventListener('click', handleLogout);
         sidebarLogoutBtn.addEventListener('click', handleLogout);
+
         checkAuth();
+
         function initRealtimeSync() {
             syncStatus.innerText = "⏳ Se sincronizează live...";
+
             onValue(productsRef, (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     products = Array.isArray(data) ? data : Object.values(data);
                 } else {
                     products = [
-                        { id: 1, name: "Pantofi Ceremonie din Piele Naturala", color: "Negru", sku: "053", price: 135, category: "Pantofi eleganți", image: "1.webp", notes: "", stock: { "39": 0, "40": 3, "41": 0, "42": 0, "43": 0, "44": 0 } }
+                        {
+                            id: 1,
+                            name: "Pantofi Ceremonie din Piele Naturala",
+                            color: "Negru",
+                            sku: "053",
+                            price: 135,
+                            category: "Pantofi eleganți",
+                            image: "1.webp",
+                            notes: "",
+                            stock: {
+                                "39": 0,
+                                "40": 0,
+                                "41": 0,
+                                "42": 0,
+                                "43": 0,
+                                "44": 0,
+                                "45": 0
+                            }
+                        }
                     ];
                     set(productsRef, products);
                 }
@@ -384,9 +1001,10 @@
             }, () => {
                 syncStatus.innerText = "● Eroare conexiune rețea";
             });
-            onValue(ref(db, 'vander_istoric'), (snapshot) => {
+
+            onValue(historyRef, (snapshot) => {
                 const data = snapshot.val();
-                if(data) {
+                if (data) {
                     historyLogs = Array.isArray(data) ? data : Object.values(data);
                 } else {
                     historyLogs = [];
@@ -394,11 +1012,13 @@
                 renderHistory();
             });
         }
+
         function saveToFirebase() {
             set(productsRef, products).catch(() => {
                 alert("Eroare la salvarea în baza de date online!");
             });
         }
+
         function logAction(actionText) {
             const now = new Date();
             const logEntry = {
@@ -410,6 +1030,7 @@
             historyLogs.unshift(logEntry);
             set(ref(db, 'vander_istoric'), historyLogs);
         }
+
         const sizesContainer = document.getElementById('sizesContainer');
         standardSizes.forEach(size => {
             sizesContainer.innerHTML += `
@@ -419,22 +1040,26 @@
                 </div>
             `;
         });
+
         function renderProducts() {
             const list = document.getElementById('productsList');
             list.innerHTML = '';
+
             const searchText = document.getElementById('searchInput').value.toLowerCase();
             const selectedCategory = document.getElementById('categoryFilter').value;
+
             let filtered = products.filter(p => {
                 if (!p) return false;
                 let matchesSearch = (p.name + (p.sku || '') + (p.color || '')).toLowerCase().includes(searchText);
                 let matchesCategory = !selectedCategory || p.category === selectedCategory;
                 return matchesSearch && matchesCategory;
             });
-            if(filtered.length === 0) {
+
+            if (filtered.length === 0) {
                 list.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">Niciun produs găsit.</div>`;
                 return;
             }
-            
+
             let totalPiecesAll = 0;
             let lowStockCount = 0;
 
@@ -445,18 +1070,17 @@
                 standardSizes.forEach(size => {
                     let qty = (p.stock && p.stock[size]) ? parseInt(p.stock[size]) || 0 : 0;
                     totalStock += qty;
-                    
+
                     let cellClass = "stock-cell-val";
                     if (qty > 0 && qty <= 4) {
                         cellClass += " low-stock";
                         lowStockCount++;
-                    } else if (qty === 0) {
-                        // opțional poți lăsa normal sau adăuga stil
                     }
 
                     sizeHeaders += `<div class="stock-cell-head">${size}</div>`;
                     sizeValues += `<div class="${cellClass}">${qty}</div>`;
                 });
+
                 totalPiecesAll += totalStock;
 
                 list.innerHTML += `
@@ -483,24 +1107,30 @@
                     </div>
                 `;
             });
+
             document.getElementById('statTotalModels').innerText = products.length;
             document.getElementById('statTotalPieces').innerText = totalPiecesAll;
             document.getElementById('statLowStock').innerText = lowStockCount;
         }
+
         window.stopSale = function(id, name) {
             logAction(`Oprire vânzare pentru modelul: ${name}`);
             alert(`S-a oprit vânzarea pentru ${name}`);
         }
+
         function renderHistory() {
             const container = document.getElementById('historyListContainer');
             let filteredLogs = historyLogs;
-            if(selectedStartDate && selectedEndDate) {
+
+            if (selectedStartDate && selectedEndDate) {
                 filteredLogs = filteredLogs.filter(l => l.date >= selectedStartDate && l.date <= selectedEndDate);
             }
-            if(filteredLogs.length === 0) {
+
+            if (filteredLogs.length === 0) {
                 container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.75rem; padding: 10px;">Nicio înregistrare în intervalul selectat.</div>`;
                 return;
             }
+
             container.innerHTML = '';
             filteredLogs.forEach(log => {
                 container.innerHTML += `
@@ -510,21 +1140,25 @@
                 `;
             });
         }
+
         window.deleteProd = function(id) {
-            if(confirm("Sigur ștergi definitiv acest produs?")) {
+            if (confirm("Sigur ștergi definitiv acest produs?")) {
                 let p = products.find(item => item.id === id);
-                if(p) logAction(`Șters produsul: ${p.name}`);
+                if (p) logAction(`Șters produsul: ${p.name}`);
                 products = products.filter(item => item && item.id !== id);
                 saveToFirebase();
             }
         }
+
         window.editProd = function(id) {
             const p = products.find(prod => prod && prod.id === id);
-            if(!p) return;
+            if (!p) return;
+
             const container = document.getElementById('formContainer');
             if (container.style.display !== 'block') {
                 toggleAddProductForm();
             }
+
             document.getElementById('editProductId').value = p.id;
             document.getElementById('prodName').value = p.name || '';
             document.getElementById('prodColor').value = p.color || '';
@@ -532,15 +1166,18 @@
             document.getElementById('prodPrice').value = p.price || '';
             document.getElementById('prodCategory').value = p.category || 'Pantofi sport';
             document.getElementById('prodNotes').value = p.notes || '';
+
             document.querySelectorAll('.size-input').forEach(inp => {
                 let size = inp.dataset.size;
                 inp.value = (p.stock && p.stock[size]) ? p.stock[size] : 0;
             });
+
             document.getElementById('formTitle').innerText = "✏️ Editează Produsul: " + p.name;
             document.getElementById('saveProductBtn').innerText = "Actualizează Produsul";
             document.getElementById('cancelEditBtn').style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
         window.cancelEdit = function() {
             document.getElementById('addProductForm').reset();
             document.getElementById('editProductId').value = '';
@@ -550,51 +1187,67 @@
             document.querySelectorAll('.size-input').forEach(inp => inp.value = 0);
             toggleAddProductForm();
         }
+
         document.getElementById('importCsvBtn').addEventListener('click', () => {
             const fileInput = document.getElementById('csvFileInput');
-            if(!fileInput.files[0]) {
+            if (!fileInput.files[0]) {
                 alert('Selectează un fișier CSV mai întâi!');
                 return;
             }
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 const lines = e.target.result.split('\n');
                 let count = 0;
+
                 lines.forEach((line, index) => {
-                    if(index === 0 || !line.trim()) return;
+                    if (index === 0 || !line.trim()) return;
+
                     const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-                    if(cols.length >= 5) {
+                    if (cols.length >= 5) {
                         products.push({
                             id: Date.now() + Math.random(),
-                            name: cols[0], color: cols[1], sku: cols[2],
-                            price: parseFloat(cols[3]) || 0, category: cols[4],
-                            notes: cols[12] || 'Importat CSV', image: '',
+                            name: cols[0],
+                            color: cols[1],
+                            sku: cols[2],
+                            price: parseFloat(cols[3]) || 0,
+                            category: cols[4],
+                            notes: cols[12] || 'Importat CSV',
+                            image: '',
                             stock: {
-                                "39": parseInt(cols[5]) || 0, "40": parseInt(cols[6]) || 0,
-                                "41": parseInt(cols[7]) || 0, "42": parseInt(cols[8]) || 0,
-                                "43": parseInt(cols[9]) || 0, "44": parseInt(cols[10]) || 0,
+                                "39": parseInt(cols[5]) || 0,
+                                "40": parseInt(cols[6]) || 0,
+                                "41": parseInt(cols[7]) || 0,
+                                "42": parseInt(cols[8]) || 0,
+                                "43": parseInt(cols[9]) || 0,
+                                "44": parseInt(cols[10]) || 0,
                                 "45": parseInt(cols[11]) || 0
                             }
                         });
                         count++;
                     }
                 });
+
                 saveToFirebase();
                 logAction(`Importat fișier CSV cu ${count} produse.`);
                 alert(`Importate ${count} produse cu succes în baza de date online!`);
             };
+
             reader.readAsText(fileInput.files[0]);
         });
+
         document.getElementById('addProductForm').addEventListener('submit', (e) => {
             e.preventDefault();
+
             let editId = document.getElementById('editProductId').value;
             let stock = {};
             document.querySelectorAll('.size-input').forEach(inp => {
                 let val = parseInt(inp.value) || 0;
-                if(val > 0) {
+                if (val > 0) {
                     stock[inp.dataset.size] = val;
                 }
             });
+
             const prodNameVal = document.getElementById('prodName').value;
             const prodData = {
                 name: prodNameVal,
@@ -605,11 +1258,13 @@
                 notes: document.getElementById('prodNotes').value,
                 stock: stock
             };
+
             const fileInput = document.getElementById('prodImgFile');
+
             function finishSave(imageUrl) {
-                if(editId) {
+                if (editId) {
                     products = products.map(p => {
-                        if(p && p.id == editId) {
+                        if (p && p.id == editId) {
                             return {
                                 ...p,
                                 ...prodData,
@@ -628,11 +1283,13 @@
                     products.push(newProd);
                     logAction(`Adăugat produs nou: ${prodNameVal}`);
                 }
+
                 saveToFirebase();
                 cancelEdit();
                 alert(editId ? 'Produs actualizat cu succes!' : 'Produs salvat cu succes!');
             }
-            if(fileInput.files[0]) {
+
+            if (fileInput.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(evt) {
                     finishSave(evt.target.result);
@@ -640,13 +1297,14 @@
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
                 let existingImg = undefined;
-                if(editId) {
+                if (editId) {
                     let oldP = products.find(p => p && p.id == editId);
-                    if(oldP) existingImg = oldP.image;
+                    if (oldP) existingImg = oldP.image;
                 }
                 finishSave(existingImg);
             }
         });
+
         document.getElementById('searchInput').addEventListener('input', renderProducts);
         document.getElementById('categoryFilter').addEventListener('change', renderProducts);
     </script>
