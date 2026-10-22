@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Evidență Implanturi și Bonturi Protetice - Cabinet Stomatologic</title>
+    <title>Hope Smile - Evidență Implanturi și Bonturi Protetice</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -15,8 +15,8 @@
                             50: '#f0f9ff',
                             100: '#e0f2fe',
                             500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
+                            600: '#475569',
+                            700: '#334155',
                         }
                     }
                 }
@@ -45,15 +45,19 @@
 
     <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <!-- Logo Hope Smile -->
             <div class="flex items-center space-x-3">
-                <div class="bg-brand-600 text-white p-2.5 rounded-xl shadow-md">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold text-slate-900 tracking-tight">Cabinet Stomatologic</h1>
-                    <p class="text-xs text-slate-500">Registru Digital Implanturi & Bonturi Protetice</p>
+                <div class="flex flex-col">
+                    <div class="flex items-baseline">
+                        <span class="text-3xl font-bold tracking-tight text-slate-700">hope</span>
+                        <div class="ml-1 flex flex-col">
+                            <span class="text-[9px] font-bold tracking-widest text-slate-500 uppercase -mb-1">smile</span>
+                            <svg class="w-8 h-3 text-slate-600" viewBox="0 0 100 35" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round">
+                                <path d="M5 5 C 35 40, 65 40, 95 5"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <span class="text-[10px] font-medium tracking-wider text-slate-500 uppercase -mt-1">Creatori de zâmbete</span>
                 </div>
             </div>
 
@@ -63,7 +67,7 @@
                     <span id="statusText">Se conectează la Cloud...</span>
                 </div>
 
-                <button onclick="openModal()" class="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-brand-500/20 transition-all flex items-center gap-2">
+                <button onclick="openModal()" class="bg-slate-700 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-slate-700/20 transition-all flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
@@ -80,7 +84,7 @@
                     <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Implanturi</p>
                     <h3 id="statTotal" class="text-3xl font-bold text-slate-900 mt-1">0</h3>
                 </div>
-                <div class="bg-sky-50 text-brand-600 p-3 rounded-xl">
+                <div class="bg-sky-50 text-slate-700 p-3 rounded-xl">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h8M8 12h8M8 17h5"></path>
                     </svg>
@@ -132,7 +136,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                     </span>
-                    <input type="text" id="searchInput" oninput="filterData()" placeholder="Caută după pacient sau brand implant..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
+                    <input type="text" id="searchInput" oninput="filterData()" placeholder="Caută după pacient sau brand implant..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-500" />
                 </div>
                 <div class="text-xs text-slate-500 font-medium">
                     Sincronizare în timp real activată
@@ -149,6 +153,8 @@
                             <th class="py-3.5 px-6">Tip / Brand Implant</th>
                             <th class="py-3.5 px-6">Bont Protetic</th>
                             <th class="py-3.5 px-6">Furnizor Bont</th>
+                            <th class="py-3.5 px-6">Adiție Osoasă</th>
+                            <th class="py-3.5 px-6">Capă Vindecare</th>
                             <th class="py-3.5 px-6">Următoarea Vizită (6-8 luni)</th>
                             <th class="py-3.5 px-6 text-right">Acțiuni</th>
                         </tr>
@@ -175,29 +181,29 @@
             <form id="implantForm" onsubmit="handleFormSubmit(event)" class="p-6 space-y-4">
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Nume și Prenume Pacient</label>
-                    <input type="text" id="numePacient" required placeholder="Ex: Popescu Ion" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
+                    <input type="text" id="numePacient" required placeholder="Ex: Popescu Ion" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-500" />
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Data Implantului</label>
-                        <input type="date" id="dataInplantului" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
+                        <input type="date" id="dataInplantului" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-500" />
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Cadran / Dinte</label>
-                        <input type="text" id="cadran" required placeholder="Ex: Cadran 1 / 1.6" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
+                        <input type="text" id="cadran" required placeholder="Ex: Cadran 1 / 1.6" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-500" />
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Tip / Brand Implant</label>
-                    <input type="text" id="tipImplant" required placeholder="Ex: Straumann BLT 4.1" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
+                    <input type="text" id="tipImplant" required placeholder="Ex: Straumann BLT 4.1" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-500" />
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">A primit bont protetic?</label>
-                        <select id="bontProtetic" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <select id="bontProtetic" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-500">
                             <option value="Da">Da</option>
                             <option value="Nu">Nu</option>
                         </select>
@@ -205,16 +211,27 @@
 
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Furnizor Bont Protetic</label>
-                        <select id="facturareBont" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <select id="facturareBont" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-500">
                             <option value="Inovation Dent">1 - Inovation Dent</option>
                             <option value="Custom Dental">2 - Custom Dental</option>
                         </select>
                     </div>
                 </div>
 
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Adiție Osoasă</label>
+                        <input type="text" id="aditieOsoasa" placeholder="Ex: Da - 0.5g / Nu" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-500" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Capă Vindecare</label>
+                        <input type="text" id="capaVindecare" placeholder="Ex: 4x5mm / Nu" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-500" />
+                    </div>
+                </div>
+
                 <div class="pt-4 flex justify-end space-x-3">
                     <button type="button" onclick="closeModal()" class="px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-all">Anulează</button>
-                    <button type="submit" class="px-5 py-2.5 text-sm font-semibold bg-brand-600 hover:bg-brand-700 text-white rounded-xl shadow-lg shadow-brand-500/20 transition-all">Salvează Înregistrarea</button>
+                    <button type="submit" class="px-5 py-2.5 text-sm font-semibold bg-slate-700 hover:bg-slate-800 text-white rounded-xl shadow-lg shadow-slate-700/20 transition-all">Salvează Înregistrarea</button>
                 </div>
             </form>
         </div>
@@ -225,7 +242,7 @@
             <h4 id="customModalTitle" class="text-lg font-bold text-slate-900 mb-2">Notificare</h4>
             <p id="customModalText" class="text-sm text-slate-600 mb-6">Mesaj...</p>
             <div id="customModalButtons" class="flex justify-center space-x-3">
-                <button onclick="closeCustomModal()" class="px-5 py-2 bg-brand-600 text-white rounded-xl text-sm font-semibold hover:bg-brand-700">OK</button>
+                <button onclick="closeCustomModal()" class="px-5 py-2 bg-slate-700 text-white rounded-xl text-sm font-semibold hover:bg-slate-800">OK</button>
             </div>
         </div>
     </div>
@@ -233,7 +250,7 @@
     <div id="toastContainer" class="fixed bottom-5 right-5 z-[60] flex flex-col gap-3"></div>
 
     <footer class="bg-white border-t border-slate-200 py-4 mt-12 text-center text-xs text-slate-400">
-        Cabinet Stomatologic &bull; Sistem Gestiune Implanturi & Bonturi Protetice
+        Hope Smile &bull; Sistem Gestiune Implanturi & Bonturi Protetice
     </footer>
 
     <script type="module">
@@ -357,7 +374,6 @@
     </script>
 
     <script>
-        // Funcție pentru calculul automatei următoarei vizite (6 luni de la implant)
         function calculateNextVisit(dateStr) {
             if (!dateStr) return "-";
             const d = new Date(dateStr);
@@ -375,7 +391,7 @@
             let customCount = 0;
 
             if (data.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="8" class="text-center py-12 text-slate-400">Nu există înregistrări în sistem.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="10" class="text-center py-12 text-slate-400">Nu există înregistrări în sistem.</td></tr>`;
             } else {
                 data.forEach((item) => {
                     if (item.bontProtetic === "Da") abutmentYesCount++;
@@ -401,7 +417,9 @@
                         <td class="py-3.5 px-6 text-slate-600">${escapeHTML(item.tipImplant)}</td>
                         <td class="py-3.5 px-6"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${badgeClass}">${escapeHTML(item.bontProtetic)}</span></td>
                         <td class="py-3.5 px-6"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${billingBadge}">${escapeHTML(item.facturareBont)}</span></td>
-                        <td class="py-3.5 px-6 font-medium text-indigo-600">${escapeHTML(nextVisitDate)}</td>
+                        <td class="py-3.5 px-6 text-slate-600">${escapeHTML(item.aditieOsoasa || '-')}</td>
+                        <td class="py-3.5 px-6 text-slate-600">${escapeHTML(item.capaVindecare || '-')}</td>
+                        <td class="py-3.5 px-6 font-medium text-slate-700">${escapeHTML(nextVisitDate)}</td>
                         <td class="py-3.5 px-6 text-right">
                             <button onclick="confirmDelete('${item.id}')" class="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg transition-colors" title="Șterge">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -452,7 +470,9 @@
                 cadran: document.getElementById("cadran").value.trim(),
                 tipImplant: document.getElementById("tipImplant").value.trim(),
                 bontProtetic: document.getElementById("bontProtetic").value,
-                facturareBont: document.getElementById("facturareBont").value
+                facturareBont: document.getElementById("facturareBont").value,
+                aditieOsoasa: document.getElementById("aditieOsoasa").value.trim(),
+                capaVindecare: document.getElementById("capaVindecare").value.trim()
             };
 
             if (!payload.numePacient || !payload.dataInplantului || !payload.tipImplant || !payload.cadran) {
@@ -505,7 +525,7 @@
                 document.getElementById("modalConfirmBtn").onclick = onConfirm;
             } else {
                 buttonsDiv.innerHTML = `
-                    <button onclick="closeCustomModal()" class="px-5 py-2 bg-brand-600 text-white rounded-xl text-sm font-semibold hover:bg-brand-700">OK</button>
+                    <button onclick="closeCustomModal()" class="px-5 py-2 bg-slate-700 text-white rounded-xl text-sm font-semibold hover:bg-slate-800">OK</button>
                 `;
             }
 
