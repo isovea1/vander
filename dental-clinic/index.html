@@ -234,18 +234,11 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import {
-            getAuth,
-            signInAnonymously,
-            onAuthStateChanged
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import {
             getDatabase,
             ref,
             push,
             remove,
-            onValue,
-            query,
-            orderByChild
+            onValue
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
         const firebaseConfig = {
@@ -260,11 +253,9 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getDatabase(app);
 
         let allImplantData = [];
-        const LOCAL_FALLBACK_KEY = "implanturi_cabinet_fallback";
 
         function showToast(message, type = "info") {
             const container = document.getElementById("toastContainer");
@@ -307,35 +298,6 @@
             }
         }
 
-        function getLocalFallbackData() {
-            try {
-                return JSON.parse(localStorage.getItem(LOCAL_FALLBACK_KEY)) || [];
-            } catch (e) {
-                return [];
-            }
-        }
-
-        function saveLocalFallbackData(data) {
-            localStorage.setItem(LOCAL_FALLBACK_KEY, JSON.stringify(data));
-        }
-
-        async function initFirebase() {
-            try {
-                await signInAnonymously(auth);
-
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        startRealtimeSync();
-                    } else {
-                        setConnectionStatus("error", "Autentificare eșuată");
-                    }
-                });
-            } catch (error) {
-                console.error("Firebase auth error:", error);
-                setConnectionStatus("error", "Eroare autentificare");
-            }
-        }
-
         function startRealtimeSync() {
             const implantRef = ref(db, "implanturi_cabinet");
             
@@ -345,7 +307,6 @@
                     allImplantData.push({ id: childSnap.key, ...childSnap.val() });
                 });
 
-                // Sortează descrescător după data creării
                 allImplantData.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
                 setConnectionStatus("success", "Sincronizare activă");
@@ -374,15 +335,6 @@
         }
 
         async function deleteImplantFromCloud(id) {
-            if (id.startsWith("local_")) {
-                const local = getLocalFallbackData().filter((item) => item.id !== id);
-                saveLocalFallbackData(local);
-                allImplantData = local;
-                renderTableAndStats(local);
-                showToast("Înregistrarea locală a fost ștearsă.", "success");
-                return;
-            }
-
             try {
                 await remove(ref(db, "implanturi_cabinet/" + id));
                 showToast("Înregistrarea a fost ștearsă din cloud.", "success");
@@ -396,7 +348,8 @@
         window.deleteImplantFromCloud = deleteImplantFromCloud;
         window.getAllData = () => allImplantData;
 
-        initFirebase();
+        // Pornire directă fără autentificare blocantă
+        startRealtimeSync();
     </script>
 
     <script>
